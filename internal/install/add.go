@@ -41,6 +41,8 @@ type Deps struct {
 	Rename func(oldpath, newpath string) error
 	// Cwd is where project scope is resolved from; empty means os.Getwd.
 	Cwd string
+	// Global selects the global scope for Sync and Remove.
+	Global bool
 }
 
 // AddRequest is one `cali add` invocation.
@@ -212,12 +214,8 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	if sc.scope == targets.Project {
-		for _, p := range []string{sc.manifest, sc.lockPath} {
-			if fi, err := os.Lstat(p); err == nil && fi.Mode()&os.ModeSymlink != 0 {
-				return Result{}, fmt.Errorf("%s is a symlink; Cali does not write through symlinks in a project", p)
-			}
-		}
+	if err := checkScopeFiles(sc); err != nil {
+		return Result{}, err
 	}
 	m, err := manifest.ReadWith(sc.manifest, opts)
 	created := false
@@ -236,16 +234,9 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 		return Result{}, err
 	}
 
-	repo, err := gitx.Open(d.Dirs.Cache, spec)
+	repo, err := openFetch(ctx, d, spec)
 	if err != nil {
 		return Result{}, err
-	}
-	getenv := d.Getenv
-	if getenv == nil {
-		getenv = func(string) string { return "" }
-	}
-	if err := repo.Fetch(ctx, gitx.AuthEnv(host(spec.URL), getenv, d.GhToken)); err != nil {
-		return Result{}, fmt.Errorf("fetch %s: %w", spec.URL, err)
 	}
 	commit, err := repo.Resolve(spec.Ref)
 	if err != nil {
@@ -361,26 +352,9 @@ func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit st
 		}
 		return nil, fmt.Errorf("name %q already installed from %s; remove it first or pass --replace", name, prev.Source)
 	}
-	tree, err := repo.TreeSHA(commit, p)
+	tree, t, err := exportSkill(repo, commit, p, name)
 	if err != nil {
 		return nil, err
-	}
-	t, err := repo.Export(commit, p)
-	if err != nil {
-		return nil, fmt.Errorf("skill %q: %w", name, err)
-	}
-	var md []byte
-	for _, f := range t {
-		if f.Path == "SKILL.md" {
-			md = f.Data
-		}
-	}
-	fm, err := skillfs.ParseFrontmatter(md)
-	if err != nil {
-		return nil, fmt.Errorf("skill %q: %w", name, err)
-	}
-	if fm.Name != name {
-		return nil, fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name)
 	}
 
 	pl := &plan{name: name, path: p, tree: tree, tree0: t, source: manifestSource(req.Spec, spec, p)}
@@ -416,6 +390,62 @@ func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit st
 		}
 	}
 	return pl, nil
+}
+
+// exportSkill reads the skill folder p at commit and checks that its
+// SKILL.md frontmatter names it name.
+func exportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree, error) {
+	tree, err := repo.TreeSHA(commit, p)
+	if err != nil {
+		return "", nil, err
+	}
+	t, err := repo.Export(commit, p)
+	if err != nil {
+		return "", nil, fmt.Errorf("skill %q: %w", name, err)
+	}
+	var md []byte
+	for _, f := range t {
+		if f.Path == "SKILL.md" {
+			md = f.Data
+		}
+	}
+	fm, err := skillfs.ParseFrontmatter(md)
+	if err != nil {
+		return "", nil, fmt.Errorf("skill %q: %w", name, err)
+	}
+	if fm.Name != name {
+		return "", nil, fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name)
+	}
+	return tree, t, nil
+}
+
+// checkScopeFiles refuses a symlinked manifest or lock in project scope.
+func checkScopeFiles(sc scope) error {
+	if sc.scope != targets.Project {
+		return nil
+	}
+	for _, p := range []string{sc.manifest, sc.lockPath} {
+		if fi, err := os.Lstat(p); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+			return fmt.Errorf("%s is a symlink; Cali does not write through symlinks in a project", p)
+		}
+	}
+	return nil
+}
+
+// openFetch opens the cache mirror for spec and fetches it.
+func openFetch(ctx context.Context, d Deps, spec source.Spec) (*gitx.Repo, error) {
+	repo, err := gitx.Open(d.Dirs.Cache, spec)
+	if err != nil {
+		return nil, err
+	}
+	getenv := d.Getenv
+	if getenv == nil {
+		getenv = func(string) string { return "" }
+	}
+	if err := repo.Fetch(ctx, gitx.AuthEnv(host(spec.URL), getenv, d.GhToken)); err != nil {
+		return nil, fmt.Errorf("fetch %s: %w", spec.URL, err)
+	}
+	return repo, nil
 }
 
 // existing reports whether final already exists as an unmanaged folder that

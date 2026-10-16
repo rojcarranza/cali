@@ -201,3 +201,27 @@ func TestStatusExitCode(t *testing.T) {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 }
+
+func TestSyncAndRemoveCommands(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	dir := filepath.Join(project, ".claude", "skills", "x")
+	if err := os.RemoveAll(dir); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, errs := run("sync", "--frozen"); code != 0 || out != "installed x (claude)\n" {
+		t.Fatalf("sync: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, _, errs := run("remove", "nope"); code != 1 || !strings.Contains(errs, `"nope"`) {
+		t.Fatalf("remove nope: code=%d err=%q", code, errs)
+	}
+	code, out, errs := run("remove", "x")
+	if code != 0 || !strings.Contains(out, "backed up x (claude) to "+filepath.Join(os.Getenv("CALI_DATA_DIR"), "backups", "x")) {
+		t.Fatalf("remove: code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Lstat(dir); !os.IsNotExist(err) {
+		t.Fatal("folder not removed")
+	}
+}
