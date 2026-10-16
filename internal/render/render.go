@@ -110,12 +110,22 @@ func (t Table) Render(w io.Writer, m Mode) {
 
 // WriteJSON writes v (a struct or map) as indented JSON with "schema_version": 1 as the first key.
 func WriteJSON(w io.Writer, v any) error {
-	raw, err := json.Marshal(v)
-	if err != nil {
+	var enc bytes.Buffer
+	e := json.NewEncoder(&enc)
+	e.SetEscapeHTML(false)
+	if err := e.Encode(v); err != nil {
 		return err
 	}
+	raw := bytes.TrimSpace(enc.Bytes())
 	if len(raw) < 2 || raw[0] != '{' {
 		return errors.New("render: JSON output must be an object")
+	}
+	var keys map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &keys); err != nil {
+		return err
+	}
+	if _, dup := keys["schema_version"]; dup {
+		return errors.New(`render: value already has a "schema_version" key`)
 	}
 	body := `{"schema_version":1`
 	if len(raw) > 2 {
@@ -126,6 +136,6 @@ func WriteJSON(w io.Writer, v any) error {
 		return err
 	}
 	out.WriteByte('\n')
-	_, err = w.Write(out.Bytes())
+	_, err := w.Write(out.Bytes())
 	return err
 }

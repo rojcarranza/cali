@@ -70,3 +70,25 @@ func TestJSONHasSchemaVersion(t *testing.T) {
 		t.Fatalf("struct order: %q", b.String())
 	}
 }
+
+func TestWriteJSONRejectsSchemaVersion(t *testing.T) {
+	type st struct {
+		V int `json:"schema_version"`
+	}
+	for _, v := range []any{st{7}, map[string]any{"schema_version": 7}} {
+		var b bytes.Buffer
+		if err := WriteJSON(&b, v); err == nil || b.Len() != 0 {
+			t.Fatalf("%T: want error and no output, got %v %q", v, err, b.String())
+		}
+	}
+}
+
+func TestWriteJSONNoHTMLEscape(t *testing.T) {
+	var b bytes.Buffer
+	if err := WriteJSON(&b, map[string]string{"u": "a<b>&c"}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(b.String(), `"a<b>&c"`) {
+		t.Fatalf("escaped: %q", b.String())
+	}
+}
