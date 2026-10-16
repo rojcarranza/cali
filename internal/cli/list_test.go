@@ -116,3 +116,33 @@ func TestListNoManifest(t *testing.T) {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 }
+
+func TestFind(t *testing.T) {
+	repoURL, project := setup(t)
+	manifest := "version: 1\nsources:\n  - " + repoURL + "\n  - file:///does/not/exist\nskills:\n  x:\n    source: " + repoURL + "//skills/x\n"
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte(manifest), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := run("find", "X", "--json")
+	if code != 0 {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+	var got struct {
+		Hits []struct{ Name, Source, Path, Description string }
+	}
+	if err := json.Unmarshal([]byte(out), &got); err != nil {
+		t.Fatalf("%v: %q", err, out)
+	}
+	if len(got.Hits) != 1 || got.Hits[0].Name != "x" || got.Hits[0].Path != "skills/x" || got.Hits[0].Source != repoURL {
+		t.Fatalf("hits = %+v", got.Hits)
+	}
+	if !strings.Contains(errs, "warning: file:///does/not/exist: ") {
+		t.Fatalf("stderr = %q", errs)
+	}
+	if code, _, _ := run("find", ""); code != 1 {
+		t.Fatalf("empty query: code=%d", code)
+	}
+	if code, out, _ := run("find", "zzz", "--offline"); code != 0 || !strings.HasPrefix(out, "NAME") {
+		t.Fatalf("offline: code=%d out=%q", code, out)
+	}
+}

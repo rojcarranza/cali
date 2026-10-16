@@ -420,3 +420,34 @@ func (r *Repo) ListSkillDirs(commit string, maxDepth int) ([]string, error) {
 	sort.Strings(dirs)
 	return dirs, nil
 }
+
+// URL returns the source URL the mirror was opened for.
+func (r *Repo) URL() string { return r.url }
+
+// ReadFile returns the regular file at path in commit. The size is taken from
+// the tree listing and a file over the skillfs.MaxFileSize limit is refused
+// before its blob is read.
+func (r *Repo) ReadFile(commit, path string) ([]byte, error) {
+	if !hex40.MatchString(commit) {
+		return nil, fmt.Errorf("invalid commit %q", commit)
+	}
+	ctx := context.Background()
+	out, err := r.git(ctx, r.env, "ls-tree", "-z", "-l", commit, "--", path)
+	if err != nil {
+		return nil, err
+	}
+	meta, name, ok := bytes.Cut(bytes.TrimSuffix(out, []byte{0}), []byte{'\t'})
+	fields := strings.Fields(string(meta))
+	if !ok || len(fields) != 4 || string(name) != path || fields[1] != "blob" ||
+		(fields[0] != "100644" && fields[0] != "100755") {
+		return nil, fmt.Errorf("%q is not a regular file at commit %s", path, commit)
+	}
+	size, err := strconv.ParseInt(fields[3], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%q: bad size in tree listing", path)
+	}
+	if size > limits.file {
+		return nil, fmt.Errorf("%q: file is %d bytes, limit is %d", path, size, limits.file)
+	}
+	return r.git(ctx, r.env, "cat-file", "blob", fields[2])
+}
