@@ -91,7 +91,8 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		return Proposal{}, err
 	}
 	m, err := manifest.ReadWith(loc.Manifest, opts)
-	if errors.Is(err, os.ErrNotExist) {
+	noManifest := errors.Is(err, os.ErrNotExist)
+	if noManifest {
 		m, err = manifest.Manifest{Version: 1, Skills: map[string]manifest.Skill{}}, nil
 	}
 	if err != nil {
@@ -100,6 +101,9 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	l, err := lock.Read(loc.LockPath)
 	if err != nil {
 		return Proposal{}, err
+	}
+	if noManifest && len(l.Skills) > 0 {
+		return Proposal{}, fmt.Errorf("%s not found but %s has skills; restore the manifest first", loc.Manifest, loc.LockPath)
 	}
 	names := slices.Clone(o.Names)
 	if len(names) == 0 {
@@ -306,6 +310,9 @@ func (p Proposal) Conflicts() int {
 	return n
 }
 
+// baseLostHint is what dry run and apply say for a lost base: sync can often rebuild it.
+const baseLostHint = "base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream"
+
 func short(c string) string { return c[:min(7, len(c))] }
 
 // shellArg quotes s for a POSIX shell unless it is plainly safe: paths come
@@ -334,7 +341,7 @@ func (p Proposal) WriteText(w io.Writer, global bool) error {
 			continue
 		case s.BaseLost:
 			n++
-			fmt.Fprintf(&b, "%s: base lost, use --take-upstream\n", s.Name)
+			fmt.Fprintf(&b, "%s: %s\n", s.Name, baseLostHint)
 			continue
 		}
 		n++

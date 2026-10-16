@@ -1,7 +1,6 @@
 package update
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -29,8 +28,14 @@ type job struct {
 }
 
 // swapped is a folder already replaced; old is where the previous one waits
-// (empty when there was none).
-type swapped struct{ dir, old string }
+// (empty when there was none) and ours is what it held when it was backed up.
+type swapped struct {
+	dir, old string
+	ours     skillfs.Tree
+}
+
+// beforeCleanup, when set by a test, runs before a moved-aside folder is removed.
+var beforeCleanup func(old string)
 
 // Apply writes the update planned in p (design §5 steps 4 to 6). Every
 // conflict must be resolved, by p.Opts or by prompt (nil: never asks), before
@@ -67,7 +72,7 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 			kept = append(kept, s.Name+": base lost, kept the installed folder")
 			continue
 		case s.BaseLost && !o.TakeUpstream:
-			open = append(open, "  "+s.Name+": base lost, use --take-upstream")
+			open = append(open, "  "+s.Name+": "+baseLostHint)
 			continue
 		case s.BaseLost:
 			for _, tp := range s.lost {
@@ -127,7 +132,7 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 
 	// No local edit is lost: back up every folder that differs from its base.
 	for _, j := range jobs {
-		if !j.exists || (!j.lost && sameBytes(j.base, j.ours)) { // a line-ending-only edit is still an edit
+		if !j.exists || (!j.lost && skillfs.SameBytes(j.base, j.ours)) { // a line-ending-only edit is still an edit
 			continue
 		}
 		var patch []byte
@@ -198,6 +203,14 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	}
 	for _, sw := range done {
 		if sw.old != "" {
+			if beforeCleanup != nil {
+				beforeCleanup(sw.old)
+			}
+			// An edit saved into old after the swap is not in the backup: keep it.
+			if cur, err := skillfs.ReadDir(sw.old); err != nil || !skillfs.SameBytes(cur, sw.ours) {
+				_, _ = fmt.Fprintf(out, "kept %s: it changed during the update\n", sw.old)
+				continue
+			}
 			_ = os.RemoveAll(sw.old) // best effort: the update itself is complete
 		}
 	}
@@ -331,7 +344,7 @@ func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job
 // root set (project scope) it refuses a symlink anywhere from root to the
 // parent, checked again here because the tree may have changed since planning.
 func swap(j job, rename func(string, string) error, root string) (swapped, error) {
-	sw := swapped{dir: j.dir}
+	sw := swapped{dir: j.dir, ours: j.ours}
 	parent := filepath.Dir(j.dir)
 	if err := os.MkdirAll(parent, 0o755); err != nil {
 		return sw, err
@@ -367,7 +380,7 @@ func swap(j job, rename func(string, string) error, root string) (swapped, error
 			return sw, fmt.Errorf("move %s aside: %w", j.dir, err)
 		}
 		// An edit saved after the backup would be deleted with old: put it back and stop.
-		if cur, err := skillfs.ReadDir(old); err != nil || !sameBytes(cur, j.ours) {
+		if cur, err := skillfs.ReadDir(old); err != nil || !skillfs.SameBytes(cur, j.ours) {
 			_ = os.RemoveAll(staging)
 			if rerr := rename(old, j.dir); rerr != nil {
 				return sw, fmt.Errorf("%s changed while updating and could not be moved back; it is at %s: %w", j.dir, old, rerr)
@@ -387,17 +400,4 @@ func swap(j job, rename func(string, string) error, root string) (swapped, error
 		return sw, err
 	}
 	return sw, nil
-}
-
-// sameBytes compares trees byte for byte: same paths, exec bits and data.
-func sameBytes(a, b skillfs.Tree) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i].Path != b[i].Path || a[i].Exec != b[i].Exec || !bytes.Equal(a[i].Data, b[i].Data) {
-			return false
-		}
-	}
-	return true
 }

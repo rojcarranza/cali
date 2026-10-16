@@ -388,7 +388,7 @@ func TestBaseLostNeedsTakeUpstream(t *testing.T) {
 		t.Fatal(err)
 	}
 	before := f.snapshot(t)
-	if _, err := f.apply(t, Options{}, nil); err == nil || !strings.Contains(err.Error(), "x: base lost, use --take-upstream") {
+	if _, err := f.apply(t, Options{}, nil); err == nil || !strings.Contains(err.Error(), "x: base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream") {
 		t.Fatalf("err = %v", err)
 	}
 	sameSnapshot(t, before, f.snapshot(t))
@@ -554,5 +554,40 @@ func TestSwapRefusesSymlinkSwappedIn(t *testing.T) {
 	}
 	if got := read(t, filepath.Join(elsewhere, "x", "a.md")); got != "a\n" {
 		t.Fatalf("write went through the symlink: a.md = %q", got)
+	}
+}
+
+func TestChangedOldFolderIsKept(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	f.upstream(t, map[string]string{"more.md": "more\n"})
+	var old string
+	beforeCleanup = func(p string) {
+		old = p
+		write(t, p, "late.md", "saved late\n")
+	}
+	t.Cleanup(func() { beforeCleanup = nil })
+	out, err := f.apply(t, Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := read(t, filepath.Join(old, "late.md")); got != "saved late\n" {
+		t.Fatalf("late.md = %q", got)
+	}
+	if !strings.Contains(out, "kept "+old+": it changed during the update\n") || !strings.Contains(out, "updated x ") {
+		t.Fatalf("out = %q", out)
+	}
+}
+
+func TestUnchangedOldFolderIsRemoved(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	f.upstream(t, map[string]string{"more.md": "more\n"})
+	var old string
+	beforeCleanup = func(p string) { old = p }
+	t.Cleanup(func() { beforeCleanup = nil })
+	if _, err := f.apply(t, Options{}, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Lstat(old); old == "" || !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("old folder %q not removed: %v", old, err)
 	}
 }

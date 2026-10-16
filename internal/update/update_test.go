@@ -319,7 +319,7 @@ func TestPlanBaseLost(t *testing.T) {
 	if err := p.WriteText(&out, false); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasPrefix(out.String(), "x: base lost, use --take-upstream\n") {
+	if !strings.HasPrefix(out.String(), "x: base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream\n") {
 		t.Fatalf("out = %q", out.String())
 	}
 }
@@ -449,5 +449,16 @@ func TestPlanWarnsAboutLeftovers(t *testing.T) {
 	}
 	if _, err := os.Lstat(left); err != nil {
 		t.Fatalf("leftover removed: %v", err)
+	}
+}
+
+func TestPlanRefusesLockWithoutManifest(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	manifestPath := filepath.Join(f.d.Cwd, "cali.yaml")
+	if err := os.Remove(manifestPath); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Plan(context.Background(), f.d, Options{}); err == nil || !strings.Contains(err.Error(), manifestPath) {
+		t.Fatalf("err = %v, want an error naming %s", err, manifestPath)
 	}
 }
