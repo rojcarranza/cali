@@ -42,6 +42,14 @@ func TestParseErrors(t *testing.T) {
 		{"github:o/", "repo"},
 		{"github:o", "repo"},
 		{"https://h//p", "owner"},
+		{"https://../../x", "host"},
+		{"https://../o/r", "host"},
+		{"github:../x", "owner"},
+		{"github:o/..", "repo"},
+		{"github:o/r%2f", "repo"},
+		{"https://-h/o/r", "host"},
+		{"https://h/-o/r", "owner"},
+		{"https://h:/o/r", "host"},
 	}
 	for _, c := range cases {
 		_, err := Parse(c.in)

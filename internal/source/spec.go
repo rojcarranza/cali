@@ -85,6 +85,9 @@ func ParseWith(s string, o Options) (Spec, error) {
 		if parts[0] == "" {
 			return Spec{}, reject("empty host")
 		}
+		if !validPart(parts[0], true) {
+			return Spec{}, reject("host is invalid")
+		}
 		owner, repo, err := ownerRepo(parts[1:])
 		if err != nil {
 			return Spec{}, err
@@ -129,6 +132,12 @@ func ownerRepo(parts []string) (owner, repo string, err error) {
 	if repo == "" {
 		return "", "", reject("empty repo")
 	}
+	if !validPart(owner, false) {
+		return "", "", reject("owner is invalid")
+	}
+	if !validPart(repo, false) {
+		return "", "", reject("repo is invalid")
+	}
 	if len(parts) > 2 {
 		if extra := parts[2]; !strings.ContainsAny(extra, "@:") {
 			return "", "", reject("want exactly owner/repo, got extra segment " + strconv.Quote(extra))
@@ -136,6 +145,29 @@ func ownerRepo(parts []string) (owner, repo string, err error) {
 		return "", "", reject("want exactly owner/repo, got extra segment")
 	}
 	return owner, repo, nil
+}
+
+// validPart reports whether a host, owner or repo is made of [A-Za-z0-9._-]
+// only (a host may add :<port>), is not . or .. and does not start with -.
+// This keeps Key() inside the mirror cache and out of git's option parsing.
+func validPart(p string, host bool) bool {
+	if host {
+		if h, port, ok := strings.Cut(p, ":"); ok {
+			if port == "" || strings.Trim(port, "0123456789") != "" {
+				return false
+			}
+			p = h
+		}
+	}
+	if p == "" || p == "." || p == ".." || p[0] == '-' {
+		return false
+	}
+	for _, r := range p {
+		if !strings.ContainsRune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-", r) {
+			return false
+		}
+	}
+	return true
 }
 
 // String returns the canonical form: URL[//Path][@Ref].

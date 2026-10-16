@@ -1,6 +1,9 @@
 package targets
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+)
 
 func TestDirTable(t *testing.T) {
 	cases := []struct {
@@ -8,10 +11,10 @@ func TestDirTable(t *testing.T) {
 		scope  Scope
 		want   string
 	}{
-		{"claude", Project, "/p/.claude/skills"},
-		{"claude", Global, "/h/.claude/skills"},
-		{"copilot", Project, "/p/.github/skills"},
-		{"copilot", Global, "/h/.copilot/skills"},
+		{"claude", Project, filepath.Join("/p", ".claude", "skills")},
+		{"claude", Global, filepath.Join("/h", ".claude", "skills")},
+		{"copilot", Project, filepath.Join("/p", ".github", "skills")},
+		{"copilot", Global, filepath.Join("/h", ".copilot", "skills")},
 	}
 	for _, c := range cases {
 		got, err := Dir(c.target, c.scope, "/p", "/h")

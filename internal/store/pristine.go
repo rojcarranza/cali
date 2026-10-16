@@ -49,6 +49,13 @@ func Put(dataDir, tree string, t skillfs.Tree) error {
 	}
 	if err := os.Rename(tmp, filepath.Join(root, tree)); err != nil {
 		_ = os.RemoveAll(tmp)
+		// A concurrent Put may have won the race; accept an equal copy.
+		if have, ok, gerr := Get(dataDir, tree); gerr == nil && ok {
+			if skillfs.Equal(have, t) {
+				return nil
+			}
+			return fmt.Errorf("pristine %s already exists with different content", tree)
+		}
 		return err
 	}
 	return nil

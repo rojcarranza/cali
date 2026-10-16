@@ -52,6 +52,13 @@ func fixture(t *testing.T) string {
 	git(t, dir, "commit", "-q", "-m", "one")
 	// From here on the author's clone has autocrlf=true, as on Windows.
 	git(t, dir, "config", "core.autocrlf", "true")
+	// Run everything after the commit under a global autocrlf=true, as on
+	// Windows; Export must still return the committed bytes.
+	global := filepath.Join(t.TempDir(), "gitconfig")
+	if err := os.WriteFile(global, []byte("[core]\n\tautocrlf = true\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("GIT_CONFIG_GLOBAL", global)
 	return dir
 }
 
@@ -192,6 +199,124 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 	_, err = r.Export(c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), "sub") {
 		t.Fatalf("submodule err = %v", err)
+	}
+}
+
+func TestFilteredFetchIsBlobless(t *testing.T) {
+	dir := fixture(t)
+	git(t, dir, "config", "uploadpack.allowFilter", "true")
+	git(t, dir, "config", "uploadpack.allowAnySHA1InWant", "true")
+	r := openFetched(t, dir)
+	out, err := r.git(context.Background(), nil, "rev-list", "--objects", "--missing=print", "--all")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains("\n"+string(out), "\n?") {
+		t.Fatalf("fetch was not blob-less, no missing objects:\n%s", out)
+	}
+	c, _ := r.Resolve("")
+	tr, err := r.Export(c, "skills/a")
+	if err != nil || len(tr) != 2 {
+		t.Fatalf("Export over lazy fetch = %v, %v", tr, err)
+	}
+	if string(tr[0].Data) != "---\nname: a\n---\r\nline\r\n" {
+		t.Fatalf("bytes = %q", tr[0].Data)
+	}
+}
+
+func TestOpenRefusesEscapingKey(t *testing.T) {
+	cache := t.TempDir()
+	_, err := Open(cache, source.Spec{URL: "https://../../x"})
+	if err == nil {
+		t.Fatal("want error for a key that escapes the cache")
+	}
+	if _, serr := os.Stat(filepath.Join(cache, "x.git")); serr == nil {
+		t.Fatal("repository was created outside the cache")
+	}
+}
+
+func TestExportEnforcesLimitsBeforeReading(t *testing.T) {
+	dir := fixture(t)
+	r := openFetched(t, dir)
+	c, _ := r.Resolve("")
+	old := limits
+	t.Cleanup(func() { limits = old })
+
+	limits.files = 1
+	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
+		t.Fatalf("file count err = %v", err)
+	}
+	limits.files, limits.file = old.files, 5
+	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
+		t.Fatalf("file size err = %v", err)
+	}
+	limits.file, limits.tree = old.file, 10
+	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
+		t.Fatalf("tree size err = %v", err)
+	}
+}
+
+func TestResolveRejectsRevisionExpressions(t *testing.T) {
+	r := openFetched(t, fixture(t))
+	for _, ref := range []string{"main~1", "main^", "main^{tree}", "main..main", "@{u}", "main:skills", "a\\b"} {
+		if _, err := r.Resolve(ref); err == nil || !strings.Contains(err.Error(), "invalid ref") {
+			t.Errorf("Resolve(%q) err = %v, want invalid ref", ref, err)
+		}
+	}
+}
+
+func TestEnvironStripsInheritedConfig(t *testing.T) {
+	base := []string{
+		"PATH=/bin", "GIT_CONFIG_COUNT=2", "GIT_CONFIG_KEY_0=a", "GIT_CONFIG_VALUE_0=b",
+		"GIT_CONFIG_KEY_1=c", "GIT_CONFIG_VALUE_1=d", "GIT_ALLOW_PROTOCOL=ext",
+	}
+	got := environ(base, "https", AuthEnv("github.com", func(string) string { return "t" }, nil))
+	m := envMap(got)
+	if m["GIT_CONFIG_COUNT"] != "1" || m["GIT_CONFIG_KEY_0"] != "http.https://github.com/.extraheader" ||
+		m["GIT_ALLOW_PROTOCOL"] != "https" || m["GIT_TERMINAL_PROMPT"] != "0" || m["PATH"] != "/bin" {
+		t.Fatalf("env = %v", got)
+	}
+	if _, ok := m["GIT_CONFIG_KEY_1"]; ok {
+		t.Fatalf("inherited key survived: %v", got)
+	}
+	if _, ok := m["GIT_CONFIG_VALUE_1"]; ok {
+		t.Fatalf("inherited value survived: %v", got)
+	}
+	for _, e := range got {
+		if e == "GIT_CONFIG_COUNT=2" || e == "GIT_ALLOW_PROTOCOL=ext" {
+			t.Fatalf("inherited entry survived: %v", got)
+		}
+	}
+}
+
+func TestSanitizeStderr(t *testing.T) {
+	in := "fatal: \x1b[31mred\x1b]0;title\x07 \u009b2J bell\x07 nul\x00 line\nnext\x7f"
+	out := sanitize(in, nil)
+	for _, r := range out {
+		if r < ' ' || r == 0x7f || (r >= 0x80 && r <= 0x9f) {
+			t.Fatalf("control rune %U left in %q", r, out)
+		}
+	}
+	if !strings.Contains(out, "line next") {
+		t.Fatalf("out = %q", out)
+	}
+	long := sanitize(strings.Repeat("x", 10000), nil)
+	if len(long) > maxStderr+3 {
+		t.Fatalf("len = %d, want capped", len(long))
+	}
+}
+
+func TestSymlinkErrorQuotesPath(t *testing.T) {
+	// Paths in errors are %q-quoted so a hostile name cannot inject text.
+	dir := fixture(t)
+	linkBlob := hashString(t, dir, "x")
+	git(t, dir, "update-index", "--add", "--cacheinfo", "120000,"+linkBlob+",skills/b/ev\"il")
+	git(t, dir, "commit", "-q", "-m", "evil")
+	r := openFetched(t, dir)
+	c, _ := r.Resolve("")
+	_, err := r.Export(c, "skills/b")
+	if err == nil || !strings.Contains(err.Error(), `"ev\"il"`) {
+		t.Fatalf("err = %v", err)
 	}
 }
 
