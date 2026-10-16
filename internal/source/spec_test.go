@@ -13,7 +13,7 @@ func TestParse(t *testing.T) {
 		{"github:obra/superpowers//skills/x@v1.2.0", Spec{URL: "https://github.com/obra/superpowers", Path: "skills/x", Ref: "v1.2.0"}},
 		{"github:o/r", Spec{URL: "https://github.com/o/r"}},
 		{"github:o/r@main", Spec{URL: "https://github.com/o/r", Ref: "main"}},
-		{"https://h/o/r.git//p@abc", Spec{URL: "https://h/o/r.git", Path: "p", Ref: "abc"}},
+		{"https://h/o/r.git//p@abc", Spec{URL: "https://h/o/r", Path: "p", Ref: "abc"}},
 	}
 	for _, c := range cases {
 		got, err := Parse(c.in)
@@ -34,8 +34,8 @@ func TestParseErrors(t *testing.T) {
 		{"github:o/r//../x", ".."},
 		{"github:o/r//skills/../../x", ".."},
 		{"github:o/r///abs", "leading"},
-		{"https://user:pass@h/o/r", "user:pass"},
-		{"https://user:pass@h/o/r//p", "user:pass"},
+		{"https://user:pass@h/o/r", "credentials"},
+		{"https://user:pass@h/o/r//p", "credentials"},
 		{"ssh://git@h/o/r", "ssh"},
 		{"file:///tmp/repo", "file"},
 		{"github:/r", "owner"},
@@ -91,6 +91,38 @@ func TestStringRoundTrip(t *testing.T) {
 	s, _ := Parse("github:o/r//p@v1")
 	if s.String() != "https://github.com/o/r//p@v1" {
 		t.Errorf("String() = %q", s.String())
+	}
+}
+
+func TestCanonicalURL(t *testing.T) {
+	for _, in := range []string{
+		"github:o/r",
+		"github:o/r.git",
+		"https://github.com/o/r.git",
+		"https://GitHub.com/o/r",
+	} {
+		s, err := Parse(in)
+		if err != nil {
+			t.Fatalf("Parse(%q): %v", in, err)
+		}
+		if s.URL != "https://github.com/o/r" {
+			t.Errorf("Parse(%q).URL = %q", in, s.URL)
+		}
+		if s.Key() != "github.com/o/r" {
+			t.Errorf("Parse(%q).Key() = %q", in, s.Key())
+		}
+	}
+}
+
+func TestCredentialsNotEchoed(t *testing.T) {
+	_, err := Parse("https://user:tok@github.com/o/r")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	for _, leak := range []string{"tok", "user"} {
+		if strings.Contains(err.Error(), leak) {
+			t.Errorf("error %q leaks %q", err, leak)
+		}
 	}
 }
 

@@ -46,8 +46,8 @@ func ParseWith(s string, o Options) (Spec, error) {
 	head, tail, hasPath := strings.Cut(rest, "//")
 	if scheme == "https" {
 		host, _, _ := strings.Cut(head, "/")
-		if strings.Contains(host, "@") {
-			return Spec{}, fmt.Errorf("source %q: credentials (user:pass@) in URL are not allowed", s)
+		if i := strings.LastIndex(host, "@"); i >= 0 {
+			return Spec{}, fmt.Errorf("source URL for host %q: embedded credentials are not allowed", host[i+1:])
 		}
 	}
 
@@ -83,10 +83,11 @@ func ParseWith(s string, o Options) (Spec, error) {
 		if parts[0] == "" {
 			return Spec{}, fmt.Errorf("source %q: empty host", s)
 		}
-		if _, _, err := ownerRepo(s, parts[1:]); err != nil {
+		owner, repo, err := ownerRepo(s, parts[1:])
+		if err != nil {
 			return Spec{}, err
 		}
-		spec.URL = "https://" + head
+		spec.URL = "https://" + strings.ToLower(parts[0]) + "/" + owner + "/" + repo
 	case "file":
 		if strings.Trim(head, "/") == "" {
 			return Spec{}, fmt.Errorf("source %q: empty file path", s)
@@ -112,7 +113,7 @@ func ownerRepo(s string, parts []string) (owner, repo string, err error) {
 	if len(parts) > 2 {
 		return "", "", fmt.Errorf("source %q: want exactly owner/repo, got extra segment %q", s, parts[2])
 	}
-	return owner, parts[1], nil
+	return owner, repo, nil
 }
 
 // String returns the canonical form: URL[//Path][@Ref].
