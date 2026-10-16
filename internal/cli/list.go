@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"io"
 	"os"
 	"sort"
@@ -43,6 +44,9 @@ func load(out io.Writer, global bool) (state, error) {
 		return state{}, err
 	}
 	m, err := manifest.ReadWith(loc.Manifest, source.Options{AllowFile: allowFileScheme})
+	if errors.Is(err, os.ErrNotExist) {
+		m, err = manifest.Manifest{Version: 1, Skills: map[string]manifest.Skill{}}, nil
+	}
 	if err != nil {
 		return state{}, err
 	}
@@ -88,12 +92,12 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 			rows := []row{}
 			t := render.Table{Header: []string{"NAME", "SOURCE", "COMMIT", "TARGETS"}}
 			for _, n := range names {
-				r := row{n, s.m.Skills[n].Source, short(s.l.Skills[n].Commit), s.m.TargetsFor(n)}
+				r := row{n, s.m.Skills[n].Source, s.l.Skills[n].Commit, s.m.TargetsFor(n)}
 				if r.Targets == nil {
 					r.Targets = []string{}
 				}
 				rows = append(rows, r)
-				t.Rows = append(t.Rows, []string{r.Name, r.Source, r.Commit, strings.Join(r.Targets, ",")})
+				t.Rows = append(t.Rows, []string{r.Name, r.Source, short(r.Commit), strings.Join(r.Targets, ",")})
 			}
 			mode := render.ModeFor(isTTY(out), asJSON)
 			if mode == render.JSON {

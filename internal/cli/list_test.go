@@ -38,7 +38,7 @@ func TestListOffline(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(out), "\n")
 	if len(lines) != 3 || !strings.HasPrefix(lines[0], "NAME") ||
 		!strings.Contains(lines[1], "0123456") || !strings.Contains(lines[1], "claude") ||
-		!strings.HasPrefix(lines[2], "b") || !strings.Contains(lines[2], "claude,copilot") {
+		!strings.HasPrefix(lines[2], "b") || !strings.Contains(lines[2], "claude,copilot") || !strings.Contains(lines[2], " -") {
 		t.Fatalf("out = %q", out)
 	}
 	if strings.Contains(lines[1], "0123456789") {
@@ -59,7 +59,7 @@ func TestListOffline(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &got); err != nil {
 		t.Fatalf("%v: %q", err, out)
 	}
-	if got.SchemaVersion != 1 || len(got.Skills) != 2 || got.Skills[0].Name != "a" || got.Skills[1].Commit != "-" {
+	if got.SchemaVersion != 1 || len(got.Skills) != 2 || got.Skills[0].Name != "a" || got.Skills[1].Commit != "" {
 		t.Fatalf("got %+v", got)
 	}
 }
@@ -93,6 +93,26 @@ func TestShow(t *testing.T) {
 		t.Fatalf("code=%d out=%q", code, out)
 	}
 	if code, _, errs := run("show", "nope"); code != 1 || !strings.Contains(errs, "nope") {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+}
+
+func TestListNoManifest(t *testing.T) {
+	setup(t)
+	for _, args := range [][]string{{"list"}, {"list", "-g"}} {
+		code, out, errs := run(args...)
+		if code != 0 || strings.Count(strings.TrimSpace(out), "\n") != 0 {
+			t.Fatalf("%v: code=%d out=%q err=%q", args, code, out, errs)
+		}
+		code, out, errs = run(append(args, "--json")...)
+		var got struct {
+			Skills []struct{} `json:"skills"`
+		}
+		if code != 0 || json.Unmarshal([]byte(out), &got) != nil || got.Skills == nil || len(got.Skills) != 0 {
+			t.Fatalf("%v --json: code=%d out=%q err=%q", args, code, out, errs)
+		}
+	}
+	if code, _, errs := run("show", "x"); code != 1 || !strings.Contains(errs, "no skill named x") {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 }

@@ -67,9 +67,9 @@ func newShowCmd(out io.Writer, global *bool) *cobra.Command {
 			w("name", name)
 			w("source", sk.Source)
 			w("ref", sk.Ref)
-			w("path", e.Path)
-			w("commit", e.Commit)
-			w("tree", e.Tree)
+			w("path", dash(e.Path))
+			w("commit", dash(e.Commit))
+			w("tree", dash(e.Tree))
 			for _, t := range tgts {
 				state := "missing"
 				if t.Installed {
@@ -83,4 +83,11 @@ func newShowCmd(out io.Writer, global *bool) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	return cmd
+}
+
+func dash(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
 }
