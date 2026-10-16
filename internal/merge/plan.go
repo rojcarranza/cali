@@ -136,14 +136,14 @@ func Plan(base, ours, theirs skillfs.Tree) ([]FilePlan, error) {
 		if o.Exec == b.Exec {
 			exe = t.Exec
 		}
-		out = append(out, FilePlan{Path: p, Action: Merged, Merged: encodeLike(o.Data, merged), Exec: exe})
+		out = append(out, FilePlan{Path: p, Action: Merged, Merged: EncodeLike(o.Data, merged), Exec: exe})
 	}
 	return out, nil
 }
 
-// encodeLike re-encodes LF text with ref's style: CRLF if ref has more CRLF
+// EncodeLike re-encodes LF text with ref's style: CRLF if ref has more CRLF
 // than lone LF line endings.
-func encodeLike(ref, lf []byte) []byte {
+func EncodeLike(ref, lf []byte) []byte {
 	crlf := bytes.Count(ref, []byte("\r\n"))
 	if crlf > bytes.Count(ref, []byte("\n"))-crlf {
 		return bytes.ReplaceAll(lf, []byte("\n"), []byte("\r\n"))
@@ -176,6 +176,27 @@ func git(dir string, args ...string) ([]byte, int, error) {
 		return stdout.Bytes(), ee.ExitCode(), fmt.Errorf("git %s: exit %d: %s", args[0], ee.ExitCode(), strings.TrimSpace(stderr.String()))
 	}
 	return stdout.Bytes(), 0, err
+}
+
+// LocalPatch returns `git diff --no-index --binary` from base to ours, with
+// the trees written to dirs a/ and b/, so `git apply -p1` in a copy of base
+// reproduces ours. It is empty when the trees are equal.
+func LocalPatch(base, ours skillfs.Tree) ([]byte, error) {
+	dir, err := os.MkdirTemp("", "cali-patch-*")
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = os.RemoveAll(dir) }()
+	for name, t := range map[string]skillfs.Tree{"a": base, "b": ours} {
+		if err := t.WriteTo(filepath.Join(dir, name)); err != nil {
+			return nil, err
+		}
+	}
+	out, code, err := git(dir, "diff", "--no-index", "--binary", "--no-prefix", "--no-color", "--no-ext-diff", "--", "a", "b")
+	if err != nil && code != 1 {
+		return nil, err
+	}
+	return out, nil
 }
 
 // merge3 line-merges LF-normalized ours/base/theirs. It returns the merged LF

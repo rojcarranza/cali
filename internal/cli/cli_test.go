@@ -252,7 +252,7 @@ func TestUpdateDryRunCommand(t *testing.T) {
 		t.Fatalf("json: code=%d out=%q", code, out)
 	}
 	for args, want := range map[string]string{
-		"update x --apply":                 "cali: update --apply is not implemented yet\n",
+		"update x --apply":                 "nothing was written",
 		"update --resolve SKILL.md=theirs": "cali: --resolve needs exactly one skill name\n",
 		"update x --resolve SKILL.md=both": "cali: --resolve \"SKILL.md=both\": want <file>=ours|theirs|merge\n",
 		"update nope":                      "is not in",
@@ -260,5 +260,16 @@ func TestUpdateDryRunCommand(t *testing.T) {
 		if code, _, errs := run(strings.Fields(args)...); code != 1 || !strings.Contains(errs, want) {
 			t.Errorf("%s: code=%d err=%q", args, code, errs)
 		}
+	}
+	// Not a TTY: the explicit choice applies without a prompt.
+	code, out, errs = run("update", "x", "--apply", "--resolve", "SKILL.md=theirs")
+	if code != 0 || !strings.HasPrefix(out, "x (claude) backup: ") || !strings.Contains(out, "\nupdated x ") {
+		t.Fatalf("apply: code=%d out=%q err=%q", code, out, errs)
+	}
+	if b, err := os.ReadFile(filepath.Join(project, ".claude", "skills", "x", "SKILL.md")); err != nil || string(b) != "---\nname: x\ndescription: X.\n---\ntheirs\n" {
+		t.Fatalf("SKILL.md = %q, %v", b, err)
+	}
+	if code, out, _ := run("update"); code != 0 || out != "x: up to date\n0 skill(s) to update, 0 conflict(s)\n" {
+		t.Fatalf("after apply: code=%d out=%q", code, out)
 	}
 }

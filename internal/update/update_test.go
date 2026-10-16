@@ -50,8 +50,8 @@ func skillMD(name, body string) string {
 }
 
 // setup installs skills/<name> (files relative to the skill folder) from a
-// fresh file:// repo into the claude target of an isolated project.
-func setup(t *testing.T, name string, files map[string]string) fx {
+// fresh file:// repo into the claude target (or tgs) of an isolated project.
+func setup(t *testing.T, name string, files map[string]string, tgs ...string) fx {
 	t.Helper()
 	base := t.TempDir()
 	empty := filepath.Join(base, "gitconfig")
@@ -83,8 +83,11 @@ func setup(t *testing.T, name string, files map[string]string) fx {
 		AllowFileScheme: true,
 		Cwd:             project,
 	}
+	if tgs == nil {
+		tgs = []string{"claude"}
+	}
 	res, err := install.Add(context.Background(), f.d, install.AddRequest{
-		Spec: "file://" + filepath.ToSlash(f.repo) + "//skills/" + name, Targets: []string{"claude"},
+		Spec: "file://" + filepath.ToSlash(f.repo) + "//skills/" + name, Targets: tgs,
 	})
 	if err != nil {
 		t.Fatal(err)

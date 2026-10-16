@@ -35,8 +35,12 @@ type Options struct {
 	TakeUpstream, KeepMine, AcceptRecommended bool
 }
 
-// Proposal is the planned update of every selected skill.
-type Proposal struct{ Skills []SkillPlan }
+// Proposal is the planned update of every selected skill, and the options
+// Apply resolves conflicts with.
+type Proposal struct {
+	Skills []SkillPlan
+	Opts   Options
+}
 
 // SkillPlan is one skill: Noop when upstream did not change its folder,
 // BaseLost when the pristine copy of the locked tree is gone.
@@ -46,6 +50,8 @@ type SkillPlan struct {
 	BaseLost                               bool
 	Noop                                   bool
 	Targets                                []TargetPlan
+	base, theirs                           skillfs.Tree
+	lost                                   []TargetPlan // BaseLost only: the folders --take-upstream replaces
 }
 
 // TargetPlan is one installed folder; Missing when it does not exist.
@@ -53,6 +59,7 @@ type TargetPlan struct {
 	Target, Dir string
 	Missing     bool
 	Files       []FileDecision
+	ours        skillfs.Tree
 }
 
 // FileDecision is a merge.FilePlan plus the pre-resolution or recommendation
@@ -109,7 +116,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	names = slices.Compact(names)
 
 	repos := map[string]*gitx.Repo{}
-	var p Proposal
+	p := Proposal{Opts: o}
 	for _, n := range names {
 		s := m.Skills[n]
 		spec, err := source.ParseWith(s.Source, opts)
@@ -150,15 +157,11 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if err != nil {
 			return Proposal{}, fmt.Errorf("pristine copy of %s: %w", n, err)
 		}
-		if !ok {
-			sp.BaseLost = true
-			p.Skills = append(p.Skills, sp)
-			continue
-		}
 		_, theirs, err := install.ExportSkill(repo, commit, e.Path, n)
 		if err != nil {
 			return Proposal{}, err
 		}
+		sp.BaseLost, sp.base, sp.theirs = !ok, base, theirs
 		for _, tg := range m.TargetsFor(n) {
 			dir, err := targets.Dir(tg, loc.Scope, loc.Root, d.Dirs.Home)
 			if err != nil {
@@ -174,15 +177,21 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			case !fi.IsDir(): // Lstat: a symlink is not a dir either
 				return Proposal{}, fmt.Errorf("%s is not a directory", tp.Dir)
 			default:
-				ours, err := skillfs.ReadDir(tp.Dir)
-				if err != nil {
+				if tp.ours, err = skillfs.ReadDir(tp.Dir); err != nil {
 					return Proposal{}, err
 				}
-				if tp.Files, err = decide(base, ours, theirs); err != nil {
+				if sp.BaseLost {
+					break
+				}
+				if tp.Files, err = decide(base, tp.ours, theirs); err != nil {
 					return Proposal{}, fmt.Errorf("skill %s (%s): %w", n, tg, err)
 				}
 			}
-			sp.Targets = append(sp.Targets, tp)
+			if sp.BaseLost {
+				sp.lost = append(sp.lost, tp)
+			} else {
+				sp.Targets = append(sp.Targets, tp)
+			}
 		}
 		p.Skills = append(p.Skills, sp)
 	}

@@ -607,6 +607,10 @@ func OpenFetch(ctx context.Context, d Deps, spec source.Spec) (*gitx.Repo, error
 	return openFetch(ctx, d, spec)
 }
 
+// NoSymlinks refuses a symlink at any existing path component below root
+// down to and including dir.
+func NoSymlinks(root, dir string) error { return noSymlinks(root, dir) }
+
 // ExportSkill reads the skill folder p at commit and returns its tree SHA and
 // files; SKILL.md must name the skill name.
 func ExportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree, error) {
