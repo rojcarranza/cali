@@ -229,7 +229,9 @@ func decide(base, ours, theirs skillfs.Tree) ([]FileDecision, error) {
 			if res, ok := merge.PreResolve(c.Base, c.Ours, c.Theirs); ok {
 				fd.PreResolved, fd.Conflict = true, nil
 				switch {
-				case res == nil: // the other side deleted the file
+				case res == nil && c.Ours == nil: // local deleted it, upstream only touched whitespace: keep the deletion
+					fd.Action, fd.Delete = merge.KeepLocal, true
+				case res == nil: // upstream deleted it, local only touched whitespace
 					fd.Action, fd.Delete = merge.TakeUpstream, true
 				case bytes.Equal(res, c.Ours) && !bytes.Equal(res, c.Theirs):
 					fd.Action, fd.Merged, fd.Exec = merge.KeepLocal, res, om[fp.Path].Exec
@@ -328,7 +330,7 @@ func (p Proposal) WriteText(w io.Writer, global bool) error {
 						}
 					}
 				}
-				fmt.Fprintf(&b, "    RECOMMEND %s (%s)\n", f.Rec.Choice, f.Rec.Reason)
+				fmt.Fprintf(&b, "    RECOMMEND %s [%s] (%s)\n", f.Rec.Choice, f.Rec.Class, f.Rec.Reason)
 				fmt.Fprintf(&b, "    cali update %s%s --apply --resolve %s\n", s.Name, g, shellArg(path+"="+f.Rec.Choice))
 			}
 		}

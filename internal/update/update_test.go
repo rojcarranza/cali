@@ -261,7 +261,7 @@ func TestNonTTYConflictPrintsCommandAndChangesNothing(t *testing.T) {
 		"ours| line 1 local\n",
 		"base| line 1\n",
 		"theirs| new 1\n",
-		"RECOMMEND theirs (" + d.Rec.Reason + ")\n",
+		"RECOMMEND theirs [local-small] (" + d.Rec.Reason + ")\n",
 		"cali update code-review --apply --resolve SKILL.md=theirs\n",
 	} {
 		if !strings.Contains(s, want) {
@@ -342,6 +342,18 @@ func TestPlanPreResolvesWhitespace(t *testing.T) {
 	f.upstream(t, map[string]string{"notes.md": "a\nB\nc\n"})
 	d := decision(t, f.plan(t), "notes.md")
 	if d.Action != merge.TakeUpstream || !d.PreResolved || d.Rec != nil || d.Conflict != nil || string(d.Merged) != "a\nB\nc\n" {
+		t.Fatalf("notes.md = %+v", d)
+	}
+}
+
+func TestPlanPreResolvesWhitespaceKeepsLocalDeletion(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", ""), "notes.md": "a\nb\nc\n"})
+	if err := os.Remove(filepath.Join(f.local, "notes.md")); err != nil {
+		t.Fatal(err)
+	}
+	f.upstream(t, map[string]string{"notes.md": "a\nb  \nc\n"})
+	d := decision(t, f.plan(t), "notes.md")
+	if d.Action != merge.KeepLocal || !d.Delete || !d.PreResolved || d.Rec != nil || d.Conflict != nil {
 		t.Fatalf("notes.md = %+v", d)
 	}
 }
