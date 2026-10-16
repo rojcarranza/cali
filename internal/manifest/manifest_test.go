@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/rojcarranza/cali/internal/source"
 )
 
 func writeFile(t *testing.T, content string) string {
@@ -213,5 +215,28 @@ func TestWriteRejectsInvalid(t *testing.T) {
 	}
 	if _, err := os.Stat(p); err == nil {
 		t.Error("file must not be created")
+	}
+}
+
+func TestWriteWithAllowsFileScheme(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "cali.yaml")
+	m := Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]Skill{
+		"x": {Source: "file:///tmp/repo//skills/x"},
+	}}
+	if err := Write(p, m); err == nil {
+		t.Fatal("Write accepted a file:// source without the option")
+	}
+	if err := WriteWith(p, m, source.Options{AllowFile: true}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Read(p); err == nil {
+		t.Fatal("Read accepted a file:// source without the option")
+	}
+	got, err := ReadWith(p, source.Options{AllowFile: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Skills["x"].Source != "file:///tmp/repo//skills/x" {
+		t.Fatalf("got %+v", got)
 	}
 }

@@ -344,3 +344,33 @@ func TestFetchErrorDoesNotLeakToken(t *testing.T) {
 		t.Fatalf("token leaked: %v", err)
 	}
 }
+
+func TestListSkillDirs(t *testing.T) {
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	write(t, dir, "SKILL.md", "root\n", 0o644)
+	write(t, dir, "skills/a/SKILL.md", "a\n", 0o644)
+	write(t, dir, "skills/a/nested/SKILL.md", "n\n", 0o644)
+	write(t, dir, "x/skill.md", "lowercase name is not a skill\n", 0o644)
+	write(t, dir, "d1/d2/d3/d4/SKILL.md", "depth 4\n", 0o644)
+	write(t, dir, "d1/d2/d3/d4/d5/SKILL.md", "depth 5\n", 0o644)
+	write(t, dir, "notes/SKILL.md/readme", "a dir named SKILL.md\n", 0o644)
+	git(t, dir, "add", ".")
+	git(t, dir, "commit", "-q", "-m", "one")
+	r := openFetched(t, dir)
+	commit, err := r.Resolve("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := r.ListSkillDirs(commit, 4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"", "d1/d2/d3/d4", "skills/a", "skills/a/nested"}
+	if strings.Join(got, ",") != strings.Join(want, ",") || len(got) != len(want) {
+		t.Fatalf("ListSkillDirs = %q, want %q", got, want)
+	}
+	if _, err := r.ListSkillDirs("HEAD", 4); err == nil {
+		t.Fatal("want error for a non-SHA commit")
+	}
+}

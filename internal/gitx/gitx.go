@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -378,4 +379,44 @@ func (r *Repo) readBlobs(ctx context.Context, entries []entry) (skillfs.Tree, er
 		return nil, fmt.Errorf("git cat-file: %w: %s", err, sanitize(stderr.String(), r.env))
 	}
 	return t, nil
+}
+
+// ListSkillDirs returns the directories at commit that hold a regular file
+// named SKILL.md, at most maxDepth path segments deep ("" is the repository
+// root, depth 0). The result is sorted. Only tree listings are read, so no
+// blob is downloaded.
+func (r *Repo) ListSkillDirs(commit string, maxDepth int) ([]string, error) {
+	if !hex40.MatchString(commit) {
+		return nil, fmt.Errorf("invalid commit %q", commit)
+	}
+	out, err := r.git(context.Background(), r.env, "ls-tree", "-r", "-z", "--full-tree", commit)
+	if err != nil {
+		return nil, err
+	}
+	var dirs []string
+	for _, rec := range bytes.Split(out, []byte{0}) {
+		meta, name, ok := bytes.Cut(rec, []byte{'\t'})
+		if !ok {
+			continue
+		}
+		fields := strings.Fields(string(meta))
+		if len(fields) != 3 || fields[1] != "blob" || (fields[0] != "100644" && fields[0] != "100755") {
+			continue
+		}
+		p := string(name)
+		var dir string
+		switch {
+		case p == "SKILL.md":
+		case strings.HasSuffix(p, "/SKILL.md"):
+			dir = strings.TrimSuffix(p, "/SKILL.md")
+		default:
+			continue
+		}
+		if dir != "" && strings.Count(dir, "/")+1 > maxDepth {
+			continue
+		}
+		dirs = append(dirs, dir)
+	}
+	sort.Strings(dirs)
+	return dirs, nil
 }

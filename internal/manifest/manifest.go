@@ -52,7 +52,11 @@ func (m Manifest) TargetsFor(name string) []string {
 }
 
 // Read loads and validates the manifest at path. Unknown keys are errors.
-func Read(path string) (Manifest, error) {
+func Read(path string) (Manifest, error) { return ReadWith(path, source.Options{}) }
+
+// ReadWith is Read with o passed to source.ParseWith when sources are
+// validated (o.AllowFile admits file:// test fixtures).
+func ReadWith(path string, o source.Options) (Manifest, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return Manifest{}, fmt.Errorf("read manifest %s: %w", path, err)
@@ -66,7 +70,7 @@ func Read(path string) (Manifest, error) {
 		}
 		return Manifest{}, fmt.Errorf("parse manifest %s: %w", path, err)
 	}
-	if err := m.validate(); err != nil {
+	if err := m.validate(o); err != nil {
 		return Manifest{}, fmt.Errorf("manifest %s: %w", path, err)
 	}
 	if m.Skills == nil {
@@ -75,7 +79,7 @@ func Read(path string) (Manifest, error) {
 	return m, nil
 }
 
-func (m Manifest) validate() error {
+func (m Manifest) validate(o source.Options) error {
 	if m.Version != currentVersion {
 		return fmt.Errorf("unsupported version %d (want %d)", m.Version, currentVersion)
 	}
@@ -83,7 +87,7 @@ func (m Manifest) validate() error {
 		return fmt.Errorf("targets: %w", err)
 	}
 	for i, s := range m.Sources {
-		if _, err := source.Parse(s); err != nil {
+		if _, err := source.ParseWith(s, o); err != nil {
 			return fmt.Errorf("sources[%d]: %w", i, err)
 		}
 	}
@@ -100,7 +104,7 @@ func (m Manifest) validate() error {
 		if s.Source == "" {
 			return fmt.Errorf("skill %s: source is required", n)
 		}
-		if _, err := source.Parse(s.Source); err != nil {
+		if _, err := source.ParseWith(s.Source, o); err != nil {
 			return fmt.Errorf("skill %s: source: %w", n, err)
 		}
 		if err := validTargets(s.Targets); err != nil {
@@ -122,8 +126,11 @@ func validTargets(ts []string) error {
 // Write atomically replaces the manifest at path. If the file exists its
 // yaml.Node tree is updated from m so comments are kept; otherwise the file
 // is marshalled fresh. m is validated first and nothing is written if invalid.
-func Write(path string, m Manifest) (err error) {
-	if err := m.validate(); err != nil {
+func Write(path string, m Manifest) error { return WriteWith(path, m, source.Options{}) }
+
+// WriteWith is Write with o passed to source.ParseWith during validation.
+func WriteWith(path string, m Manifest, o source.Options) (err error) {
+	if err := m.validate(o); err != nil {
 		return fmt.Errorf("write manifest %s: %w", path, err)
 	}
 	out, err := render(path, m)
