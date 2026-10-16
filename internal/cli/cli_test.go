@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -122,5 +123,81 @@ func TestFileSchemeRejectedByDefault(t *testing.T) {
 func TestVersion(t *testing.T) {
 	if code, out, _ := run("--version"); code != 0 || !strings.Contains(out, "cali") {
 		t.Fatalf("code=%d out=%q", code, out)
+	}
+}
+
+func TestStatusExitCode(t *testing.T) {
+	repoURL, project := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	status := func(wantCode int, wantState string, args ...string) string {
+		t.Helper()
+		code, out, errs := run(append([]string{"status"}, args...)...)
+		if code != wantCode || !strings.Contains(out, wantState) {
+			t.Fatalf("status %v: code=%d out=%q err=%q", args, code, out, errs)
+		}
+		return out
+	}
+	out := status(0, "ok")
+	if lines := strings.Split(strings.TrimSpace(out), "\n"); len(lines) != 2 || !strings.HasPrefix(lines[0], "SKILL") ||
+		!strings.HasPrefix(lines[1], "x") || !strings.Contains(lines[1], "claude") {
+		t.Fatalf("out = %q", out)
+	}
+	status(0, "ok", "--exit-code")
+
+	// A newer commit outside skills/x is not outdated.
+	if err := os.WriteFile(filepath.Join(repo, "README.md"), []byte("hi\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "readme")
+	status(0, "ok", "--exit-code")
+
+	// One that touches skills/x is.
+	if err := os.WriteFile(filepath.Join(repo, "skills", "x", "more.md"), []byte("more\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "more")
+	status(0, "outdated")
+	status(1, "outdated", "--exit-code")
+	status(0, "ok", "--offline", "--exit-code")
+
+	// A local edit that also declares a missing dependency.
+	p := filepath.Join(project, ".claude", "skills", "x", "SKILL.md")
+	if err := os.WriteFile(p, []byte("---\nname: x\ndescription: X.\nmetadata:\n  cali-requires: \"dep\"\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out = status(1, "modified", "--offline", "--exit-code")
+	if !strings.HasSuffix(out, "WARN x requires dep (missing)\n") {
+		t.Fatalf("out = %q", out)
+	}
+
+	code, out, errs := run("status", "--offline", "--json")
+	var got struct {
+		SchemaVersion int `json:"schema_version"`
+		Rows          []struct {
+			Skill, Target, Detail string
+			States                []string
+		} `json:"rows"`
+		Warnings []struct{ Skill, Missing, Target string } `json:"warnings"`
+	}
+	if code != 0 || json.Unmarshal([]byte(out), &got) != nil {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+	if got.SchemaVersion != 1 || len(got.Rows) != 1 || strings.Join(got.Rows[0].States, ",") != "modified" ||
+		len(got.Warnings) != 1 || got.Warnings[0].Missing != "dep" || got.Warnings[0].Target != "claude" {
+		t.Fatalf("got %+v", got)
+	}
+
+	// A broken source is a warning, not a failure.
+	if err := os.RemoveAll(repo); err != nil {
+		t.Fatal(err)
+	}
+	code, _, errs = run("status")
+	if code != 0 || !strings.HasPrefix(errs, "warning: "+repoURL+": ") {
+		t.Fatalf("code=%d err=%q", code, errs)
 	}
 }

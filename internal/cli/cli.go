@@ -4,6 +4,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -30,7 +31,9 @@ func Execute(args []string, out, errw io.Writer) int {
 	root.SetOut(out)
 	root.SetErr(errw)
 	if err := root.ExecuteContext(context.Background()); err != nil {
-		_, _ = fmt.Fprintln(errw, "cali: "+err.Error())
+		if !errors.Is(err, errFindings) {
+			_, _ = fmt.Fprintln(errw, "cali: "+err.Error())
+		}
 		return 1
 	}
 	return 0
@@ -86,7 +89,7 @@ func newRoot(out io.Writer) *cobra.Command {
 	add.Flags().BoolVar(&req.All, "all", false, "install every skill in the repo")
 	add.Flags().StringSliceVar(&req.Targets, "target", nil, "target to install into: claude or copilot (repeatable)")
 	add.Flags().BoolVar(&req.Adopt, "adopt", false, "take over an existing folder that is not managed by Cali, as is")
-	root.AddCommand(add, newListCmd(out, &global), newShowCmd(out, &global))
+	root.AddCommand(add, newListCmd(out, &global), newShowCmd(out, &global), newStatusCmd(out, &global))
 	return root
 }
 
