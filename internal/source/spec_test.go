@@ -141,6 +141,13 @@ func TestCredentialsNotEchoed(t *testing.T) {
 	}
 }
 
+func TestExtraSegmentNamed(t *testing.T) {
+	_, err := Parse("github:o/r/x")
+	if err == nil || !strings.Contains(err.Error(), `"x"`) {
+		t.Errorf("Parse(github:o/r/x) error = %v, want it to name \"x\"", err)
+	}
+}
+
 func TestRefAfterRepoStillParses(t *testing.T) {
 	for in, want := range map[string]Spec{
 		"github:o/r@main":    {URL: "https://github.com/o/r", Ref: "main"},

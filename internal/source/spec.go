@@ -4,6 +4,7 @@ package source
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -129,6 +130,9 @@ func ownerRepo(parts []string) (owner, repo string, err error) {
 		return "", "", reject("empty repo")
 	}
 	if len(parts) > 2 {
+		if extra := parts[2]; !strings.ContainsAny(extra, "@:") {
+			return "", "", reject("want exactly owner/repo, got extra segment " + strconv.Quote(extra))
+		}
 		return "", "", reject("want exactly owner/repo, got extra segment")
 	}
 	return owner, repo, nil
