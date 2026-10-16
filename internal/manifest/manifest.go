@@ -37,11 +37,15 @@ type Manifest struct {
 	Skills  map[string]Skill `yaml:"skills"`
 }
 
-var nameRe = regexp.MustCompile(`^[a-z0-9-]{1,64}$`)
+var (
+	nameRe   = regexp.MustCompile(`^[a-z0-9-]{1,64}$`)
+	deviceRe = regexp.MustCompile(`^(con|prn|aux|nul|com[1-9]|lpt[1-9])$`) // Windows device names
+)
 
 // SkillNameValid reports whether name is a legal install name: lowercase
-// letters, digits and hyphens, 1 to 64 characters.
-func SkillNameValid(name string) bool { return nameRe.MatchString(name) }
+// letters, digits and hyphens, 1 to 64 characters, and not a Windows device
+// name (con, prn, aux, nul, com1-9, lpt1-9).
+func SkillNameValid(name string) bool { return nameRe.MatchString(name) && !deviceRe.MatchString(name) }
 
 // TargetsFor returns the skill's own targets if set, else the default targets.
 func (m Manifest) TargetsFor(name string) []string {

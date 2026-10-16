@@ -293,7 +293,7 @@ func TestAddDiscovery(t *testing.T) {
 
 	e := newEnv(t)
 	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r)})
-	if err == nil || !strings.Contains(err.Error(), "skills/x") || !strings.Contains(err.Error(), "skills/y") {
+	if err == nil || !strings.Contains(err.Error(), `"skills/x"`) || !strings.Contains(err.Error(), `"skills/y"`) {
 		t.Fatalf("err = %v, want both candidates listed", err)
 	}
 
@@ -357,27 +357,53 @@ func TestAddRollsBackWhenATargetFails(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "injected") {
 		t.Fatalf("err = %v", err)
 	}
-	for _, p := range []string{
-		".claude/skills/x", ".claude/skills/x.cali-new",
-		".github/skills/x", ".github/skills/x.cali-new",
-		"cali.yaml", "cali.lock",
-	} {
-		if exists(filepath.Join(e.project, filepath.FromSlash(p))) {
-			t.Errorf("%s left behind after failure", p)
+	for _, d := range []string{".claude/skills", ".github/skills"} {
+		entries, _ := os.ReadDir(filepath.Join(e.project, filepath.FromSlash(d)))
+		for _, en := range entries {
+			t.Errorf("%s/%s left behind after failure", d, en.Name())
+		}
+	}
+	for _, p := range []string{"cali.yaml", "cali.lock"} {
+		if exists(filepath.Join(e.project, p)) {
+			t.Errorf("%s written after failure", p)
 		}
 	}
 }
 
-func TestAddReplacesStaleStagingDir(t *testing.T) {
+func TestAddLeavesForeignStagingNameAlone(t *testing.T) {
 	r := monorepo(t)
 	e := newEnv(t)
-	stale := filepath.Join(e.project, ".claude", "skills", "x.cali-new")
-	write(t, stale, "junk", "left from a crash\n")
+	other := filepath.Join(e.project, ".claude", "skills", "x.cali-new")
+	write(t, other, "keep", "not ours\n")
 	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}}); err != nil {
 		t.Fatal(err)
 	}
-	if exists(stale) || exists(filepath.Join(e.project, ".claude", "skills", "x", "junk")) {
-		t.Fatal("stale staging content survived")
+	if !exists(filepath.Join(other, "keep")) || exists(filepath.Join(e.project, ".claude", "skills", "x", "keep")) {
+		t.Fatal("x.cali-new must be left untouched and not used")
+	}
+	fi, err := os.Stat(filepath.Join(e.project, ".claude", "skills", "x"))
+	if err != nil || fi.Mode().Perm() != 0o755 {
+		t.Fatalf("installed dir mode = %v, %v; want 0755", fi.Mode().Perm(), err)
+	}
+}
+
+func TestPlaceRefusesTargetThatAppeared(t *testing.T) {
+	skills := t.TempDir()
+	final := filepath.Join(skills, "x")
+	tr := skillfs.Tree{{Path: "SKILL.md", Data: []byte(skillMD("x"))}}
+	rename := func(o, n string) error {
+		t.Fatal("rename must not be called")
+		return nil
+	}
+	// Simulate another process creating the folder after planning.
+	write(t, final, "theirs", "t\n")
+	err := place(final, tr, rename)
+	if err == nil {
+		t.Fatal("want error")
+	}
+	entries, _ := os.ReadDir(skills)
+	if len(entries) != 1 || !exists(filepath.Join(final, "theirs")) {
+		t.Fatalf("staging left behind or target changed: %v", entries)
 	}
 }
 
@@ -404,7 +430,6 @@ func TestAddGlobalScope(t *testing.T) {
 func TestProjectRootResolution(t *testing.T) {
 	r := monorepo(t)
 	e := newEnv(t)
-	// A cali.yaml in an ancestor wins over a nearer .git.
 	if err := os.MkdirAll(filepath.Join(e.project, "sub", ".git"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -413,7 +438,10 @@ func TestProjectRootResolution(t *testing.T) {
 		t.Fatal(err)
 	}
 	e.deps.Cwd = cwd
-	// No cali.yaml anywhere: the git root (sub) is used.
+	// A cali.yaml above the git root is ignored: the walk stops at .git.
+	if err := os.WriteFile(filepath.Join(e.project, "cali.yaml"), []byte("version: 1\ntargets: [copilot]\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := Init(e.deps, false); err != nil {
 		t.Fatal(err)
 	}
@@ -426,17 +454,95 @@ func TestProjectRootResolution(t *testing.T) {
 	if err := os.Remove(filepath.Join(e.project, "sub", "cali.yaml")); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(e.project, "cali.yaml"), []byte("version: 1\ntargets: [copilot]\nskills: {}\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
 	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x"}); err != nil {
 		t.Fatal(err)
 	}
-	if !exists(filepath.Join(e.project, ".github", "skills", "x", "SKILL.md")) || exists(filepath.Join(e.project, ".claude")) {
-		t.Fatal("add did not install into the cali.yaml root with its targets")
+	if !exists(filepath.Join(e.project, "sub", ".claude", "skills", "x", "SKILL.md")) || exists(filepath.Join(e.project, ".github")) {
+		t.Fatal("add did not install into the git root")
 	}
-	if exists(filepath.Join(e.project, "sub", "cali.yaml")) || !exists(filepath.Join(e.project, "cali.lock")) {
-		t.Fatal("lock/manifest not at the cali.yaml root")
+	if !exists(filepath.Join(e.project, "sub", "cali.lock")) || exists(filepath.Join(e.project, "cali.lock")) {
+		t.Fatal("lock not at the git root")
+	}
+
+	// A cali.yaml between cwd and the git root wins.
+	if err := os.WriteFile(filepath.Join(cwd, "cali.yaml"), []byte("version: 1\ntargets: [claude]\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	p, err := Init(e.deps, false)
+	if err == nil || !strings.Contains(err.Error(), filepath.Join(cwd, "cali.yaml")) {
+		t.Fatalf("init = %s, %v; want refusal naming the nearer cali.yaml", p, err)
+	}
+}
+
+func TestProjectRootStopsAtHome(t *testing.T) {
+	e := newEnv(t)
+	home := e.deps.Dirs.Home
+	// A stray cali.yaml in HOME's parent must not capture projects in HOME.
+	if err := os.WriteFile(filepath.Join(filepath.Dir(home), "cali.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cwd := filepath.Join(home, "work", "proj")
+	if err := os.MkdirAll(cwd, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	e.deps.Cwd = cwd
+	p, err := Init(e.deps, false)
+	if err != nil || p != filepath.Join(cwd, "cali.yaml") {
+		t.Fatalf("init = %s, %v; want cwd", p, err)
+	}
+}
+
+func TestAddRefusesSymlinkInProjectTree(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	outside := t.TempDir()
+	if err := os.Symlink(outside, filepath.Join(e.project, ".claude")); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}})
+	if err == nil || !strings.Contains(err.Error(), filepath.Join(e.project, ".claude")) {
+		t.Fatalf("err = %v, want refusal naming .claude", err)
+	}
+	if entries, _ := os.ReadDir(outside); len(entries) != 0 {
+		t.Fatalf("wrote through the symlink: %v", entries)
+	}
+	if exists(filepath.Join(e.project, "cali.yaml")) {
+		t.Fatal("manifest written after refusal")
+	}
+}
+
+func TestAddRefusesSymlinkedLockInProject(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	victim := filepath.Join(t.TempDir(), "victim")
+	write(t, filepath.Dir(victim), "victim", "keep\n")
+	if err := os.Symlink(victim, filepath.Join(e.project, "cali.lock")); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x"})
+	if err == nil || !strings.Contains(err.Error(), "cali.lock") {
+		t.Fatalf("err = %v", err)
+	}
+	if b, _ := os.ReadFile(victim); string(b) != "keep\n" || exists(filepath.Join(e.project, ".claude")) {
+		t.Fatal("wrote after refusing the symlinked lock")
+	}
+}
+
+func TestAddGlobalAllowsSymlinkedSkillsDir(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	dotfiles := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(e.deps.Dirs.Home, ".claude"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(dotfiles, filepath.Join(e.deps.Dirs.Home, ".claude", "skills")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Global: true, Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	if !exists(filepath.Join(dotfiles, "x", "SKILL.md")) {
+		t.Fatal("global install did not go through the symlinked skills dir")
 	}
 }
 

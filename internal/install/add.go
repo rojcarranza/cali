@@ -27,9 +27,6 @@ import (
 // maxScanDepth is how deep add looks for SKILL.md when the spec has no //path.
 const maxScanDepth = 4
 
-// stagingSuffix marks a folder Cali is writing; it is renamed into place.
-const stagingSuffix = ".cali-new"
-
 var defaultTargets = []string{"claude", "copilot"}
 
 // Deps are the outside-world inputs of an install.
@@ -99,13 +96,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 	if err != nil {
 		return scope{}, err
 	}
-	root := findUp(cwd, "cali.yaml")
-	if root == "" {
-		root = findUp(cwd, ".git")
-	}
-	if root == "" {
-		root = cwd
-	}
+	root := findRoot(cwd, filepath.Clean(d.Dirs.Home))
 	return scope{
 		scope:    targets.Project,
 		root:     root,
@@ -114,17 +105,47 @@ func resolveScope(d Deps, global bool) (scope, error) {
 	}, nil
 }
 
-func findUp(dir, name string) string {
-	for {
-		if _, err := os.Lstat(filepath.Join(dir, name)); err == nil {
-			return dir
+// findRoot walks up from cwd: the first dir holding cali.yaml or .git is the
+// root. The walk never goes above home (a stray cali.yaml there must not
+// capture every project below); with no match the root is cwd.
+func findRoot(cwd, home string) string {
+	for dir := cwd; ; {
+		for _, marker := range []string{"cali.yaml", ".git"} {
+			if _, err := os.Lstat(filepath.Join(dir, marker)); err == nil {
+				return dir
+			}
 		}
 		parent := filepath.Dir(dir)
-		if parent == dir {
-			return ""
+		if dir == home || parent == dir {
+			return cwd
 		}
 		dir = parent
 	}
+}
+
+// noSymlinks refuses a symlink at any existing path component below root
+// down to and including dir. Used in project scope, where a cloned repo could
+// ship .claude as a link to somewhere sensitive.
+func noSymlinks(root, dir string) error {
+	rel, err := filepath.Rel(root, dir)
+	if err != nil || rel == "." {
+		return err
+	}
+	cur := root
+	for _, seg := range strings.Split(rel, string(filepath.Separator)) {
+		cur = filepath.Join(cur, seg)
+		fi, err := os.Lstat(cur)
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if fi.Mode()&os.ModeSymlink != 0 {
+			return fmt.Errorf("%s is a symlink; Cali does not write through symlinks in a project", cur)
+		}
+	}
+	return nil
 }
 
 // Init creates an empty manifest (version 1, targets claude and copilot) for
@@ -190,6 +211,13 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	sc, err := resolveScope(d, req.Global)
 	if err != nil {
 		return Result{}, err
+	}
+	if sc.scope == targets.Project {
+		for _, p := range []string{sc.manifest, sc.lockPath} {
+			if fi, err := os.Lstat(p); err == nil && fi.Mode()&os.ModeSymlink != 0 {
+				return Result{}, fmt.Errorf("%s is a symlink; Cali does not write through symlinks in a project", p)
+			}
+		}
 	}
 	m, err := manifest.ReadWith(sc.manifest, opts)
 	created := false
@@ -324,7 +352,7 @@ func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit st
 	req AddRequest, reqTargets []string, p string, opts source.Options) (*plan, error) {
 	name := installName(spec, p)
 	if !manifest.SkillNameValid(name) {
-		return nil, fmt.Errorf("skill folder %q is not a valid install name: want lowercase letters, digits and hyphens, 1-64 characters", name)
+		return nil, fmt.Errorf("skill folder %q is not a valid install name: want lowercase letters, digits and hyphens, 1-64 characters, not a Windows device name", name)
 	}
 	if prev, ok := m.Skills[name]; ok {
 		ps, perr := source.ParseWith(prev.Source, opts)
@@ -371,6 +399,11 @@ func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit st
 		if err != nil {
 			return nil, err
 		}
+		if sc.scope == targets.Project {
+			if err := noSymlinks(sc.root, dir); err != nil {
+				return nil, err
+			}
+		}
 		final := filepath.Join(dir, name)
 		adopt, err := existing(final, t, req.Adopt)
 		if err != nil {
@@ -409,26 +442,32 @@ func existing(final string, upstream skillfs.Tree, adoptFlag bool) (bool, error)
 	return false, fmt.Errorf("%s exists, is not managed by Cali and differs from upstream; pass --adopt to take it over as is", final)
 }
 
-// place writes t to <final>.cali-new and renames it to final. A leftover
-// staging directory is removed first; on failure the staging dir is removed.
+// place writes t to a fresh staging dir next to final and renames it to
+// final. Only that staging dir is ever removed.
 func place(final string, t skillfs.Tree, rename func(string, string) error) error {
-	staging := final + stagingSuffix
-	if fi, err := os.Lstat(staging); err == nil {
-		if fi.Mode()&os.ModeSymlink != 0 || !fi.IsDir() {
-			return fmt.Errorf("%s exists and is not a directory; remove it", staging)
-		}
-		if err := os.RemoveAll(staging); err != nil {
-			return err
-		}
-	} else if !errors.Is(err, os.ErrNotExist) {
+	if err := os.MkdirAll(filepath.Dir(final), 0o755); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(final), 0o755); err != nil {
+	staging, err := os.MkdirTemp(filepath.Dir(final), ".cali-staging-*")
+	if err != nil {
+		return err
+	}
+	// MkdirTemp creates 0700; the installed folder must be readable like any other.
+	if err := os.Chmod(staging, 0o755); err != nil {
+		_ = os.RemoveAll(staging)
 		return err
 	}
 	if err := t.WriteTo(staging); err != nil {
 		_ = os.RemoveAll(staging)
 		return fmt.Errorf("write %s: %w", staging, err)
+	}
+	// Re-check right before the swap: something may have created final since planning.
+	if _, err := os.Lstat(final); !errors.Is(err, os.ErrNotExist) {
+		_ = os.RemoveAll(staging)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("%s appeared while installing; not overwriting it", final)
 	}
 	if err := rename(staging, final); err != nil {
 		_ = os.RemoveAll(staging)
@@ -470,6 +509,9 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 		case 1:
 			return hits, nil
 		default:
+			for i, h := range hits {
+				hits[i] = show(h)
+			}
 			return nil, fmt.Errorf("several skills named %q in %s; use a //path to pick one: %s", req.Skill, spec.URL, strings.Join(hits, ", "))
 		}
 	case len(found) == 1:
@@ -483,7 +525,7 @@ func show(p string) string {
 	if p == "" {
 		return "(repo root)"
 	}
-	return p
+	return fmt.Sprintf("%q", p) // repo-controlled: quoted so control characters cannot reach the terminal
 }
 
 // installName is the skill folder's base name, or the repo name for a skill

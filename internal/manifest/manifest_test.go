@@ -110,7 +110,9 @@ func TestTargetsForOverride(t *testing.T) {
 
 func TestSkillNameValid(t *testing.T) {
 	ok := []string{"a", "code-review", "x1", "0", strings.Repeat("a", 64)}
-	bad := []string{"", "Code", "a_b", "a b", "a/b", "..", strings.Repeat("a", 65)}
+	ok = append(ok, "con-x", "com0", "com10", "lpt", "nul1x", "auxiliary")
+	bad := []string{"", "Code", "a_b", "a b", "a/b", "..", strings.Repeat("a", 65),
+		"con", "prn", "aux", "nul", "com1", "com5", "com9", "lpt1", "lpt9"}
 	for _, n := range ok {
 		if !SkillNameValid(n) {
 			t.Errorf("%q should be valid", n)
