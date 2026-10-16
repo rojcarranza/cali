@@ -14,6 +14,7 @@ import (
 	"github.com/rojcarranza/cali/internal/manifest"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
+	"github.com/rojcarranza/cali/internal/status"
 )
 
 // isTTY reports whether w is a terminal; anything but an *os.File is not.
@@ -98,6 +99,14 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 				}
 				rows = append(rows, r)
 				t.Rows = append(t.Rows, []string{r.Name, r.Source, short(r.Commit), strings.Join(r.Targets, ",")})
+			}
+			um, err := status.UnmanagedRows(s.m, s.loc.Scope, s.loc.Root, s.home)
+			if err != nil {
+				return err
+			}
+			for _, u := range um {
+				rows = append(rows, row{u.Skill, "unmanaged", "", []string{u.Target}})
+				t.Rows = append(t.Rows, []string{u.Skill, "unmanaged", "-", u.Target})
 			}
 			mode := render.ModeFor(isTTY(out), asJSON)
 			if mode == render.JSON {

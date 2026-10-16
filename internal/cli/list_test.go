@@ -64,6 +64,49 @@ func TestListOffline(t *testing.T) {
 	}
 }
 
+func TestListShowsUnmanaged(t *testing.T) {
+	_, project := setup(t)
+	writeFixture(t, project)
+	for _, d := range []string{"z", ".cali-old-1"} {
+		p := filepath.Join(project, ".claude", "skills", d, "SKILL.md")
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte("---\nname: z\ndescription: Z.\n---\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	code, out, errs := run("list")
+	if code != 0 {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	if len(lines) != 4 || strings.Join(strings.Fields(lines[3]), " ") != "z unmanaged - claude" {
+		t.Fatalf("out = %q", out)
+	}
+
+	code, out, errs = run("list", "--json")
+	if code != 0 {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+	var got struct {
+		Skills []struct {
+			Name, Source, Commit string
+			Targets              []string
+		} `json:"skills"`
+	}
+	if err := json.Unmarshal([]byte(out), &got); err != nil {
+		t.Fatalf("%v: %q", err, out)
+	}
+	if len(got.Skills) != 3 {
+		t.Fatalf("got %+v", got)
+	}
+	if z := got.Skills[2]; z.Name != "z" || z.Source != "unmanaged" || z.Commit != "" || len(z.Targets) != 1 || z.Targets[0] != "claude" {
+		t.Fatalf("got %+v", z)
+	}
+}
+
 func TestShow(t *testing.T) {
 	_, project := setup(t)
 	writeFixture(t, project)
