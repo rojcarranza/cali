@@ -261,3 +261,54 @@ func TestStatusNoManifestNoRows(t *testing.T) {
 		t.Fatalf("rows=%+v warns=%+v", rows, warns)
 	}
 }
+
+func TestStatusRefInSource(t *testing.T) {
+	in, f, _ := fixture(t)
+	in.Manifest.Skills["x"] = manifest.Skill{Source: "https://github.com/o/r//skills/x@" + commitA}
+	f.tree = treeB
+	rows, _ := compute(t, in)
+	want(t, states(t, rows, "x", "claude"), OK)
+	if len(f.calls) != 0 {
+		t.Fatalf("skill pinned by @sha was fetched: %+v", f.calls)
+	}
+
+	in.Manifest.Skills["x"] = manifest.Skill{Source: "https://github.com/o/r//skills/x@v1.0.0"}
+	compute(t, in)
+	if len(f.calls) != 1 || f.calls[0].Ref != "v1.0.0" {
+		t.Fatalf("calls = %+v, want one for v1.0.0", f.calls)
+	}
+}
+
+func TestStatusOddManagedFolderIsARow(t *testing.T) {
+	for _, tc := range []struct{ name, detail string }{
+		{"symlink", "symlink, not managed by Cali"},
+		{"file", "not a directory"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			in, _, _ := fixture(t)
+			in.Manifest.Skills["y"] = manifest.Skill{Source: "https://github.com/o/r//skills/y"}
+			final := filepath.Join(in.Root, ".claude", "skills", "x")
+			if err := os.RemoveAll(final); err != nil {
+				t.Fatal(err)
+			}
+			if tc.name == "symlink" {
+				if err := os.Symlink(t.TempDir(), final); err != nil {
+					t.Skip("symlinks unavailable:", err)
+				}
+			} else if err := os.WriteFile(final, []byte("x"), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			rows, _, err := Compute(context.Background(), in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want(t, states(t, rows, "x", "claude"), Modified)
+			want(t, states(t, rows, "y", "claude"), Missing)
+			for _, r := range rows {
+				if r.Skill == "x" && r.Detail != tc.detail {
+					t.Fatalf("detail = %q, want %q", r.Detail, tc.detail)
+				}
+			}
+		})
+	}
+}

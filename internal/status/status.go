@@ -79,46 +79,50 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 	installed := map[string][]string{}
 	requires := map[string][]string{}
 	warned := map[string]bool{}
-	usedTargets := slices.Clone(in.Manifest.Targets)
 
 	for _, name := range sortedKeys(in.Manifest.Skills) {
 		sk := in.Manifest.Skills[name]
 		e, locked := in.Lock.Skills[name]
 		outdated := false
-		if locked && !in.Offline && in.Fetcher != nil && !fullSHA.MatchString(sk.Ref) {
-			if err := ctx.Err(); err != nil {
-				return nil, nil, err
-			}
+		if locked && !in.Offline && in.Fetcher != nil {
 			spec, err := source.ParseWith(sk.Source, in.SourceOptions)
 			if err != nil {
 				return nil, nil, fmt.Errorf("skill %s: %w", name, err)
 			}
-			spec.Ref, spec.Path = sk.Ref, e.Path
-			if _, tree, err := in.Fetcher.Latest(spec); err != nil {
-				if !warned[spec.URL] {
-					warned[spec.URL] = true
-					_, _ = fmt.Fprintf(warn, "warning: %s: %v\n", spec.URL, err)
+			ref := sk.Ref // the effective ref, as sync and update use it
+			if ref == "" {
+				ref = spec.Ref
+			}
+			spec.Ref, spec.Path = ref, e.Path
+			if !fullSHA.MatchString(ref) { // a commit pin is never outdated: nothing to fetch
+				if err := ctx.Err(); err != nil {
+					return nil, nil, err
 				}
-			} else {
-				outdated = tree != e.Tree
+				if _, tree, err := in.Fetcher.Latest(spec); err != nil {
+					if !warned[spec.URL] {
+						warned[spec.URL] = true
+						_, _ = fmt.Fprintf(warn, "warning: %s: %v\n", spec.URL, err)
+					}
+				} else {
+					outdated = tree != e.Tree
+				}
 			}
 		}
 
 		var fm skillfs.Frontmatter
 		for _, tg := range in.Manifest.TargetsFor(name) {
-			if !slices.Contains(usedTargets, tg) {
-				usedTargets = append(usedTargets, tg)
-			}
 			base, err := targets.Dir(tg, in.Scope, in.Root, in.Home)
 			if err != nil {
 				return nil, nil, err
 			}
 			r := Row{Skill: name, Target: tg}
-			have, present, err := readFolder(filepath.Join(base, name))
+			have, present, odd, err := readFolder(filepath.Join(base, name))
 			if err != nil {
 				return nil, nil, err
 			}
 			switch {
+			case odd != "":
+				r.States, r.Detail = append(r.States, Modified), odd
 			case !present:
 				r.States = append(r.States, Missing)
 			case !locked:
@@ -141,7 +145,7 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 				r.States = []State{OK}
 			}
 			rows = append(rows, r)
-			if present {
+			if present && odd == "" {
 				installed[tg] = append(installed[tg], name)
 				if fm.Name == "" {
 					fm = frontmatter(have)
@@ -168,28 +172,11 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 		}
 	}
 
-	for _, tg := range usedTargets {
-		base, err := targets.Dir(tg, in.Scope, in.Root, in.Home)
-		if err != nil {
-			return nil, nil, err
-		}
-		ents, err := os.ReadDir(base)
-		if errors.Is(err, os.ErrNotExist) {
-			continue
-		}
-		if err != nil {
-			return nil, nil, err
-		}
-		for _, ent := range ents {
-			name := ent.Name()
-			if _, managed := in.Manifest.Skills[name]; managed || !ent.IsDir() || strings.HasPrefix(name, ".") {
-				continue
-			}
-			if fi, err := os.Lstat(filepath.Join(base, name, "SKILL.md")); err == nil && fi.Mode().IsRegular() {
-				rows = append(rows, Row{Skill: name, Target: tg, States: []State{Unmanaged}})
-			}
-		}
+	um, err := UnmanagedRows(in.Manifest, in.Scope, in.Root, in.Home)
+	if err != nil {
+		return nil, nil, err
 	}
+	rows = append(rows, um...)
 
 	// Stable: a project row stays ahead of the shadowed global row of the same skill and target.
 	sort.SliceStable(rows, func(i, j int) bool {
@@ -201,23 +188,65 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 	return rows, deps.Check(installed, requires), nil
 }
 
-// readFolder reads an installed skill folder; present is false when it does not exist.
-func readFolder(dir string) (t skillfs.Tree, present bool, err error) {
+// UnmanagedRows returns an Unmanaged row for every folder holding a regular
+// SKILL.md in the skills dir of any target m uses, that m does not manage.
+// Names starting with "." (Cali's staging and moved-aside folders) are skipped.
+func UnmanagedRows(m manifest.Manifest, scope targets.Scope, root, home string) ([]Row, error) {
+	used := slices.Clone(m.Targets)
+	for _, name := range sortedKeys(m.Skills) {
+		for _, tg := range m.TargetsFor(name) {
+			if !slices.Contains(used, tg) {
+				used = append(used, tg)
+			}
+		}
+	}
+	var rows []Row
+	for _, tg := range used {
+		base, err := targets.Dir(tg, scope, root, home)
+		if err != nil {
+			return nil, err
+		}
+		ents, err := os.ReadDir(base)
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		for _, ent := range ents {
+			name := ent.Name()
+			if _, managed := m.Skills[name]; managed || !ent.IsDir() || strings.HasPrefix(name, ".") {
+				continue
+			}
+			if fi, err := os.Lstat(filepath.Join(base, name, "SKILL.md")); err == nil && fi.Mode().IsRegular() {
+				rows = append(rows, Row{Skill: name, Target: tg, States: []State{Unmanaged}})
+			}
+		}
+	}
+	return rows, nil
+}
+
+// readFolder reads an installed skill folder; present is false when it does
+// not exist, and odd says why a present path is not a folder Cali manages.
+func readFolder(dir string) (t skillfs.Tree, present bool, odd string, err error) {
 	fi, err := os.Lstat(dir)
 	if errors.Is(err, os.ErrNotExist) {
-		return nil, false, nil
+		return nil, false, "", nil
 	}
 	if err != nil {
-		return nil, false, err
+		return nil, false, "", err
 	}
-	if !fi.IsDir() {
-		return nil, false, fmt.Errorf("%s is not a directory", dir)
+	switch {
+	case fi.Mode()&os.ModeSymlink != 0:
+		return nil, true, "symlink, not managed by Cali", nil
+	case !fi.IsDir():
+		return nil, true, "not a directory", nil
 	}
 	t, err = skillfs.ReadDir(dir)
 	if err != nil {
-		return nil, false, fmt.Errorf("%s: %w", dir, err)
+		return nil, false, "", fmt.Errorf("%s: %w", dir, err)
 	}
-	return t, true, nil
+	return t, true, "", nil
 }
 
 // frontmatter parses the SKILL.md of t; an unparsable one counts as empty, as in show.
