@@ -152,9 +152,16 @@ func edits(a, b []string) []edit {
 	return out
 }
 
+// maxHunkCells caps the LCS table of one hunk side (about 8 MB of ints).
+const maxHunkCells = 1_000_000
+
 // mergeHunk applies both sides' edits to the hunk's base, or reports false if
 // any edit of ours overlaps one of theirs or both start at the same base line.
 func mergeHunk(h Hunk) ([]string, bool) {
+	// edits builds a len(Base) x len(side) table: refuse hunks too big to diff.
+	if n := len(h.Base); n*len(h.Ours) > maxHunkCells || n*len(h.Theirs) > maxHunkCells {
+		return nil, false
+	}
 	eo, et := edits(h.Base, h.Ours), edits(h.Base, h.Theirs)
 	for _, a := range eo {
 		for _, b := range et {

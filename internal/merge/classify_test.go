@@ -1,8 +1,11 @@
 package merge
 
 import (
+	"fmt"
+	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 // overlap is a text conflict with one overlapping hunk outside any frontmatter.
@@ -247,4 +250,20 @@ func TestClassifyFrontmatterUpstreamOnlyChange(t *testing.T) {
 		}
 	}
 	check(t, Classify("SKILL.md", c, 1, 48), ClassFrontmatter, "ours", false)
+}
+
+func TestMergeHunkRefusesHugeHunk(t *testing.T) {
+	base := make([]string, 2000)
+	for i := range base {
+		base[i] = fmt.Sprintf("line %d", i)
+	}
+	ours, theirs := slices.Clone(base), slices.Clone(base)
+	ours[0], theirs[len(theirs)-1] = "ours", "theirs" // disjoint, but too big to diff
+	start := time.Now()
+	if _, ok := mergeHunk(Hunk{Base: base, Ours: ours, Theirs: theirs}); ok {
+		t.Fatal("huge hunk classified as disjoint")
+	}
+	if d := time.Since(start); d > time.Second {
+		t.Fatalf("took %v", d)
+	}
 }
