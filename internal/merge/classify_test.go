@@ -167,8 +167,8 @@ func TestPreResolveWhitespaceOnly(t *testing.T) {
 		name, ours, theirs, want string
 		ok                       bool
 	}{
-		{"ours whitespace", "a  b\r\nc\n\n", "X\n", "X\n", true},
-		{"theirs whitespace", "Y\n", "a\tb\nc", "Y\n", true},
+		{"ours CRLF only", "a b\r\nc\r\n", "X\n", "X\n", true},
+		{"theirs trailing space only", "Y\n", "a b \t\nc  \n", "Y\n", true},
 		{"both real", "Y\n", "X\n", "", false},
 	} {
 		got, ok := PreResolve(base, []byte(tc.ours), []byte(tc.theirs))
@@ -201,4 +201,50 @@ func TestChangedLinesRefusesBinary(t *testing.T) {
 	if _, err := ChangedLines([]byte("a\n"), []byte("a\x00\n")); err == nil {
 		t.Error("want an error for binary input")
 	}
+}
+
+func TestResolveDisjointMarkerLineInBase(t *testing.T) {
+	c := conflictOf(t, "ref.md", "a\n=======\n", "a\n", "=======\nc\n")
+	got, ok := ResolveDisjoint(c)
+	if !ok || string(got) != "c\n" {
+		t.Errorf("got %q %v, want %q true", got, ok, "c\n")
+	}
+}
+
+func TestResolveDisjointMarkerLineIsConflict(t *testing.T) {
+	c := conflictOf(t, "ref.md", "a\nx\n=======\n", "x\na\nx\nx\n=======\n", "a\nb\n")
+	if got, ok := ResolveDisjoint(c); ok {
+		t.Errorf("got clean merge %q, want a conflict", got)
+	}
+}
+
+func TestPreResolveKeepsRealWhitespaceChanges(t *testing.T) {
+	base := []byte("def f():\n    return 1\n\nend\n")
+	for name, ours := range map[string]string{
+		"indent":       "def f():\n  return 1\n\nend\n",
+		"join":         "def f(): return 1\n\nend\n",
+		"split":        "def f():\n    return\n    1\n\nend\n",
+		"blank insert": "def f():\n\n    return 1\n\nend\n",
+	} {
+		if got, ok := PreResolve(base, []byte(ours), []byte("X\n")); ok {
+			t.Errorf("%s: pre-resolved to %q, want no pre-resolution", name, got)
+		}
+	}
+}
+
+func TestClassifyFrontmatterRemovedLocally(t *testing.T) {
+	c := conflictOf(t, "SKILL.md", skillBase, "# mine\n", "---\nname: x\ndescription: d\n---\n# theirs\n")
+	check(t, Classify("SKILL.md", c, 4, 1), ClassFrontmatter, "ours", false)
+}
+
+func TestClassifyFrontmatterUpstreamOnlyChange(t *testing.T) {
+	c := conflictOf(t, "SKILL.md", skillBase,
+		"---\nname: x\ndescription: d\n---\n# mine\n",
+		"---\nname: x\ndescription: new\n---\n# theirs\n")
+	for _, h := range c.Hunks {
+		if h.OursStart <= 4 {
+			t.Fatalf("setup: hunk %+v overlaps the frontmatter", h)
+		}
+	}
+	check(t, Classify("SKILL.md", c, 1, 48), ClassFrontmatter, "ours", false)
 }

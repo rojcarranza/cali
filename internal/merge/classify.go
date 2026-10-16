@@ -72,14 +72,29 @@ func Classify(path string, c Conflict, localLines, upstreamLines int) Recommenda
 
 func binary(b []byte) bool { return b != nil && !skillfs.IsText(b) }
 
-// inFrontmatter reports whether a hunk starts within ours' frontmatter, from
-// the first-line --- through the closing --- (an unclosed block runs to EOF).
-// shortcut: uses ours' frontmatter only; a local edit that removed the whole
-// block is not detected here, upgrade if that case shows up.
+// inFrontmatter reports whether a hunk starts within ours' frontmatter, or
+// the frontmatter blocks of base, ours and theirs are not all identical.
 func inFrontmatter(c Conflict) bool {
-	lines := strings.Split(string(skillfs.NormalizeLF(bytes.TrimPrefix(c.Ours, []byte("\xef\xbb\xbf")))), "\n")
+	ob, end, ok := frontmatter(c.Ours)
+	bb, _, bok := frontmatter(c.Base)
+	tb, _, tok := frontmatter(c.Theirs)
+	if ok != bok || ok != tok || ob != bb || ob != tb {
+		return true
+	}
+	for _, h := range c.Hunks {
+		if ok && h.OursStart <= end {
+			return true
+		}
+	}
+	return false
+}
+
+// frontmatter returns b's frontmatter block (LF) from the first-line ---
+// through the closing --- and that line's number; an unclosed block runs to EOF.
+func frontmatter(b []byte) (string, int, bool) {
+	lines := strings.Split(string(skillfs.NormalizeLF(bytes.TrimPrefix(b, []byte("\xef\xbb\xbf")))), "\n")
 	if lines[0] != "---" {
-		return false
+		return "", 0, false
 	}
 	end := len(lines)
 	for i := 1; i < len(lines); i++ {
@@ -88,12 +103,7 @@ func inFrontmatter(c Conflict) bool {
 			break
 		}
 	}
-	for _, h := range c.Hunks {
-		if h.OursStart <= end {
-			return true
-		}
-	}
-	return false
+	return strings.Join(lines[:end], "\n"), end, true
 }
 
 // edit replaces base lines [s, e) with repl; s == e is an insertion.
@@ -174,7 +184,8 @@ func allDisjoint(hs []Hunk) bool {
 
 // ResolveDisjoint re-runs the line merge of c and applies both sides' changes
 // inside every conflicting hunk. It returns the whole merged file as LF text,
-// or false if a side is deleted or binary, or any hunk is not disjoint.
+// or false if a side is deleted or binary, or any hunk is not disjoint. The
+// caller must re-encode the result with ours' line-ending style.
 func ResolveDisjoint(c Conflict) ([]byte, bool) {
 	if c.Ours == nil || c.Theirs == nil || binary(c.Base) || binary(c.Ours) || binary(c.Theirs) {
 		return nil, false
@@ -184,19 +195,14 @@ func ResolveDisjoint(c Conflict) ([]byte, bool) {
 		return nil, false
 	}
 	defer func() { _ = os.RemoveAll(dir) }()
-	for name, b := range map[string][]byte{"ours": c.Ours, "base": c.Base, "theirs": c.Theirs} {
-		if err := os.WriteFile(filepath.Join(dir, name), skillfs.NormalizeLF(b), 0o600); err != nil {
-			return nil, false
-		}
-	}
-	out, code, err := git(dir, "merge-file", "-p", "--diff3", "-L", "ours", "-L", "base", "-L", "theirs", "ours", "base", "theirs")
+	out, size, code, err := mergeFile(dir, c.Ours, c.Base, c.Theirs)
 	switch {
 	case code == 0 && err == nil:
 		return out, true
 	case code < 1 || code > 127:
 		return nil, false
 	}
-	hunks, resolved, starts := parseConflicts(out)
+	hunks, resolved, starts := parseConflicts(out, size)
 	if len(hunks) == 0 {
 		return nil, false
 	}
@@ -259,23 +265,34 @@ func ChangedLines(base, side []byte) (int, error) {
 	return n, nil
 }
 
-// PreResolve settles a conflict where one side differs from base only in
-// whitespace or line endings: it returns the other side. A nil result with ok
-// means the file is deleted. Binary input and deletions never pre-resolve.
+// PreResolve settles a conflict where one side differs from base only in line
+// endings or trailing spaces and tabs: it returns the other side. A nil result
+// with ok means the file is deleted. Binary input and deletions never pre-resolve.
 func PreResolve(base, ours, theirs []byte) ([]byte, bool) {
 	if binary(base) || binary(ours) || binary(theirs) {
 		return nil, false
 	}
 	switch {
-	case ours != nil && sameWords(base, ours):
+	case ours != nil && sameLines(base, ours):
 		return theirs, true
-	case theirs != nil && sameWords(base, theirs):
+	case theirs != nil && sameLines(base, theirs):
 		return ours, true
 	}
 	return nil, false
 }
 
-// sameWords compares a and b with every whitespace run collapsed.
-func sameWords(a, b []byte) bool {
-	return strings.Join(strings.Fields(string(a)), " ") == strings.Join(strings.Fields(string(b)), " ")
+// sameLines reports whether a and b have the same LF lines once trailing
+// spaces and tabs are trimmed; indentation and line breaks still count.
+func sameLines(a, b []byte) bool {
+	la := strings.Split(string(skillfs.NormalizeLF(a)), "\n")
+	lb := strings.Split(string(skillfs.NormalizeLF(b)), "\n")
+	if len(la) != len(lb) {
+		return false
+	}
+	for i := range la {
+		if strings.TrimRight(la[i], " \t") != strings.TrimRight(lb[i], " \t") {
+			return false
+		}
+	}
+	return true
 }

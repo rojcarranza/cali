@@ -283,3 +283,24 @@ func TestPlanNeverEmitsMarkers(t *testing.T) {
 		}
 	}
 }
+
+func TestPlanHunkWithMarkerContentLine(t *testing.T) {
+	ps, err := Plan(tr(f("SKILL.md", "a\n=======\nc\n")), tr(f("SKILL.md", "a\nO\nc\n")), tr(f("SKILL.md", "a\nT\nc\n")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := byPath(t, ps, "SKILL.md")
+	want := []Hunk{{OursStart: 2, Ours: []string{"O"}, Base: []string{"======="}, Theirs: []string{"T"}}}
+	if p.Action != Conflicted || p.Conflict == nil || !reflect.DeepEqual(p.Conflict.Hunks, want) {
+		t.Fatalf("got %+v, want hunks %+v", p, want)
+	}
+}
+
+func TestMarkerSize(t *testing.T) {
+	if n := markerSize([]byte("a\n")); n != 7 {
+		t.Errorf("plain text: got %d, want 7", n)
+	}
+	if n := markerSize([]byte("a\n"), []byte("x\n<<<|=>>>>> y\n"), nil); n != 11 { // 10-char prefix
+		t.Errorf("got %d, want 11", n)
+	}
+}

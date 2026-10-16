@@ -181,19 +181,14 @@ func git(dir string, args ...string) ([]byte, int, error) {
 // merge3 line-merges LF-normalized ours/base/theirs. It returns the merged LF
 // text when clean, or the conflict hunks (non-nil) when not.
 func merge3(dir string, ours, base, theirs []byte) ([]byte, []Hunk, error) {
-	for name, b := range map[string][]byte{"ours": ours, "base": base, "theirs": theirs} {
-		if err := os.WriteFile(filepath.Join(dir, name), skillfs.NormalizeLF(b), 0o600); err != nil {
-			return nil, nil, err
-		}
-	}
-	out, code, err := git(dir, "merge-file", "-p", "--diff3", "-L", "ours", "-L", "base", "-L", "theirs", "ours", "base", "theirs")
+	out, size, code, err := mergeFile(dir, ours, base, theirs)
 	switch {
 	case code == 0 && err == nil:
 		return out, nil, nil
 	case code < 1 || code > 127:
 		return nil, nil, err
 	}
-	hunks, resolved, starts := parseConflicts(out)
+	hunks, resolved, starts := parseConflicts(out, size)
 	if len(hunks) == 0 {
 		return nil, nil, fmt.Errorf("git merge-file reported %d conflicts but printed no markers", code)
 	}
@@ -206,11 +201,43 @@ func merge3(dir string, ours, base, theirs []byte) ([]byte, []Hunk, error) {
 	return nil, hunks, nil
 }
 
-// parseConflicts reads diff3 output. resolved is the output with every
-// conflict replaced by its ours side; starts[i] is hunk i's 1-based line there.
-// shortcut: a content line equal to a marker line inside a conflict region is
-// misread as a marker; upgrade to --marker-size if real skills hit it.
-func parseConflicts(out []byte) (hunks []Hunk, resolved []byte, starts []int) {
+// mergeFile writes LF-normalized ours/base/theirs into dir and runs
+// `git merge-file --diff3` with a marker size longer than any marker-like
+// line prefix of the inputs, so no content line can be read as a marker.
+func mergeFile(dir string, ours, base, theirs []byte) (out []byte, size, code int, err error) {
+	for name, b := range map[string][]byte{"ours": ours, "base": base, "theirs": theirs} {
+		if err := os.WriteFile(filepath.Join(dir, name), skillfs.NormalizeLF(b), 0o600); err != nil {
+			return nil, 0, 0, err
+		}
+	}
+	size = markerSize(ours, base, theirs)
+	out, code, err = git(dir, "merge-file", "-p", "--diff3", "--marker-size="+strconv.Itoa(size),
+		"-L", "ours", "-L", "base", "-L", "theirs", "ours", "base", "theirs")
+	return out, size, code, err
+}
+
+// markerSize is 1 + the longest run of <, |, = or > at the start of any line
+// of the sides, and at least 7 (git's default).
+func markerSize(sides ...[]byte) int {
+	longest := 6
+	for _, b := range sides {
+		for _, l := range bytes.Split(b, []byte("\n")) {
+			n := 0
+			for n < len(l) && bytes.IndexByte([]byte("<|=>"), l[n]) >= 0 {
+				n++
+			}
+			longest = max(longest, n)
+		}
+	}
+	return longest + 1
+}
+
+// parseConflicts reads diff3 output written with marker size size. resolved
+// is the output with every conflict replaced by its ours side; starts[i] is
+// hunk i's 1-based line there.
+func parseConflicts(out []byte, size int) (hunks []Hunk, resolved []byte, starts []int) {
+	open, mid := strings.Repeat("<", size)+" ours", strings.Repeat("|", size)+" base"
+	sep, end := strings.Repeat("=", size), strings.Repeat(">", size)+" theirs"
 	lines := strings.SplitAfter(string(out), "\n")
 	state, n := 0, 0 // 0 outside, 1 ours, 2 base, 3 theirs
 	var h Hunk
@@ -218,14 +245,14 @@ func parseConflicts(out []byte) (hunks []Hunk, resolved []byte, starts []int) {
 	for _, l := range lines {
 		s := strings.TrimSuffix(l, "\n")
 		switch {
-		case state == 0 && s == "<<<<<<< ours":
+		case state == 0 && s == open:
 			h, state = Hunk{}, 1
 			starts = append(starts, n+1)
-		case state == 1 && s == "||||||| base":
+		case state == 1 && s == mid:
 			state = 2
-		case state == 2 && s == "=======":
+		case state == 2 && s == sep:
 			state = 3
-		case state == 3 && s == ">>>>>>> theirs":
+		case state == 3 && s == end:
 			hunks, state = append(hunks, h), 0
 		case state == 1:
 			h.Ours = append(h.Ours, s)
