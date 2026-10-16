@@ -72,10 +72,24 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		return Report{}, err
 	}
 
+	// A lock entry counts only if it matches the manifest's source, path and
+	// ref; otherwise a committed lock could point sync at another origin.
 	var names, missing, stale []string
-	for n := range m.Skills {
+	specs := map[string]source.Spec{}
+	refs := map[string]string{}
+	for n, s := range m.Skills {
 		names = append(names, n)
-		if _, ok := l.Skills[n]; !ok {
+		spec, err := source.ParseWith(s.Source, opts)
+		if err != nil {
+			return Report{}, fmt.Errorf("skill %s: %w", n, err)
+		}
+		ref := s.Ref
+		if ref == "" {
+			ref = spec.Ref
+		}
+		specs[n], refs[n] = spec, ref
+		e, ok := l.Skills[n]
+		if !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") || e.Ref != ref {
 			missing = append(missing, n)
 		}
 	}
@@ -90,7 +104,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	if frozen && (len(missing) > 0 || len(stale) > 0) {
 		var why []string
 		if len(missing) > 0 {
-			why = append(why, "not locked: "+strings.Join(missing, ", "))
+			why = append(why, "not locked, or locked with another source, path or ref: "+strings.Join(missing, ", "))
 		}
 		if len(stale) > 0 {
 			why = append(why, "no longer in the manifest: "+strings.Join(stale, ", "))
@@ -100,7 +114,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 
 	newL := lock.Lock{Version: l.Version, Skills: map[string]lock.Entry{}}
 	for n, e := range l.Skills {
-		if _, ok := m.Skills[n]; ok {
+		if _, ok := m.Skills[n]; ok && !slices.Contains(missing, n) {
 			newL.Skills[n] = e
 		}
 	}
@@ -119,20 +133,13 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	var rep Report
 	trees := map[string]skillfs.Tree{} // pristine tree per skill that can be checked
 	for _, n := range names {
+		spec := specs[n]
 		if slices.Contains(missing, n) {
-			s := m.Skills[n]
-			spec, err := source.ParseWith(s.Source, opts)
-			if err != nil {
-				return Report{}, fmt.Errorf("skill %s: %w", n, err)
-			}
 			repo, err := fetch(spec)
 			if err != nil {
 				return Report{}, err
 			}
-			ref := s.Ref
-			if ref == "" {
-				ref = spec.Ref
-			}
+			ref := refs[n]
 			commit, err := repo.Resolve(ref)
 			if err != nil {
 				return Report{}, fmt.Errorf("skill %s: %w", n, err)
@@ -155,11 +162,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			return Report{}, fmt.Errorf("pristine copy of %s: %w", n, err)
 		}
 		if !ok {
-			spec, err := source.ParseWith(e.Source, opts)
-			if err != nil {
-				return Report{}, fmt.Errorf("skill %s: lock source: %w", n, err)
-			}
-			repo, err := fetch(spec)
+			repo, err := fetch(spec) // the manifest's origin, which e.Source was checked to equal
 			if err != nil {
 				return Report{}, err
 			}
@@ -198,6 +201,9 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		if len(tgs) == 0 {
 			return Report{}, fmt.Errorf("skill %s: no targets: set targets in %s", n, sc.manifest)
 		}
+		var skillJobs []job
+		var skillActs []Action
+		unmanaged := false
 		for _, tg := range tgs {
 			dir, err := targets.Dir(tg, sc.scope, sc.root, d.Dirs.Home)
 			if err != nil {
@@ -211,7 +217,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			final := filepath.Join(dir, n)
 			fi, err := os.Lstat(final)
 			if errors.Is(err, os.ErrNotExist) {
-				jobs = append(jobs, job{n, tg, final, t})
+				skillJobs = append(skillJobs, job{n, tg, final, t})
 				continue
 			}
 			if err != nil {
@@ -224,16 +230,23 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			}
 			switch {
 			case same && fresh:
-				rep.Actions = append(rep.Actions, Action{Kind: "adopted", Name: n, Target: tg})
+				skillActs = append(skillActs, Action{Kind: "adopted", Name: n, Target: tg})
 			case same:
 			case fresh:
 				// Same rule as add: an unmanaged folder that differs is never taken over.
 				rep.Actions = append(rep.Actions, Action{Kind: "kept", Name: n, Target: tg, Detail: "unmanaged"})
-				delete(newL.Skills, n)
+				unmanaged = true
 			default:
 				rep.Actions = append(rep.Actions, Action{Kind: "kept", Name: n, Target: tg, Detail: "modified"})
 			}
 		}
+		if unmanaged {
+			// The skill stays unlocked and is not installed or adopted anywhere this run.
+			delete(newL.Skills, n)
+			continue
+		}
+		jobs = append(jobs, skillJobs...)
+		rep.Actions = append(rep.Actions, skillActs...)
 	}
 
 	rename := d.Rename

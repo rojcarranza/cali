@@ -162,3 +162,28 @@ func TestRemoveRefusesSymlinkedFolder(t *testing.T) {
 		t.Fatal("symlink target touched")
 	}
 }
+
+func TestRemoveAbortsWhenFolderChangesDuringBackup(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	final := filepath.Join(e.project, ".claude", "skills", "x")
+	afterBackup = func(dir string) { write(t, dir, "SKILL.md", "late edit\n") }
+	t.Cleanup(func() { afterBackup = nil })
+
+	err := Remove(context.Background(), e.deps, "x", false)
+	if err == nil || !strings.Contains(err.Error(), final) {
+		t.Fatalf("err = %v, want abort naming %s", err, final)
+	}
+	if b, _ := os.ReadFile(filepath.Join(final, "SKILL.md")); string(b) != "late edit\n" {
+		t.Fatal("folder removed or changed after a concurrent edit")
+	}
+	if _, ok := readManifest(t, filepath.Join(e.project, "cali.yaml")).Skills["x"]; !ok {
+		t.Fatal("manifest entry dropped")
+	}
+	if l, _ := lock.Read(filepath.Join(e.project, "cali.lock")); l.Skills["x"].Tree == "" {
+		t.Fatal("lock entry dropped")
+	}
+}

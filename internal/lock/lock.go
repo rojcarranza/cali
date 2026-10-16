@@ -12,6 +12,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // currentVersion is the only lock format version this package understands.
@@ -58,7 +59,29 @@ func Read(path string) (Lock, error) {
 	if l.Skills == nil {
 		l.Skills = map[string]Entry{}
 	}
+	for _, e := range l.Skills {
+		if !safePath(e.Path) {
+			return Lock{}, fmt.Errorf("parse lock %s: an entry has an unsafe path (absolute, empty segment, .. or backslash)", path)
+		}
+	}
 	return l, nil
+}
+
+// safePath reports whether p is a relative slash path inside the repo: empty
+// (the repo root) or segments that are neither empty nor "..", no backslash.
+func safePath(p string) bool {
+	if p == "" {
+		return true
+	}
+	if strings.Contains(p, `\`) {
+		return false
+	}
+	for _, seg := range strings.Split(p, "/") {
+		if seg == "" || seg == ".." {
+			return false
+		}
+	}
+	return true
 }
 
 // Marshal returns the canonical bytes of l. encoding/json sorts map keys, so

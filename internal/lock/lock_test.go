@@ -161,3 +161,30 @@ func TestReadRejectsBadInput(t *testing.T) {
 		}
 	}
 }
+
+func TestReadRejectsUnsafePath(t *testing.T) {
+	for _, p := range []string{"../x", "skills/../../x", "skills/..", "/abs/x", "skills//x", "skills/x/", `skills\x`, ".."} {
+		t.Run(p, func(t *testing.T) {
+			e := entry("x")
+			e.Path = p
+			path := filepath.Join(t.TempDir(), "cali.lock")
+			if err := os.WriteFile(path, Lock{Version: 1, Skills: map[string]Entry{"x": e}}.Marshal(), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := Read(path); err == nil || !strings.Contains(err.Error(), "path") {
+				t.Fatalf("Read accepted path %q: err=%v", p, err)
+			}
+		})
+	}
+	for _, p := range []string{"", "x", "skills/x", "a/b/c.d"} {
+		e := entry("x")
+		e.Path = p
+		path := filepath.Join(t.TempDir(), "cali.lock")
+		if err := os.WriteFile(path, Lock{Version: 1, Skills: map[string]Entry{"x": e}}.Marshal(), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := Read(path); err != nil {
+			t.Errorf("Read rejected path %q: %v", p, err)
+		}
+	}
+}

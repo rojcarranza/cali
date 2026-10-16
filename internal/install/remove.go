@@ -17,6 +17,9 @@ import (
 	"github.com/rojcarranza/cali/internal/targets"
 )
 
+// afterBackup, when set by a test, runs between the backup and the removal.
+var afterBackup func(final string)
+
 // Remove backs up and deletes the installed folders of skill name in the
 // scope d.Global picks, then drops its manifest and lock entries. A folder
 // that differs from its pristine copy (or has none) blocks the remove unless
@@ -101,6 +104,13 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 			return fmt.Errorf("back up %s: %w", f.final, err)
 		}
 		_, _ = fmt.Fprintf(out, "backed up %s (%s) to %s\n", name, f.target, p)
+		if afterBackup != nil {
+			afterBackup(f.final)
+		}
+		// The folder may have changed since it was checked; never delete bytes the backup lacks.
+		if now, err := skillfs.ReadDir(f.final); err != nil || !skillfs.Equal(now, f.t) {
+			return fmt.Errorf("%s changed while it was being backed up; not removing it", f.final)
+		}
 		if err := os.RemoveAll(f.final); err != nil {
 			return fmt.Errorf("remove %s: %w", f.final, err)
 		}

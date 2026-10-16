@@ -3,6 +3,7 @@ package backup
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -80,5 +81,26 @@ func TestSaveRejectsBadName(t *testing.T) {
 	}
 	if _, err := os.Lstat(filepath.Join(data, "backups")); !os.IsNotExist(err) {
 		t.Fatal("nothing may be written for a bad name")
+	}
+}
+
+func TestSaveDirsArePrivate(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("POSIX modes only")
+	}
+	fixedNow(t)
+	data := t.TempDir()
+	p, err := Save(data, "x", tree, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, d := range []string{filepath.Join(data, "backups"), filepath.Join(data, "backups", "x"), p} {
+		fi, err := os.Stat(d)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if fi.Mode().Perm() != 0o700 {
+			t.Errorf("%s mode = %v, want 0700", d, fi.Mode().Perm())
+		}
 	}
 }
