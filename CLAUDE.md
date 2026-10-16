@@ -5,10 +5,10 @@ Status: pre-build. Phases tracked in `docs/` (brief, design, requirements, archi
 
 ## Commands
 <!-- Filled and verified in Phase 5. Do not guess commands until then. -->
-- Build: TBD
-- Test: TBD
-- Lint: TBD
-- Run: TBD
+- Build: `go build -o bin/cali ./cmd/cali`
+- Test: `go test -v ./...`
+- Lint: `go vet ./... && golangci-lint run`
+- Run: `go run ./cmd/cali --version`
 
 ## Rules
 - Work only on the current task. One phase or task at a time.
