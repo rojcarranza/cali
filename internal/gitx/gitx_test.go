@@ -1,0 +1,221 @@
+package gitx
+
+import (
+	"context"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/rojcarranza/cali/internal/skillfs"
+	"github.com/rojcarranza/cali/internal/source"
+)
+
+var sha40 = regexp.MustCompile(`^[0-9a-f]{40}$`)
+
+func git(t *testing.T, dir string, args ...string) string {
+	t.Helper()
+	full := append([]string{"-c", "user.name=Test", "-c", "user.email=test@example.invalid"}, args...)
+	cmd := exec.Command("git", full...)
+	cmd.Dir = dir
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v: %v\n%s", args, err, out)
+	}
+	return strings.TrimSpace(string(out))
+}
+
+func write(t *testing.T, dir, rel, data string, mode os.FileMode) {
+	t.Helper()
+	p := filepath.Join(dir, filepath.FromSlash(rel))
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(p, []byte(data), mode); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// fixture builds a repo with skills/a and skills/b and returns its dir. The
+// committed SKILL.md of skill a contains CRLF line endings.
+func fixture(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	git(t, dir, "config", "core.autocrlf", "false")
+	write(t, dir, "skills/a/SKILL.md", "---\nname: a\n---\r\nline\r\n", 0o644)
+	write(t, dir, "skills/a/scripts/run.sh", "#!/bin/sh\n", 0o755)
+	write(t, dir, "skills/b/SKILL.md", "b\n", 0o644)
+	git(t, dir, "add", ".")
+	git(t, dir, "commit", "-q", "-m", "one")
+	// From here on the author's clone has autocrlf=true, as on Windows.
+	git(t, dir, "config", "core.autocrlf", "true")
+	return dir
+}
+
+func fixtureSpec(t *testing.T, repoDir string) source.Spec {
+	t.Helper()
+	s, err := source.ParseWith("file://"+filepath.ToSlash(repoDir), source.Options{AllowFile: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s
+}
+
+func openFetched(t *testing.T, repoDir string) *Repo {
+	t.Helper()
+	r, err := Open(t.TempDir(), fixtureSpec(t, repoDir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Fetch(context.Background(), nil); err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+func TestExportEqualsCommittedBytes(t *testing.T) {
+	dir := fixture(t)
+	r := openFetched(t, dir)
+	commit, err := r.Resolve("")
+	if err != nil || !sha40.MatchString(commit) {
+		t.Fatalf("Resolve = %q, %v", commit, err)
+	}
+	if !r.HasCommit(commit) || r.HasCommit(strings.Repeat("0", 40)) {
+		t.Fatal("HasCommit wrong")
+	}
+	tr, err := r.Export(commit, "skills/a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var md, sh *skillfs.File
+	for i := range tr {
+		switch tr[i].Path {
+		case "SKILL.md":
+			md = &tr[i]
+		case "scripts/run.sh":
+			sh = &tr[i]
+		}
+	}
+	if md == nil || sh == nil || len(tr) != 2 {
+		t.Fatalf("tree = %+v", tr)
+	}
+	if string(md.Data) != "---\nname: a\n---\r\nline\r\n" {
+		t.Fatalf("SKILL.md bytes changed: %q", md.Data)
+	}
+	if string(sh.Data) != "#!/bin/sh\n" || !sh.Exec {
+		t.Fatalf("run.sh = %+v", sh)
+	}
+	if md.Exec {
+		t.Fatal("SKILL.md must not be exec")
+	}
+}
+
+func TestResolveRefs(t *testing.T) {
+	dir := fixture(t)
+	first := git(t, dir, "rev-parse", "HEAD")
+	git(t, dir, "tag", "v1")
+	git(t, dir, "checkout", "-q", "-b", "dev")
+	write(t, dir, "skills/b/SKILL.md", "b2\n", 0o644)
+	git(t, dir, "commit", "-q", "-am", "two")
+	dev := git(t, dir, "rev-parse", "HEAD")
+	git(t, dir, "checkout", "-q", "main")
+
+	r := openFetched(t, dir)
+	for ref, want := range map[string]string{"": first, "v1": first, "dev": dev, "main": first, dev: dev} {
+		got, err := r.Resolve(ref)
+		if err != nil || got != want {
+			t.Errorf("Resolve(%q) = %q, %v; want %q", ref, got, err, want)
+		}
+	}
+	if _, err := r.Resolve("nope"); err == nil {
+		t.Error("want error for unknown ref")
+	}
+	if _, err := r.Resolve("--upload-pack=x"); err == nil {
+		t.Error("want error for option-like ref")
+	}
+}
+
+func TestTreeSHAChangesOnlyWhenSubtreeChanges(t *testing.T) {
+	dir := fixture(t)
+	r := openFetched(t, dir)
+	c1, _ := r.Resolve("")
+	a1, err := r.TreeSHA(c1, "skills/a")
+	if err != nil || !sha40.MatchString(a1) {
+		t.Fatalf("TreeSHA = %q, %v", a1, err)
+	}
+	write(t, dir, "skills/b/SKILL.md", "changed\n", 0o644)
+	git(t, dir, "commit", "-q", "-am", "touch b")
+	if err := r.Fetch(context.Background(), nil); err != nil {
+		t.Fatal(err)
+	}
+	c2, _ := r.Resolve("")
+	if c1 == c2 {
+		t.Fatal("commit should have moved")
+	}
+	a2, _ := r.TreeSHA(c2, "skills/a")
+	b1, _ := r.TreeSHA(c1, "skills/b")
+	b2, _ := r.TreeSHA(c2, "skills/b")
+	if a1 != a2 {
+		t.Errorf("skills/a tree changed: %s -> %s", a1, a2)
+	}
+	if b1 == b2 {
+		t.Error("skills/b tree should change")
+	}
+	if _, err := r.TreeSHA(c2, "skills/missing"); err == nil {
+		t.Error("want error for missing path")
+	}
+}
+
+func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
+	dir := fixture(t)
+	// Commit a symlink without needing OS symlink support.
+	linkBlob := hashString(t, dir, "SKILL.md")
+	git(t, dir, "update-index", "--add", "--cacheinfo", "120000,"+linkBlob+",skills/b/link")
+	git(t, dir, "commit", "-q", "-m", "link")
+	r := openFetched(t, dir)
+	c, _ := r.Resolve("")
+	_, err := r.Export(c, "skills/b")
+	if err == nil || !strings.Contains(err.Error(), "link") {
+		t.Fatalf("symlink err = %v", err)
+	}
+
+	git(t, dir, "rm", "-q", "--cached", "skills/b/link")
+	git(t, dir, "update-index", "--add", "--cacheinfo", "160000,0123456789abcdef0123456789abcdef01234567,skills/b/sub")
+	git(t, dir, "commit", "-q", "-m", "sub")
+	if err := r.Fetch(context.Background(), nil); err != nil {
+		t.Fatal(err)
+	}
+	c, _ = r.Resolve("")
+	_, err = r.Export(c, "skills/b")
+	if err == nil || !strings.Contains(err.Error(), "sub") {
+		t.Fatalf("submodule err = %v", err)
+	}
+}
+
+func hashString(t *testing.T, dir, s string) string {
+	t.Helper()
+	f := filepath.Join(t.TempDir(), "x")
+	if err := os.WriteFile(f, []byte(s), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return git(t, dir, "hash-object", "-w", f)
+}
+
+func TestFetchErrorDoesNotLeakToken(t *testing.T) {
+	missing := filepath.Join(t.TempDir(), "missing")
+	r, err := Open(t.TempDir(), fixtureSpec(t, missing))
+	if err != nil {
+		t.Fatal(err)
+	}
+	getenv := func(string) string { return "s3cr3t-token" }
+	err = r.Fetch(context.Background(), AuthEnv("github.com", getenv, nil))
+	if err == nil {
+		t.Fatal("want fetch error")
+	}
+	if strings.Contains(err.Error(), "s3cr3t-token") {
+		t.Fatalf("token leaked: %v", err)
+	}
+}
