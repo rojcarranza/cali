@@ -40,15 +40,33 @@ type Repo struct {
 	url   string
 	proto string   // value of GIT_ALLOW_PROTOCOL
 	env   []string // extra env of the last Fetch, reused for lazy blob fetches
+	// offline forbids lazy blob fetches (GIT_NO_LAZY_FETCH=1).
+	offline bool
+}
+
+// SetOffline makes every later git call on r refuse to fetch missing objects.
+func (r *Repo) SetOffline(v bool) { r.offline = v }
+
+// mirrorDir returns the cache root and the mirror directory of s.
+func mirrorDir(cacheDir string, s source.Spec) (root, dir string) {
+	root = filepath.Join(cacheDir, "git")
+	key := strings.ReplaceAll(s.Key(), ":", "_")
+	return root, filepath.Join(root, filepath.FromSlash(key)+".git")
+}
+
+// MirrorExists reports whether Open has created the mirror of s before.
+func MirrorExists(cacheDir string, s source.Spec) bool {
+	_, dir := mirrorDir(cacheDir, s)
+	_, err := os.Stat(filepath.Join(dir, "HEAD"))
+	return err == nil
 }
 
 // Open returns the mirror for s at <cacheDir>/git/<key>.git, creating the
 // bare repository if needed. The mirror is configured as a blob-less
 // (promisor) clone of s.URL. Open does not touch the network.
 func Open(cacheDir string, s source.Spec) (*Repo, error) {
-	root := filepath.Join(cacheDir, "git")
+	root, dir := mirrorDir(cacheDir, s)
 	key := strings.ReplaceAll(s.Key(), ":", "_")
-	dir := filepath.Join(root, filepath.FromSlash(key)+".git")
 	if rel, err := filepath.Rel(root, dir); err != nil || rel == ".." ||
 		strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel) {
 		return nil, fmt.Errorf("mirror path for %q escapes the cache", key)
@@ -102,6 +120,9 @@ func environ(base []string, proto string, extra []string) []string {
 func (r *Repo) command(ctx context.Context, env []string, args ...string) *exec.Cmd {
 	full := []string{"-c", "core.autocrlf=false", "-c", "http.followRedirects=false", "-c", "protocol.ext.allow=never"}
 	full = append(full, args...)
+	if r.offline {
+		env = append(append([]string{}, env...), "GIT_NO_LAZY_FETCH=1")
+	}
 	cmd := exec.CommandContext(ctx, "git", full...)
 	cmd.Env = environ(os.Environ(), r.proto, env)
 	return cmd

@@ -2,6 +2,7 @@ package find
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,6 +16,13 @@ import (
 // repo commits files (path -> content) into a new git repo, fetches it into a
 // fresh mirror and returns the mirror.
 func repo(t *testing.T, files map[string]string) *gitx.Repo {
+	t.Helper()
+	return repoFilter(t, files, false)
+}
+
+// repoFilter is repo; with filter the source allows blob:none, so the mirror
+// holds no blobs after Fetch.
+func repoFilter(t *testing.T, files map[string]string, filter bool) *gitx.Repo {
 	t.Helper()
 	empty := filepath.Join(t.TempDir(), "gitconfig")
 	if err := os.WriteFile(empty, nil, 0o644); err != nil {
@@ -31,7 +39,7 @@ func repo(t *testing.T, files map[string]string) *gitx.Repo {
 			t.Fatal(err)
 		}
 	}
-	for _, a := range [][]string{{"init", "-q", "-b", "main"}, {"add", "."}, {"commit", "-q", "-m", "one"}} {
+	for _, a := range [][]string{{"init", "-q", "-b", "main"}, {"add", "."}, {"commit", "-q", "-m", "one"}, {"config", "uploadpack.allowFilter", fmt.Sprint(filter)}} {
 		cmd := exec.Command("git", append([]string{"-c", "user.name=T", "-c", "user.email=t@example.invalid"}, a...)...)
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
@@ -104,5 +112,18 @@ func TestSearchNoRegistry(t *testing.T) {
 	}
 	if len(hits) != 1 || hits[0].Name != "one" || hits[0].Source != listed.URL() {
 		t.Fatalf("hits = %+v", hits)
+	}
+}
+
+func TestSearchOfflineSkipsMissingBlob(t *testing.T) {
+	r := repoFilter(t, map[string]string{"s/SKILL.md": skill("one", "common word")}, true)
+	r.SetOffline(true)
+	hits, err := Search([]*gitx.Repo{r}, "common")
+	if err != nil || len(hits) != 0 {
+		t.Fatalf("offline: hits=%+v err=%v", hits, err)
+	}
+	r.SetOffline(false)
+	if hits, err = Search([]*gitx.Repo{r}, "common"); err != nil || len(hits) != 1 {
+		t.Fatalf("online (proves the blob was only missing): hits=%+v err=%v", hits, err)
 	}
 }

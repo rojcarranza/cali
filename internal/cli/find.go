@@ -53,7 +53,14 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			warn := cmd.ErrOrStderr()
 			hits := []find.Hit{}
 			for _, sp := range urls {
+				if offline && !gitx.MirrorExists(d.Dirs.Cache, sp) {
+					_, _ = fmt.Fprintf(warn, "warning: %s: no local mirror (run without --offline)\n", sp.URL)
+					continue
+				}
 				r, err := gitx.Open(d.Dirs.Cache, sp)
+				if err == nil {
+					r.SetOffline(offline)
+				}
 				if err == nil && !offline {
 					host := ""
 					if u, perr := url.Parse(sp.URL); perr == nil {

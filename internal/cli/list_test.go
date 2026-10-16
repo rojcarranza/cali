@@ -146,3 +146,18 @@ func TestFind(t *testing.T) {
 		t.Fatalf("offline: code=%d out=%q", code, out)
 	}
 }
+
+func TestFindOfflineNoMirror(t *testing.T) {
+	repoURL, project := setup(t)
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte("version: 1\nsources:\n  - "+repoURL+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := run("find", "x", "--offline")
+	if code != 0 || !strings.HasPrefix(out, "NAME") ||
+		!strings.Contains(errs, "warning: "+repoURL+": no local mirror (run without --offline)") {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Stat(os.Getenv("CALI_CACHE_DIR")); !os.IsNotExist(err) {
+		t.Fatalf("cache dir was created: %v", err)
+	}
+}
