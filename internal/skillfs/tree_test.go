@@ -203,6 +203,117 @@ func TestWriteToRefusesSymlinkFile(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsCollisionsAndReserved(t *testing.T) {
+	cases := map[string][]File{
+		"case-file":        {skillMD(), {Path: "a.md"}, {Path: "A.md"}},
+		"case-dir":         {skillMD(), {Path: "Docs/x"}, {Path: "docs/y"}},
+		"case-file-vs-dir": {skillMD(), {Path: "A"}, {Path: "a/b"}},
+		"file-dir-prefix":  {skillMD(), {Path: "a"}, {Path: "a/b"}},
+		"conin":            {skillMD(), {Path: "conin$"}},
+		"conout-ext":       {skillMD(), {Path: "CONOUT$.txt"}},
+		"com-super":        {skillMD(), {Path: "COM¹.txt"}},
+		"lpt-super":        {skillMD(), {Path: "lpt³"}},
+		"git-dir":          {skillMD(), {Path: ".GIT/config"}},
+		"git-file":         {skillMD(), {Path: "sub/.git"}},
+	}
+	for name, files := range cases {
+		t.Run(name, func(t *testing.T) {
+			if err := Validate(Tree(files)); err == nil {
+				t.Fatalf("expected rejection for %v", files)
+			}
+		})
+	}
+	err := Validate(Tree{skillMD(), {Path: "a.md"}, {Path: "A.md"}})
+	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "A.md") {
+		t.Fatalf("collision error must name both paths, got %v", err)
+	}
+	if err := Validate(Tree{skillMD(), {Path: "docs/x"}, {Path: "docs/y"}, {Path: ".gitignore"}}); err != nil {
+		t.Fatalf("valid tree rejected: %v", err)
+	}
+}
+
+func TestEqualIgnoresExecWhenNotCompared(t *testing.T) {
+	old := compareExec
+	defer func() { compareExec = old }()
+	compareExec = false
+	a := Tree{skillMD()}
+	b := Tree{{Path: "SKILL.md", Data: []byte("# s\n"), Exec: true}}
+	if !Equal(a, b) {
+		t.Fatal("Exec-only difference must be equal when compareExec is false")
+	}
+}
+
+func TestWriteToRefusesNonEmptyTarget(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "old"), []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	err := Tree{skillMD()}.WriteTo(dir)
+	if err == nil || !strings.Contains(err.Error(), dir) {
+		t.Fatalf("err = %v, want one naming %s", err, dir)
+	}
+	if _, serr := os.Lstat(filepath.Join(dir, "SKILL.md")); !os.IsNotExist(serr) {
+		t.Fatal("wrote into non-empty dir")
+	}
+}
+
+func TestWriteToRefusesSymlinkTarget(t *testing.T) {
+	base := t.TempDir()
+	real := filepath.Join(base, "real")
+	if err := os.Mkdir(real, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(base, "link")
+	symlinkOrSkip(t, real, link)
+	if err := (Tree{skillMD()}).WriteTo(link); err == nil {
+		t.Fatal("expected refusal")
+	}
+	if _, serr := os.Lstat(filepath.Join(real, "SKILL.md")); !os.IsNotExist(serr) {
+		t.Fatal("wrote through symlinked target")
+	}
+}
+
+func withLimits(t *testing.T, files int, file, total int64) {
+	t.Helper()
+	of, osz, ot := maxFiles, maxFileSize, maxTreeSize
+	t.Cleanup(func() { maxFiles, maxFileSize, maxTreeSize = of, osz, ot })
+	maxFiles, maxFileSize, maxTreeSize = files, file, total
+}
+
+func TestValidateLimits(t *testing.T) {
+	withLimits(t, 2, 10, 15)
+	if err := Validate(Tree{skillMD(), {Path: "a"}, {Path: "b"}}); err == nil || !strings.Contains(err.Error(), "files") {
+		t.Fatalf("file count: %v", err)
+	}
+	if err := Validate(Tree{skillMD(), {Path: "big", Data: make([]byte, 11)}}); err == nil || !strings.Contains(err.Error(), "big") {
+		t.Fatalf("file size must name path: %v", err)
+	}
+	if err := Validate(Tree{{Path: "SKILL.md", Data: make([]byte, 8)}, {Path: "b", Data: make([]byte, 8)}}); err == nil {
+		t.Fatal("tree size not enforced")
+	}
+}
+
+func TestReadDirLimits(t *testing.T) {
+	dir := t.TempDir()
+	for _, n := range []string{"SKILL.md", "b", "c"} {
+		if err := os.WriteFile(filepath.Join(dir, n), []byte("0123456789ab"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	withLimits(t, 2, 100, 1000)
+	if _, err := ReadDir(dir); err == nil || !strings.Contains(err.Error(), "files") {
+		t.Fatalf("file count: %v", err)
+	}
+	withLimits(t, 10, 5, 1000)
+	if _, err := ReadDir(dir); err == nil || !strings.Contains(err.Error(), "SKILL.md") {
+		t.Fatalf("size must name path: %v", err)
+	}
+	withLimits(t, 10, 100, 20)
+	if _, err := ReadDir(dir); err == nil {
+		t.Fatal("tree size not enforced")
+	}
+}
+
 func TestDiffKinds(t *testing.T) {
 	base := Tree{
 		{Path: "SKILL.md", Data: []byte("a\n")},

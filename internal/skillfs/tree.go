@@ -13,6 +13,21 @@ import (
 	"sort"
 )
 
+// Resource caps for a skill tree, enforced by Validate and ReadDir.
+const (
+	MaxFiles    = 10000
+	MaxFileSize = 10 << 20
+	MaxTreeSize = 100 << 20
+)
+
+// Package vars so tests can use small limits.
+var (
+	maxFiles          = MaxFiles
+	maxFileSize int64 = MaxFileSize
+	maxTreeSize int64 = MaxTreeSize
+	compareExec       = runtime.GOOS != "windows"
+)
+
 // File is one regular file of a skill. Path is slash-separated and relative.
 type File struct {
 	Path string
@@ -33,6 +48,7 @@ type Change struct {
 // other non-regular entry is an error naming its relative path.
 func ReadDir(dir string) (Tree, error) {
 	var t Tree
+	var total int64
 	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -56,6 +72,16 @@ func ReadDir(dir string) (Tree, error) {
 		info, err := d.Info()
 		if err != nil {
 			return err
+		}
+		if len(t) >= maxFiles {
+			return fmt.Errorf("skill has more than %d files", maxFiles)
+		}
+		if info.Size() > maxFileSize {
+			return fmt.Errorf("file %s exceeds the %d byte file size limit", rel, maxFileSize)
+		}
+		total += info.Size()
+		if total > maxTreeSize {
+			return fmt.Errorf("skill exceeds the %d byte total size limit at %s", maxTreeSize, rel)
 		}
 		data, err := os.ReadFile(p)
 		if err != nil {
@@ -84,7 +110,7 @@ func isText(b []byte) bool {
 }
 
 func fileEqual(a, b File) bool {
-	if a.Exec != b.Exec {
+	if compareExec && a.Exec != b.Exec {
 		return false
 	}
 	if isText(a.Data) && isText(b.Data) {
