@@ -187,3 +187,22 @@ func TestRemoveAbortsWhenFolderChangesDuringBackup(t *testing.T) {
 		t.Fatal("lock entry dropped")
 	}
 }
+
+func TestRemoveAbortsOnLineEndingOnlyChangeDuringBackup(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	final := filepath.Join(e.project, ".claude", "skills", "x")
+	crlf := strings.ReplaceAll(readFile(t, filepath.Join(final, "SKILL.md")), "\n", "\r\n")
+	afterBackup = func(dir string) { write(t, dir, "SKILL.md", crlf) }
+	t.Cleanup(func() { afterBackup = nil })
+
+	if err := Remove(context.Background(), e.deps, "x", false); err == nil || !strings.Contains(err.Error(), final) {
+		t.Fatalf("err = %v, want abort naming %s", err, final)
+	}
+	if got := readFile(t, filepath.Join(final, "SKILL.md")); got != crlf {
+		t.Fatal("folder removed after a line-ending-only edit")
+	}
+}

@@ -108,7 +108,7 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 			afterBackup(f.final)
 		}
 		// The folder may have changed since it was checked; never delete bytes the backup lacks.
-		if now, err := skillfs.ReadDir(f.final); err != nil || !skillfs.Equal(now, f.t) {
+		if now, err := skillfs.ReadDir(f.final); err != nil || !skillfs.SameBytes(now, f.t) {
 			return fmt.Errorf("%s changed while it was being backed up; not removing it", f.final)
 		}
 		if err := os.RemoveAll(f.final); err != nil {

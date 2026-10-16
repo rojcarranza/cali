@@ -353,3 +353,22 @@ func TestSyncUnmanagedTargetBlocksOtherTargets(t *testing.T) {
 		t.Fatal("installed into another target of a skill with an unmanaged target")
 	}
 }
+
+func TestSyncRefusesLockWithoutManifest(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	addX(t, e, r)
+	manifestPath := filepath.Join(e.project, "cali.yaml")
+	if err := os.Remove(manifestPath); err != nil {
+		t.Fatal(err)
+	}
+	lockPath := filepath.Join(e.project, "cali.lock")
+	before := readFile(t, lockPath)
+	_, err := Sync(context.Background(), e.deps, false)
+	if err == nil || !strings.Contains(err.Error(), manifestPath) {
+		t.Fatalf("err = %v, want an error naming %s", err, manifestPath)
+	}
+	if got := readFile(t, lockPath); got != before {
+		t.Fatalf("lock changed:\n%s", got)
+	}
+}

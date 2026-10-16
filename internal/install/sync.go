@@ -61,7 +61,8 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		return Report{}, err
 	}
 	m, err := manifest.ReadWith(sc.manifest, opts)
-	if errors.Is(err, os.ErrNotExist) {
+	noManifest := errors.Is(err, os.ErrNotExist)
+	if noManifest {
 		m, err = manifest.Manifest{Version: 1, Skills: map[string]manifest.Skill{}}, nil
 	}
 	if err != nil {
@@ -70,6 +71,10 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	l, err := lock.Read(sc.lockPath)
 	if err != nil {
 		return Report{}, err
+	}
+	if noManifest && len(l.Skills) > 0 {
+		// Treating it as empty would drop every lock entry.
+		return Report{}, fmt.Errorf("%s not found but %s has skills; restore the manifest first", sc.manifest, sc.lockPath)
 	}
 
 	// A lock entry counts only if it matches the manifest's source, path and

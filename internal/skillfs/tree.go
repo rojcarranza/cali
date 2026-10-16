@@ -161,3 +161,17 @@ func Diff(base, other Tree) []Change {
 	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })
 	return out
 }
+
+// SameBytes compares trees byte for byte: same paths, exec bits and data.
+// Unlike Equal it counts a line-ending-only change as a difference.
+func SameBytes(a, b Tree) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Path != b[i].Path || a[i].Exec != b[i].Exec || !bytes.Equal(a[i].Data, b[i].Data) {
+			return false
+		}
+	}
+	return true
+}

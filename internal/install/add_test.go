@@ -283,8 +283,8 @@ func TestAddNameClashWithOtherSource(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r2) + "//x"})
-	if err == nil || !strings.Contains(err.Error(), "--replace") {
-		t.Fatalf("err = %v, want --replace hint", err)
+	if err == nil || !strings.Contains(err.Error(), "remove it first") || strings.Contains(err.Error(), "--replace") {
+		t.Fatalf("err = %v, want remove hint without the nonexistent --replace", err)
 	}
 }
 
@@ -497,7 +497,7 @@ func TestAddRefusesSymlinkInProjectTree(t *testing.T) {
 	e := newEnv(t)
 	outside := t.TempDir()
 	if err := os.Symlink(outside, filepath.Join(e.project, ".claude")); err != nil {
-		t.Fatal(err)
+		t.Skip("symlinks unavailable:", err)
 	}
 	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}})
 	if err == nil || !strings.Contains(err.Error(), filepath.Join(e.project, ".claude")) {
@@ -517,7 +517,7 @@ func TestAddRefusesSymlinkedLockInProject(t *testing.T) {
 	victim := filepath.Join(t.TempDir(), "victim")
 	write(t, filepath.Dir(victim), "victim", "keep\n")
 	if err := os.Symlink(victim, filepath.Join(e.project, "cali.lock")); err != nil {
-		t.Fatal(err)
+		t.Skip("symlinks unavailable:", err)
 	}
 	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x"})
 	if err == nil || !strings.Contains(err.Error(), "cali.lock") {
@@ -536,7 +536,7 @@ func TestAddGlobalAllowsSymlinkedSkillsDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := os.Symlink(dotfiles, filepath.Join(e.deps.Dirs.Home, ".claude", "skills")); err != nil {
-		t.Fatal(err)
+		t.Skip("symlinks unavailable:", err)
 	}
 	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Global: true, Targets: []string{"claude"}}); err != nil {
 		t.Fatal(err)

@@ -350,7 +350,7 @@ func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit st
 		if perr == nil && ps.URL == spec.URL && strings.Trim(ps.Path, "/") == p {
 			return nil, fmt.Errorf("skill %q is already in %s", name, sc.manifest)
 		}
-		return nil, fmt.Errorf("name %q already installed from %s; remove it first or pass --replace", name, prev.Source)
+		return nil, fmt.Errorf("name %q already installed from %s; remove it first", name, prev.Source)
 	}
 	tree, t, err := exportSkill(repo, commit, p, name)
 	if err != nil {
