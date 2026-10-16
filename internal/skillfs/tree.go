@@ -101,25 +101,28 @@ func ReadDir(dir string) (Tree, error) {
 	return t, nil
 }
 
-// isText applies the spec rule: no NUL byte in the first 8000 bytes.
-func isText(b []byte) bool {
+// IsText applies the spec rule: no NUL byte in the first 8000 bytes.
+func IsText(b []byte) bool {
 	if len(b) > 8000 {
 		b = b[:8000]
 	}
 	return bytes.IndexByte(b, 0) < 0
 }
 
-func fileEqual(a, b File) bool {
+// FileEqual compares two files: Exec bits (except on windows), then text
+// content after CRLF to LF, or binary content byte for byte.
+func FileEqual(a, b File) bool {
 	if compareExec && a.Exec != b.Exec {
 		return false
 	}
-	if isText(a.Data) && isText(b.Data) {
-		return bytes.Equal(normalizeLF(a.Data), normalizeLF(b.Data))
+	if IsText(a.Data) && IsText(b.Data) {
+		return bytes.Equal(NormalizeLF(a.Data), NormalizeLF(b.Data))
 	}
 	return bytes.Equal(a.Data, b.Data)
 }
 
-func normalizeLF(b []byte) []byte {
+// NormalizeLF replaces every CRLF in b with LF.
+func NormalizeLF(b []byte) []byte {
 	return bytes.ReplaceAll(b, []byte("\r\n"), []byte("\n"))
 }
 
@@ -146,7 +149,7 @@ func Diff(base, other Tree) []Change {
 		switch {
 		case !ok:
 			out = append(out, Change{p, "removed"})
-		case !fileEqual(bf, of):
+		case !FileEqual(bf, of):
 			out = append(out, Change{p, "modified"})
 		}
 	}
