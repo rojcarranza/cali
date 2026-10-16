@@ -558,3 +558,16 @@ func host(rawURL string) string {
 	}
 	return u.Hostname()
 }
+
+// Location is where a scope keeps its files.
+type Location struct {
+	Scope              targets.Scope
+	Root               string // project root; empty for global
+	Manifest, LockPath string
+}
+
+// Locate resolves the manifest, lock and project root for the scope without touching disk.
+func Locate(d Deps, global bool) (Location, error) {
+	sc, err := resolveScope(d, global)
+	return Location{sc.scope, sc.root, sc.manifest, sc.lockPath}, err
+}
