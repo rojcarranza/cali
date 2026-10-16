@@ -90,7 +90,7 @@ func newRoot(out io.Writer) *cobra.Command {
 	add.Flags().StringSliceVar(&req.Targets, "target", nil, "target to install into: claude or copilot (repeatable)")
 	add.Flags().BoolVar(&req.Adopt, "adopt", false, "take over an existing folder that is not managed by Cali, as is")
 	root.AddCommand(add, newListCmd(out, &global), newShowCmd(out, &global), newStatusCmd(out, &global),
-		newSyncCmd(out, &global), newRemoveCmd(out, &global), newFindCmd(out, &global), newUpdateCmd(out, &global))
+		newSyncCmd(out, &global), newRemoveCmd(out, &global), newFindCmd(out, &global), newUpdateCmd(out, &global), newImportCmd(out, &global))
 	return root
 }
 
