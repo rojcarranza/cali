@@ -3,7 +3,7 @@
 package source
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 )
 
@@ -31,25 +31,26 @@ func ParseWith(s string, o Options) (Spec, error) {
 		i := strings.Index(s, "://")
 		scheme, rest = s[:i], s[i+3:]
 	default:
-		return Spec{}, fmt.Errorf("source %q: unsupported form, want github:owner/repo or https://host/owner/repo", s)
+		return Spec{}, reject("unsupported form, want github:owner/repo or https://host/owner/repo")
 	}
 	switch scheme {
 	case "github", "https":
 	case "file":
 		if !o.AllowFile {
-			return Spec{}, fmt.Errorf("source %q: scheme file is not allowed", s)
+			return Spec{}, reject("scheme file is not allowed")
 		}
 	default:
-		return Spec{}, fmt.Errorf("source %q: scheme %s is not allowed, use github: or https://", s, scheme)
+		return Spec{}, reject("scheme " + safeScheme(scheme) + " is not allowed, use github: or https://")
+	}
+
+	if scheme != "github" {
+		authority, _, _ := strings.Cut(rest, "/")
+		if strings.Contains(authority, "@") {
+			return Spec{}, reject("embedded credentials are not allowed")
+		}
 	}
 
 	head, tail, hasPath := strings.Cut(rest, "//")
-	if scheme == "https" {
-		host, _, _ := strings.Cut(head, "/")
-		if i := strings.LastIndex(host, "@"); i >= 0 {
-			return Spec{}, fmt.Errorf("source URL for host %q: embedded credentials are not allowed", host[i+1:])
-		}
-	}
 
 	var ref string
 	if hasPath {
@@ -62,18 +63,18 @@ func ParseWith(s string, o Options) (Spec, error) {
 
 	path := tail
 	if strings.HasPrefix(path, "/") {
-		return Spec{}, fmt.Errorf("source %q: path %q has a leading /", s, path)
+		return Spec{}, reject("path has a leading /")
 	}
 	for _, seg := range strings.Split(path, "/") {
 		if seg == ".." {
-			return Spec{}, fmt.Errorf("source %q: path %q contains a .. segment", s, path)
+			return Spec{}, reject("path contains a .. segment")
 		}
 	}
 
 	spec := Spec{Path: path, Ref: ref}
 	switch scheme {
 	case "github":
-		owner, repo, err := ownerRepo(s, strings.Split(head, "/"))
+		owner, repo, err := ownerRepo(strings.Split(head, "/"))
 		if err != nil {
 			return Spec{}, err
 		}
@@ -81,37 +82,54 @@ func ParseWith(s string, o Options) (Spec, error) {
 	case "https":
 		parts := strings.Split(head, "/")
 		if parts[0] == "" {
-			return Spec{}, fmt.Errorf("source %q: empty host", s)
+			return Spec{}, reject("empty host")
 		}
-		owner, repo, err := ownerRepo(s, parts[1:])
+		owner, repo, err := ownerRepo(parts[1:])
 		if err != nil {
 			return Spec{}, err
 		}
 		spec.URL = "https://" + strings.ToLower(parts[0]) + "/" + owner + "/" + repo
 	case "file":
 		if strings.Trim(head, "/") == "" {
-			return Spec{}, fmt.Errorf("source %q: empty file path", s)
+			return Spec{}, reject("empty file path")
 		}
 		spec.URL = "file://" + head
 	}
 	return spec, nil
 }
 
-func ownerRepo(s string, parts []string) (owner, repo string, err error) {
+// reject is the only way ParseWith builds an error. It takes a fixed reason and
+// never the input, because the input may carry credentials.
+func reject(reason string) error {
+	return errors.New("invalid source spec: " + reason)
+}
+
+// safeScheme returns scheme if it is made of URL-scheme characters only,
+// otherwise a placeholder, so a malformed scheme cannot carry a secret.
+func safeScheme(scheme string) string {
+	for _, r := range scheme {
+		if !strings.ContainsRune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-.", r) {
+			return "(invalid)"
+		}
+	}
+	return scheme
+}
+
+func ownerRepo(parts []string) (owner, repo string, err error) {
 	if len(parts) > 0 {
 		owner = parts[0]
 	}
 	if owner == "" {
-		return "", "", fmt.Errorf("source %q: empty owner", s)
+		return "", "", reject("empty owner")
 	}
 	if len(parts) > 1 {
 		repo = strings.TrimSuffix(parts[1], ".git")
 	}
 	if repo == "" {
-		return "", "", fmt.Errorf("source %q: empty repo", s)
+		return "", "", reject("empty repo")
 	}
 	if len(parts) > 2 {
-		return "", "", fmt.Errorf("source %q: want exactly owner/repo, got extra segment %q", s, parts[2])
+		return "", "", reject("want exactly owner/repo, got extra segment")
 	}
 	return owner, repo, nil
 }

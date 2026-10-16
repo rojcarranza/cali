@@ -115,13 +115,40 @@ func TestCanonicalURL(t *testing.T) {
 }
 
 func TestCredentialsNotEchoed(t *testing.T) {
-	_, err := Parse("https://user:tok@github.com/o/r")
-	if err == nil {
-		t.Fatal("expected error")
+	inputs := []string{
+		"https://user:tok@github.com/o/r",
+		"ssh://git:tok@h/o/r",
+		"file://user:tok@x/r",
+		"user:tok@host/o/r",
+		"https://user:pa//ss@h/o/r",
+		"github:user:tok@host/o/r",
+		"user:tok@h://x",
+		"https://user:tok@h/o/r//../x",
 	}
-	for _, leak := range []string{"tok", "user"} {
-		if strings.Contains(err.Error(), leak) {
-			t.Errorf("error %q leaks %q", err, leak)
+	for _, allow := range []bool{false, true} {
+		for _, in := range inputs {
+			_, err := ParseWith(in, Options{AllowFile: allow})
+			if err == nil {
+				t.Errorf("ParseWith(%q, allowFile=%v) expected error", in, allow)
+				continue
+			}
+			for _, leak := range []string{"tok", "pa//ss", "user:"} {
+				if strings.Contains(err.Error(), leak) {
+					t.Errorf("ParseWith(%q, allowFile=%v) error %q leaks %q", in, allow, err, leak)
+				}
+			}
+		}
+	}
+}
+
+func TestRefAfterRepoStillParses(t *testing.T) {
+	for in, want := range map[string]Spec{
+		"github:o/r@main":    {URL: "https://github.com/o/r", Ref: "main"},
+		"https://h/o/r@main": {URL: "https://h/o/r", Ref: "main"},
+	} {
+		got, err := Parse(in)
+		if err != nil || got != want {
+			t.Errorf("Parse(%q) = %+v, %v; want %+v", in, got, err, want)
 		}
 	}
 }
