@@ -225,3 +225,40 @@ func TestSyncAndRemoveCommands(t *testing.T) {
 		t.Fatal("folder not removed")
 	}
 }
+
+func TestUpdateDryRunCommand(t *testing.T) {
+	repoURL, project := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, _ := run("update"); code != 0 || out != "x: up to date\n0 skill(s) to update, 0 conflict(s)\n" {
+		t.Fatalf("code=%d out=%q", code, out)
+	}
+	// Local and upstream rewrite the same body line: a conflict exits 1 with no error text.
+	if err := os.WriteFile(filepath.Join(project, ".claude", "skills", "x", "SKILL.md"), []byte("---\nname: x\ndescription: X.\n---\nmine\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "skills", "x", "SKILL.md"), []byte("---\nname: x\ndescription: X.\n---\ntheirs\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "commit", "-q", "-am", "two")
+	code, out, errs := run("update")
+	if code != 1 || errs != "" || !strings.Contains(out, "cali update x --apply --resolve SKILL.md=") {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+	code, out, _ = run("update", "--json")
+	if code != 1 || !json.Valid([]byte(out)) {
+		t.Fatalf("json: code=%d out=%q", code, out)
+	}
+	for args, want := range map[string]string{
+		"update x --apply":                 "cali: update --apply is not implemented yet\n",
+		"update --resolve SKILL.md=theirs": "cali: --resolve needs exactly one skill name\n",
+		"update x --resolve SKILL.md=both": "cali: --resolve \"SKILL.md=both\": want <file>=ours|theirs|merge\n",
+		"update nope":                      "is not in",
+	} {
+		if code, _, errs := run(strings.Fields(args)...); code != 1 || !strings.Contains(errs, want) {
+			t.Errorf("%s: code=%d err=%q", args, code, errs)
+		}
+	}
+}

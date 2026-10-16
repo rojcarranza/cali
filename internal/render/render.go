@@ -139,3 +139,6 @@ func WriteJSON(w io.Writer, v any) error {
 	_, err := w.Write(out.Bytes())
 	return err
 }
+
+// Sanitize strips control characters from untrusted text, as table cells do.
+func Sanitize(s string) string { return sanitize(s) }

@@ -601,3 +601,14 @@ func Locate(d Deps, global bool) (Location, error) {
 	sc, err := resolveScope(d, global)
 	return Location{sc.scope, sc.root, sc.manifest, sc.lockPath}, err
 }
+
+// OpenFetch opens the cache mirror for spec and fetches it, with the auth of d.
+func OpenFetch(ctx context.Context, d Deps, spec source.Spec) (*gitx.Repo, error) {
+	return openFetch(ctx, d, spec)
+}
+
+// ExportSkill reads the skill folder p at commit and returns its tree SHA and
+// files; SKILL.md must name the skill name.
+func ExportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree, error) {
+	return exportSkill(repo, commit, p, name)
+}
