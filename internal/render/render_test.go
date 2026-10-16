@@ -1,0 +1,72 @@
+package render
+
+import (
+	"bytes"
+	"strings"
+	"testing"
+)
+
+func TestModeFor(t *testing.T) {
+	cases := []struct {
+		tty, json bool
+		want      Mode
+	}{
+		{false, false, Plain},
+		{true, false, Styled},
+		{true, true, JSON},
+		{false, true, JSON},
+	}
+	for _, c := range cases {
+		if got := ModeFor(c.tty, c.json); got != c.want {
+			t.Errorf("ModeFor(%v,%v)=%v want %v", c.tty, c.json, got, c.want)
+		}
+	}
+}
+
+func TestPlainTableHasNoANSI(t *testing.T) {
+	var b bytes.Buffer
+	Table{Header: []string{"NAME", "REF"}, Rows: [][]string{{"a\x1b[31mred", "v1\x00\u009b"}}}.Render(&b, Plain)
+	out := b.String()
+	if strings.ContainsRune(out, 0x1b) || strings.ContainsAny(out, "\x00\u009b") {
+		t.Fatalf("control chars in output: %q", out)
+	}
+	if !strings.Contains(out, "NAME") || !strings.Contains(out, "a[31mred") {
+		t.Fatalf("unexpected output: %q", out)
+	}
+}
+
+func TestStyledTableStripsControl(t *testing.T) {
+	var b bytes.Buffer
+	Table{Header: []string{"NAME"}, Rows: [][]string{{"x\x1b]0;evil\x07y"}}}.Render(&b, Styled)
+	if strings.Contains(b.String(), "evil\x07") || strings.ContainsRune(b.String(), 0x07) {
+		t.Fatalf("control char survived: %q", b.String())
+	}
+}
+
+func TestSanitize(t *testing.T) {
+	if got := sanitize("a\tb\n\x1b\x7f\u0085c"); got != "a b c" {
+		t.Fatalf("got %q", got)
+	}
+}
+
+func TestJSONHasSchemaVersion(t *testing.T) {
+	var b bytes.Buffer
+	if err := WriteJSON(&b, map[string]any{"skills": []string{"x"}, "a": 1}); err != nil {
+		t.Fatal(err)
+	}
+	want := "{\n  \"schema_version\": 1,\n  \"a\": 1,\n  \"skills\": [\n    \"x\"\n  ]\n}\n"
+	if b.String() != want {
+		t.Fatalf("got %q want %q", b.String(), want)
+	}
+	b.Reset()
+	type s struct {
+		Z int `json:"z"`
+		A int `json:"a"`
+	}
+	if err := WriteJSON(&b, s{1, 2}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.HasPrefix(b.String(), "{\n  \"schema_version\": 1,\n  \"z\": 1,\n  \"a\": 2") {
+		t.Fatalf("struct order: %q", b.String())
+	}
+}
