@@ -40,14 +40,14 @@ type Table struct {
 	Rows   [][]string
 }
 
-// sanitize drops C0/C1 control characters and ESC from untrusted cell text;
+// sanitize drops C0/C1 control characters, ESC and format (Cf) runes from untrusted cell text;
 // tab and newline become a space so cells stay on one line.
 func sanitize(s string) string {
 	return strings.Map(func(r rune) rune {
 		switch {
 		case r == '\t' || r == '\n':
 			return ' '
-		case unicode.IsControl(r):
+		case unicode.IsControl(r) || unicode.Is(unicode.Cf, r): // Cf: bidi overrides, zero-width chars
 			return -1
 		}
 		return r

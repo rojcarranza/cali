@@ -252,10 +252,12 @@ func TestUpdateDryRunCommand(t *testing.T) {
 		t.Fatalf("json: code=%d out=%q", code, out)
 	}
 	for args, want := range map[string]string{
-		"update x --apply":                 "nothing was written",
-		"update --resolve SKILL.md=theirs": "cali: --resolve needs exactly one skill name\n",
-		"update x --resolve SKILL.md=both": "cali: --resolve \"SKILL.md=both\": want <file>=ours|theirs|merge\n",
-		"update nope":                      "is not in",
+		"update x --apply":                   "nothing was written",
+		"update --resolve SKILL.md=theirs":   "cali: --resolve needs exactly one skill name\n",
+		"update x --resolve SKILL.md=both":   "cali: --resolve \"SKILL.md=both\": want <file>=ours|theirs|merge\n",
+		"update nope":                        "is not in",
+		"update --take-upstream --keep-mine": "cali: --take-upstream and --keep-mine cannot be used together\n",
+		"update --apply --json":              "cali: --apply and --json cannot be used together\n",
 	} {
 		if code, _, errs := run(strings.Fields(args)...); code != 1 || !strings.Contains(errs, want) {
 			t.Errorf("%s: code=%d err=%q", args, code, errs)

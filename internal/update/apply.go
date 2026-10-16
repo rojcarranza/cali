@@ -1,6 +1,7 @@
 package update
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -126,7 +127,7 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 
 	// No local edit is lost: back up every folder that differs from its base.
 	for _, j := range jobs {
-		if !j.exists || (!j.lost && skillfs.Equal(j.base, j.ours)) {
+		if !j.exists || (!j.lost && sameBytes(j.base, j.ours)) { // a line-ending-only edit is still an edit
 			continue
 		}
 		var patch []byte
@@ -169,8 +170,12 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 		}
 		return errors.Join(errs...)
 	}
+	root := "" // global scope may use a symlinked skills dir (as add allows)
+	if loc.Scope == targets.Project {
+		root = loc.Root
+	}
 	for _, j := range jobs {
-		sw, err := swap(j, rename)
+		sw, err := swap(j, rename, root)
 		if err != nil {
 			return restore(err)
 		}
@@ -272,10 +277,10 @@ func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job
 			case o.AcceptRecommended:
 				choice = f.Rec.Choice
 			case prompt != nil:
+				// Not explicit: keep-mine at the prompt keeps the skill, only --resolve f=ours advances it.
 				if choice, err = prompt.Choose(s.Name, f.Path, *f.Conflict, *f.Rec); err != nil {
 					return nil, "", nil, err
 				}
-				explicit = true
 			}
 			path := render.Sanitize(f.Path)
 			switch choice {
@@ -322,12 +327,19 @@ func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job
 }
 
 // swap stages j.next beside j.dir and renames it into place, moving the old
-// folder to a reserved .cali-old-* path the caller removes or restores.
-func swap(j job, rename func(string, string) error) (swapped, error) {
+// folder to a reserved .cali-old-* path the caller removes or restores. With
+// root set (project scope) it refuses a symlink anywhere from root to the
+// parent, checked again here because the tree may have changed since planning.
+func swap(j job, rename func(string, string) error, root string) (swapped, error) {
 	sw := swapped{dir: j.dir}
 	parent := filepath.Dir(j.dir)
 	if err := os.MkdirAll(parent, 0o755); err != nil {
 		return sw, err
+	}
+	if root != "" {
+		if err := install.NoSymlinks(root, parent); err != nil {
+			return sw, err
+		}
 	}
 	staging, err := os.MkdirTemp(parent, ".cali-staging-*")
 	if err != nil {
@@ -354,6 +366,14 @@ func swap(j job, rename func(string, string) error) (swapped, error) {
 			_ = os.RemoveAll(staging)
 			return sw, fmt.Errorf("move %s aside: %w", j.dir, err)
 		}
+		// An edit saved after the backup would be deleted with old: put it back and stop.
+		if cur, err := skillfs.ReadDir(old); err != nil || !sameBytes(cur, j.ours) {
+			_ = os.RemoveAll(staging)
+			if rerr := rename(old, j.dir); rerr != nil {
+				return sw, fmt.Errorf("%s changed while updating and could not be moved back; it is at %s: %w", j.dir, old, rerr)
+			}
+			return sw, fmt.Errorf("%s changed while updating; left as is, run cali update again", j.dir)
+		}
 		sw.old = old
 	}
 	if err := rename(staging, j.dir); err != nil {
@@ -367,4 +387,17 @@ func swap(j job, rename func(string, string) error) (swapped, error) {
 		return sw, err
 	}
 	return sw, nil
+}
+
+// sameBytes compares trees byte for byte: same paths, exec bits and data.
+func sameBytes(a, b skillfs.Tree) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Path != b[i].Path || a[i].Exec != b[i].Exec || !bytes.Equal(a[i].Data, b[i].Data) {
+			return false
+		}
+	}
+	return true
 }

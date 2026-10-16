@@ -56,6 +56,12 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 		Short: "Show what updating skills from upstream would change (dry run); --apply writes it",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			o.Names = args
+			if o.TakeUpstream && o.KeepMine {
+				return errors.New("--take-upstream and --keep-mine cannot be used together")
+			}
+			if o.Apply && asJSON {
+				return errors.New("--apply and --json cannot be used together")
+			}
 			if len(resolve) > 0 {
 				if len(args) != 1 {
 					return errors.New("--resolve needs exactly one skill name")
@@ -81,7 +87,7 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 			}
 			if o.Apply {
 				var pr update.Prompter
-				if isTTY(out) && !asJSON {
+				if isTTY(out) {
 					pr = huhPrompter{}
 				}
 				d.Stdout = out

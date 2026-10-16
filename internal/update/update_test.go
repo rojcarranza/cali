@@ -432,3 +432,22 @@ func TestShellArgQuotesRepoPaths(t *testing.T) {
 		}
 	}
 }
+
+func TestPlanWarnsAboutLeftovers(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	left := filepath.Join(filepath.Dir(f.local), ".cali-old-123")
+	if err := os.Mkdir(left, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	f.d.Stdout = &out
+	if _, err := Plan(context.Background(), f.d, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := out.String(), "warning: leftover from an interrupted update: "+left+"\n"; got != want {
+		t.Fatalf("out = %q, want %q", got, want)
+	}
+	if _, err := os.Lstat(left); err != nil {
+		t.Fatalf("leftover removed: %v", err)
+	}
+}

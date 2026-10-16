@@ -116,6 +116,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	names = slices.Compact(names)
 
 	repos := map[string]*gitx.Repo{}
+	warned := map[string]bool{} // skills dirs already checked for leftovers
 	p := Proposal{Opts: o}
 	for _, n := range names {
 		s := m.Skills[n]
@@ -128,6 +129,16 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") {
 			_, _ = fmt.Fprintf(note, "%s: not locked, run cali sync\n", n)
 			continue
+		}
+		for _, tg := range m.TargetsFor(n) { // also for up-to-date skills: the leftover may be from any run
+			dir, err := targets.Dir(tg, loc.Scope, loc.Root, d.Dirs.Home)
+			if err != nil {
+				return Proposal{}, err
+			}
+			if !warned[dir] {
+				warned[dir] = true
+				warnLeftovers(note, dir)
+			}
 		}
 		ref := s.Ref
 		if ref == "" {
@@ -196,6 +207,21 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		p.Skills = append(p.Skills, sp)
 	}
 	return p, nil
+}
+
+// warnLeftovers reports staging and moved-aside folders an interrupted update
+// left in the skills dir. They may hold the only copy of a folder, so they are
+// never deleted.
+func warnLeftovers(w io.Writer, dir string) {
+	ents, err := os.ReadDir(dir)
+	if err != nil {
+		return // absent or unreadable: nothing to report
+	}
+	for _, e := range ents {
+		if name := e.Name(); strings.HasPrefix(name, ".cali-old-") || strings.HasPrefix(name, ".cali-staging-") {
+			_, _ = fmt.Fprintf(w, "warning: leftover from an interrupted update: %s\n", render.Sanitize(filepath.Join(dir, name)))
+		}
+	}
 }
 
 func index(t skillfs.Tree) map[string]*skillfs.File {

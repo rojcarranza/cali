@@ -92,3 +92,9 @@ func TestWriteJSONNoHTMLEscape(t *testing.T) {
 		t.Fatalf("escaped: %q", b.String())
 	}
 }
+
+func TestSanitizeDropsFormatRunes(t *testing.T) {
+	if got := Sanitize("a\u202eb\u200bc\u2066d\ufeff"); got != "abcd" {
+		t.Fatalf("got %q", got)
+	}
+}

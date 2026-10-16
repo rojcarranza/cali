@@ -466,3 +466,93 @@ func exact(a, b skillfs.Tree) bool {
 	}
 	return true
 }
+
+func TestPromptKeepMineDoesNotAdvance(t *testing.T) {
+	f := codeReview(t)
+	before := f.snapshot(t)
+	pr := &fakePrompter{choice: "ours"}
+	out, err := f.apply(t, Options{}, pr)
+	if err != nil || !strings.HasPrefix(out, "kept code-review: ") || len(pr.asked) != 1 {
+		t.Fatalf("out = %q, err = %v, asked %v", out, err, pr.asked)
+	}
+	sameSnapshot(t, before, f.snapshot(t))
+}
+
+func TestEditBeforeSwapIsNotLost(t *testing.T) {
+	f := codeReview(t)
+	loc, _ := install.Locate(f.d, false)
+	oldLock := read(t, loc.LockPath)
+	f.d.Rename = func(oldpath, newpath string) error {
+		if oldpath == f.local { // moving the installed folder aside: an editor saves first
+			write(t, f.local, "late.md", "saved late\n")
+		}
+		return os.Rename(oldpath, newpath)
+	}
+	_, err := f.apply(t, Options{Names: []string{"code-review"}, Resolve: map[string]string{"code-review:SKILL.md": "theirs"}}, nil)
+	if err == nil || !strings.Contains(err.Error(), f.local) {
+		t.Fatalf("err = %v", err)
+	}
+	if got := read(t, filepath.Join(f.local, "late.md")); got != "saved late\n" {
+		t.Fatalf("late.md = %q", got)
+	}
+	if got := read(t, filepath.Join(f.local, "SKILL.md")); !strings.Contains(got, "line 1 local") {
+		t.Fatalf("SKILL.md = %q", got)
+	}
+	if got := read(t, loc.LockPath); got != oldLock {
+		t.Fatalf("lock changed:\n%s", got)
+	}
+}
+
+func TestLineEndingOnlyEditIsBackedUp(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", ""), "a.md": "a\nb\n"})
+	write(t, f.local, "a.md", "a\r\nb\r\n")
+	f.upstream(t, map[string]string{"more.md": "more\n"})
+	out, err := f.apply(t, Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := read(t, filepath.Join(backupDir(t, out), "files", "a.md")); got != "a\r\nb\r\n" {
+		t.Fatalf("backup a.md = %q", got)
+	}
+}
+
+func TestSwapRefusesSymlinkSwappedIn(t *testing.T) {
+	f, dirs := twoTargets(t)
+	loc, _ := install.Locate(f.d, false)
+	oldLock := read(t, loc.LockPath)
+	ghSkills := filepath.Dir(dirs[1])
+	elsewhere := filepath.Join(t.TempDir(), "elsewhere")
+	swapped := false
+	f.d.Rename = func(oldpath, newpath string) error {
+		if !swapped && strings.HasPrefix(filepath.Base(oldpath), ".cali-staging-") {
+			// After the first target's swap: replace .github/skills with a symlink.
+			swapped = true
+			if err := os.Rename(ghSkills, elsewhere); err != nil {
+				return err
+			}
+			if err := os.Symlink(elsewhere, ghSkills); err != nil {
+				return err
+			}
+		}
+		return os.Rename(oldpath, newpath)
+	}
+	_, err := f.apply(t, Options{}, nil)
+	if err == nil || !strings.Contains(err.Error(), "symlink") {
+		t.Fatalf("err = %v", err)
+	}
+	if got := read(t, filepath.Join(dirs[0], "SKILL.md")); got != skillMD("x", "mine\n") {
+		t.Fatalf("first target not restored: %q", got)
+	}
+	if _, err := os.Lstat(filepath.Join(dirs[0], "a.md")); err != nil {
+		t.Fatal(err)
+	}
+	if got := read(t, filepath.Join(dirs[0], "a.md")); got != "a\n" {
+		t.Fatalf("first target a.md = %q", got)
+	}
+	if got := read(t, loc.LockPath); got != oldLock {
+		t.Fatalf("lock changed:\n%s", got)
+	}
+	if got := read(t, filepath.Join(elsewhere, "x", "a.md")); got != "a\n" {
+		t.Fatalf("write went through the symlink: a.md = %q", got)
+	}
+}
