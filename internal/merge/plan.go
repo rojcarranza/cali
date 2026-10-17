@@ -188,7 +188,7 @@ func LocalPatch(base, ours skillfs.Tree) ([]byte, error) {
 	}
 	defer func() { _ = os.RemoveAll(dir) }()
 	for name, t := range map[string]skillfs.Tree{"a": base, "b": ours} {
-		if err := t.WriteTo(filepath.Join(dir, name)); err != nil {
+		if err := t.WriteUnchecked(filepath.Join(dir, name)); err != nil {
 			return nil, err
 		}
 	}

@@ -104,3 +104,18 @@ func TestSaveDirsArePrivate(t *testing.T) {
 		}
 	}
 }
+
+func TestSaveUserTreeBreakingUpstreamRules(t *testing.T) {
+	user := skillfs.Tree{
+		{Path: ".git/HEAD", Data: []byte("ref: refs/heads/main\n")},
+		{Path: "aux.md", Data: []byte("notes\n")},
+	}
+	p, err := Save(t.TempDir(), "x", user, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := skillfs.ReadDir(filepath.Join(p, "files"))
+	if err != nil || !skillfs.SameBytes(got, user) {
+		t.Fatalf("backup = %v, %v", got, err)
+	}
+}

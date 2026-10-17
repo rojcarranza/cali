@@ -44,7 +44,7 @@ func Save(dataDir, name string, t skillfs.Tree, patch []byte) (string, error) {
 		}
 		dir = fmt.Sprintf("%s-%d", base, i)
 	}
-	if err := t.WriteTo(filepath.Join(dir, "files")); err != nil {
+	if err := t.WriteUnchecked(filepath.Join(dir, "files")); err != nil {
 		return "", fmt.Errorf("write backup %s: %w", dir, err)
 	}
 	if patch != nil {

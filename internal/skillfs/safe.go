@@ -122,6 +122,22 @@ func validateSegment(seg string) error {
 	return nil
 }
 
+// safePath is the part of validatePath that keeps a write inside its dir.
+func safePath(p string) error {
+	if p == "" {
+		return errors.New("empty path")
+	}
+	if strings.HasPrefix(p, "/") || filepath.IsAbs(filepath.FromSlash(p)) || filepath.VolumeName(filepath.FromSlash(p)) != "" {
+		return fmt.Errorf("absolute path: %s", quote(p))
+	}
+	for _, seg := range strings.Split(p, "/") {
+		if seg == ".." {
+			return fmt.Errorf("path has a .. segment: %s", quote(p))
+		}
+	}
+	return nil
+}
+
 func quote(s string) string { return fmt.Sprintf("%q", s) }
 
 // WriteTo validates t and writes it under dir. Nothing is written if
@@ -132,6 +148,20 @@ func quote(s string) string { return fmt.Sprintf("%q", s) }
 func (t Tree) WriteTo(dir string) error {
 	if err := Validate(t); err != nil {
 		return err
+	}
+	return t.WriteUnchecked(dir)
+}
+
+// WriteUnchecked writes a user's own tree (a backup, a patch side) under dir
+// like WriteTo, but skips the upstream content rules (root SKILL.md, reserved
+// names, .git, case collisions, caps): a local folder may break them and must
+// still be saved. Path safety stays: no empty, absolute or .. path, nothing
+// outside dir, no symlink followed, files created exclusively.
+func (t Tree) WriteUnchecked(dir string) error {
+	for _, f := range t {
+		if err := safePath(f.Path); err != nil {
+			return err
+		}
 	}
 	root := filepath.Clean(dir)
 	fi, err := os.Lstat(root)

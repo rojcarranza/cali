@@ -343,3 +343,43 @@ func TestDiffKinds(t *testing.T) {
 		}
 	}
 }
+
+func TestWriteUncheckedSkipsContentRules(t *testing.T) {
+	user := Tree{
+		{Path: ".git/config", Data: []byte("[core]\n")},
+		{Path: "aux.md", Data: []byte("notes\n")},
+	}
+	dir := filepath.Join(t.TempDir(), "out")
+	if err := user.WriteUnchecked(dir); err != nil {
+		t.Fatal(err)
+	}
+	got, err := ReadDir(dir)
+	if err != nil || !SameBytes(got, user) {
+		t.Fatalf("read back %v, %v", got, err)
+	}
+}
+
+func TestWriteUncheckedKeepsPathSafety(t *testing.T) {
+	for _, p := range []string{"../x", "a/../../x", "/abs", ""} {
+		dir := filepath.Join(t.TempDir(), "out")
+		if err := (Tree{{Path: "ok.md"}, {Path: p, Data: []byte("x")}}).WriteUnchecked(dir); err == nil {
+			t.Errorf("%q: expected refusal", p)
+		}
+		if _, serr := os.Lstat(filepath.Join(dir, "ok.md")); !os.IsNotExist(serr) {
+			t.Errorf("%q: wrote before refusing", p)
+		}
+	}
+	base := t.TempDir()
+	real := filepath.Join(base, "real")
+	if err := os.Mkdir(real, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(base, "link")
+	symlinkOrSkip(t, real, link)
+	if err := (Tree{{Path: "f.md"}}).WriteUnchecked(link); err == nil {
+		t.Fatal("expected refusal of a symlinked target")
+	}
+	if ents, _ := os.ReadDir(real); len(ents) != 0 {
+		t.Fatal("wrote through symlinked target")
+	}
+}

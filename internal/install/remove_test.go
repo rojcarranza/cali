@@ -206,3 +206,29 @@ func TestRemoveAbortsOnLineEndingOnlyChangeDuringBackup(t *testing.T) {
 		t.Fatal("folder removed after a line-ending-only edit")
 	}
 }
+
+func TestRemoveForceBacksUpFolderBreakingUpstreamRules(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	claude := filepath.Join(e.project, ".claude", "skills", "x")
+	if err := os.Remove(filepath.Join(claude, "SKILL.md")); err != nil {
+		t.Fatal(err)
+	}
+	write(t, claude, ".git/HEAD", "ref: refs/heads/main\n")
+	write(t, claude, "aux.md", "notes\n")
+	want := readTree(t, claude)
+
+	if err := Remove(context.Background(), e.deps, "x", true); err != nil {
+		t.Fatal(err)
+	}
+	if exists(claude) {
+		t.Fatal("folder not removed")
+	}
+	bs := backups(t, e, "x")
+	if len(bs) != 1 || !skillfs.SameBytes(readTree(t, filepath.Join(bs[0], "files")), want) {
+		t.Fatalf("backups = %v, want one holding the removed folder", bs)
+	}
+}
