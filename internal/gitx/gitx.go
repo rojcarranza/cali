@@ -278,18 +278,17 @@ type entry struct {
 	exec bool
 }
 
-// Export reads the folder path at commit into a Tree straight from git
-// blobs, so no checkout filter can alter the bytes. Symlinks and submodules
+// Export reads the folder whose tree SHA is tree (from TreeSHA) into a Tree
+// straight from git blobs, so no checkout filter can alter the bytes. Symlinks and submodules
 // are errors naming the path. File count and sizes are checked against the
 // skillfs limits from the tree listing before any blob is read, and the
 // result is validated by skillfs.Validate.
 //
 // Fetch must have run on this Repo first: the mirror is blob-less, and the
 // auth environment given to Fetch is what lets git download blobs lazily.
-func (r *Repo) Export(commit, path string) (skillfs.Tree, error) {
-	tree, err := r.TreeSHA(commit, path)
-	if err != nil {
-		return nil, err
+func (r *Repo) Export(tree string) (skillfs.Tree, error) {
+	if !hex40.MatchString(tree) {
+		return nil, fmt.Errorf("invalid tree %q", tree)
 	}
 	ctx := context.Background()
 	out, err := r.git(ctx, r.env, "ls-tree", "-r", "-z", "-l", tree)
@@ -333,7 +332,7 @@ func (r *Repo) Export(commit, path string) (skillfs.Tree, error) {
 		entries = append(entries, entry{p, sha, size, mode == "100755"})
 	}
 	if len(entries) == 0 {
-		return nil, fmt.Errorf("no files at %q", path)
+		return nil, fmt.Errorf("no files in tree %s", tree)
 	}
 	t, err := r.readBlobs(ctx, entries)
 	if err != nil {

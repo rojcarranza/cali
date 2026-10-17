@@ -431,9 +431,16 @@ func exportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree,
 	if err != nil {
 		return "", nil, err
 	}
-	t, err := repo.Export(commit, p)
+	t, err := exportTree(repo, tree, name)
+	return tree, t, err
+}
+
+// exportTree reads the skill folder with tree SHA tree and checks that its
+// SKILL.md frontmatter names it name.
+func exportTree(repo *gitx.Repo, tree, name string) (skillfs.Tree, error) {
+	t, err := repo.Export(tree)
 	if err != nil {
-		return "", nil, fmt.Errorf("skill %q: %w", name, err)
+		return nil, fmt.Errorf("skill %q: %w", name, err)
 	}
 	var md []byte
 	for _, f := range t {
@@ -443,12 +450,12 @@ func exportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree,
 	}
 	fm, err := skillfs.ParseFrontmatter(md)
 	if err != nil {
-		return "", nil, fmt.Errorf("skill %q: %w", name, err)
+		return nil, fmt.Errorf("skill %q: %w", name, err)
 	}
 	if fm.Name != name {
-		return "", nil, fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name)
+		return nil, fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name)
 	}
-	return tree, t, nil
+	return t, nil
 }
 
 // checkScopeFiles refuses a symlinked manifest or lock in project scope.
@@ -643,8 +650,8 @@ func OpenFetch(ctx context.Context, d Deps, spec source.Spec) (*gitx.Repo, error
 // down to and including dir.
 func NoSymlinks(root, dir string) error { return noSymlinks(root, dir) }
 
-// ExportSkill reads the skill folder p at commit and returns its tree SHA and
-// files; SKILL.md must name the skill name.
-func ExportSkill(repo *gitx.Repo, commit, p, name string) (string, skillfs.Tree, error) {
-	return exportSkill(repo, commit, p, name)
+// ExportTree reads the skill folder with tree SHA tree (from TreeSHA);
+// SKILL.md must name the skill name.
+func ExportTree(repo *gitx.Repo, tree, name string) (skillfs.Tree, error) {
+	return exportTree(repo, tree, name)
 }

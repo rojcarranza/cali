@@ -181,7 +181,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if err != nil {
 			return Proposal{}, fmt.Errorf("pristine copy of %s: %w", n, err)
 		}
-		_, theirs, err := install.ExportSkill(repo, commit, e.Path, n)
+		theirs, err := install.ExportTree(repo, sp.ToTree, n)
 		if err != nil {
 			return Proposal{}, err
 		}

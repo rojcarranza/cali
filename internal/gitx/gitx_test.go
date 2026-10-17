@@ -96,7 +96,7 @@ func TestExportEqualsCommittedBytes(t *testing.T) {
 	if !r.HasCommit(commit) || r.HasCommit(strings.Repeat("0", 40)) {
 		t.Fatal("HasCommit wrong")
 	}
-	tr, err := r.Export(commit, "skills/a")
+	tr, err := exportAt(r, commit, "skills/a")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 	git(t, dir, "commit", "-q", "-m", "link")
 	r := openFetched(t, dir)
 	c, _ := r.Resolve("")
-	_, err := r.Export(c, "skills/b")
+	_, err := exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), "link") {
 		t.Fatalf("symlink err = %v", err)
 	}
@@ -199,7 +199,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 		t.Fatal(err)
 	}
 	c, _ = r.Resolve("")
-	_, err = r.Export(c, "skills/b")
+	_, err = exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), "sub") {
 		t.Fatalf("submodule err = %v", err)
 	}
@@ -218,7 +218,7 @@ func TestFilteredFetchIsBlobless(t *testing.T) {
 		t.Fatalf("fetch was not blob-less, no missing objects:\n%s", out)
 	}
 	c, _ := r.Resolve("")
-	tr, err := r.Export(c, "skills/a")
+	tr, err := exportAt(r, c, "skills/a")
 	if err != nil || len(tr) != 2 {
 		t.Fatalf("Export over lazy fetch = %v, %v", tr, err)
 	}
@@ -246,15 +246,15 @@ func TestExportEnforcesLimitsBeforeReading(t *testing.T) {
 	t.Cleanup(func() { limits = old })
 
 	limits.files = 1
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
 		t.Fatalf("file count err = %v", err)
 	}
 	limits.files, limits.file = old.files, 5
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
 		t.Fatalf("file size err = %v", err)
 	}
 	limits.file, limits.tree = old.file, 10
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
 		t.Fatalf("tree size err = %v", err)
 	}
 }
@@ -320,7 +320,7 @@ func TestSymlinkErrorQuotesPath(t *testing.T) {
 	git(t, dir, "commit", "-q", "-m", "evil")
 	r := openFetched(t, dir)
 	c, _ := r.Resolve("")
-	_, err := r.Export(c, "skills/b")
+	_, err := exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), `"ev\"il"`) {
 		t.Fatalf("err = %v", err)
 	}
@@ -404,4 +404,13 @@ func TestReadFile(t *testing.T) {
 	if _, err := r.ReadFile(commit, "skills/b/SKILL.md"); err == nil || !strings.Contains(err.Error(), "limit") {
 		t.Fatalf("oversize: err = %v", err)
 	}
+}
+
+// exportAt exports path at commit, as callers do: TreeSHA, then Export.
+func exportAt(r *Repo, commit, path string) (skillfs.Tree, error) {
+	tree, err := r.TreeSHA(commit, path)
+	if err != nil {
+		return nil, err
+	}
+	return r.Export(tree)
 }
