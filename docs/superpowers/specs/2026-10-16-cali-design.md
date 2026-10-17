@@ -190,7 +190,7 @@ The Agent Skills frontmatter has no dependency field, and a top-level unknown ke
    metadata:
      cali-requires: "writing-plans, test-driven-development"
    ```
-   (`metadata` is the spec's extension field and, per my reading of the spec, takes string values; **Verify** against the Agent Skills spec and that VS Code/Claude Code ignore it without warning.) This travels with the skill, so skills Roj authors in `agent-skills` carry their own dependencies.
+   (`metadata` is the spec's extension field. Real skills also keep lists and maps there, e.g. awesome-copilot's `acquire-codebase-knowledge`, so Cali reads only string values and ignores the rest; `cali-requires` itself must be a string. **Verify** that VS Code/Claude Code ignore `cali-requires` without warning.) This travels with the skill, so skills Roj authors in `agent-skills` carry their own dependencies.
 2. In `cali.yaml`, `requires: [..]` on the entry, for upstream skills that cannot be edited. It survives updates because it is not inside the skill folder.
 
 Semantics: names only, no versions. A dependency is satisfied when a skill with that name is installed for the same target in the same scope or in global scope. `status` prints `WARN <skill> requires <dep> (missing)`; nothing is installed, and no cycle or transitive logic exists (non-goal 3). Reading `cali-requires` from the installed `SKILL.md` means a local edit to it takes effect immediately.

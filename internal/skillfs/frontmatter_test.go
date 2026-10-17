@@ -33,6 +33,31 @@ func TestParseFrontmatterAtEOF(t *testing.T) {
 	}
 }
 
+// Real skills (awesome-copilot's acquire-codebase-knowledge) keep lists in metadata.
+func TestParseFrontmatterIgnoresNonStringMetadata(t *testing.T) {
+	data := []byte("---\nname: x\nmetadata:\n  version: \"1.3\"\n  enhancements:\n    - a\n    - b\n  nested: {k: v}\n  empty:\n  cali-requires: y\n---\n")
+	fm, err := ParseFrontmatter(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fm.Metadata["cali-requires"] != "y" || fm.Metadata["version"] != "1.3" || len(fm.Metadata) != 2 {
+		t.Fatalf("metadata = %#v", fm.Metadata)
+	}
+}
+
+func TestParseFrontmatterMetadataAlias(t *testing.T) {
+	fm, err := ParseFrontmatter([]byte("---\nname: x\ndeps: &d \"a, b\"\nmetadata:\n  cali-requires: *d\n---\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fm.Metadata["cali-requires"] != "a, b" {
+		t.Fatalf("metadata = %#v", fm.Metadata)
+	}
+	if fm, err = ParseFrontmatter([]byte("---\nname: x\nmetadata:\n  cali-requires: !!binary YQ==\n---\n")); err != nil || fm.Metadata["cali-requires"] != "a" {
+		t.Fatalf("binary = %#v, %v", fm.Metadata, err)
+	}
+}
+
 func TestParseFrontmatterErrors(t *testing.T) {
 	const secret = "s3cr3t-content"
 	for name, in := range map[string]string{
@@ -41,7 +66,8 @@ func TestParseFrontmatterErrors(t *testing.T) {
 		"unterminated":    "---\nname: " + secret + "\n",
 		"not a mapping":   "---\n- " + secret + "\n---\n",
 		"bad yaml":        "---\nname: [" + secret + "\n---\n",
-		"metadata nested": "---\nname: x\nmetadata:\n  k: {a: " + secret + "}\n---\n",
+		"requires nested": "---\nname: x\nmetadata:\n  cali-requires: {a: " + secret + "}\n---\n",
+		"name not string": "---\nname: [" + secret + "]\n---\n",
 	} {
 		t.Run(name, func(t *testing.T) {
 			_, err := ParseFrontmatter([]byte(in))
