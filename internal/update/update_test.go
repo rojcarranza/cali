@@ -324,6 +324,46 @@ func TestPlanBaseLost(t *testing.T) {
 	}
 }
 
+func TestPlanKeepsGoingWhenOneFolderIsGoneUpstream(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	write(t, f.repo, "skills/y/SKILL.md", skillMD("y", ""))
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "add y")
+	if _, err := install.Add(context.Background(), f.d, install.AddRequest{
+		Spec: "file://" + filepath.ToSlash(f.repo) + "//skills/y", Targets: []string{"claude"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	git(t, f.repo, "rm", "-q", "-r", "skills/x")
+	write(t, f.repo, "skills/y/more.md", "more\n")
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "drop x, change y")
+
+	p := f.plan(t)
+	if len(p.Skills) != 2 || p.Skills[0].Name != "x" || !strings.Contains(p.Skills[0].Problem, "not found") ||
+		p.Skills[1].Name != "y" || p.Skills[1].Problem != "" || p.Skills[1].Noop {
+		t.Fatalf("proposal = %+v", p)
+	}
+	var out bytes.Buffer
+	if err := p.WriteText(&out); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out.String(), "x: skipped: ") || !strings.Contains(out.String(), "1 skill(s) to update") {
+		t.Fatalf("out = %q", out.String())
+	}
+	out.Reset()
+	f.d.Stdout = &out
+	if err := Apply(context.Background(), f.d, p, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(filepath.Dir(f.local), "y", "more.md")); err != nil {
+		t.Fatalf("y was not updated: %v", err)
+	}
+	if !strings.Contains(out.String(), "kept x: skipped: ") {
+		t.Fatalf("apply out = %q", out.String())
+	}
+}
+
 func TestPlanMissingTarget(t *testing.T) {
 	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
 	f.upstream(t, map[string]string{"more.md": "more\n"})

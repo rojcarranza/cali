@@ -66,6 +66,9 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	var kept, open []string
 	for _, s := range p.Skills {
 		switch {
+		case s.Problem != "":
+			kept = append(kept, s.Name+": skipped: "+render.Sanitize(s.Problem))
+			continue
 		case s.Noop:
 			if s.ref != s.fromRef {
 				refOnly = append(refOnly, s) // same folder at the new ref: only the lock changes

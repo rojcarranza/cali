@@ -44,9 +44,11 @@ type Proposal struct {
 }
 
 // SkillPlan is one skill: Noop when upstream did not change its folder,
-// BaseLost when the pristine copy of the locked tree is gone.
+// BaseLost when the pristine copy of the locked tree is gone, Problem when
+// its ref or folder is not found upstream (the skill is skipped).
 type SkillPlan struct {
 	Name                                   string
+	Problem                                string
 	FromCommit, ToCommit, FromTree, ToTree string
 	BaseLost                               bool
 	Noop                                   bool
@@ -164,13 +166,16 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			}
 			repos[spec.URL] = repo
 		}
+		// A ref or folder gone upstream skips this skill, not the whole update.
 		commit, err := repo.Resolve(ref)
 		if err != nil {
-			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error()})
+			continue
 		}
 		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref}
 		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil {
-			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error()})
+			continue
 		}
 		if sp.ToTree == e.Tree {
 			sp.Noop = true
@@ -327,6 +332,9 @@ func (p Proposal) WriteText(w io.Writer) error {
 	n := 0
 	for _, s := range p.Skills {
 		switch {
+		case s.Problem != "":
+			fmt.Fprintf(&b, "%s: skipped: %s\n", s.Name, render.Sanitize(s.Problem))
+			continue
 		case s.Noop:
 			fmt.Fprintf(&b, "%s: up to date\n", s.Name)
 			continue
@@ -406,6 +414,7 @@ type jsonTarget struct {
 
 type jsonSkill struct {
 	Name     string       `json:"name"`
+	Problem  string       `json:"problem,omitempty"`
 	From     string       `json:"from"`
 	To       string       `json:"to"`
 	Noop     bool         `json:"noop"`
@@ -417,7 +426,7 @@ type jsonSkill struct {
 func (p Proposal) WriteJSON(w io.Writer) error {
 	skills := []jsonSkill{}
 	for _, s := range p.Skills {
-		js := jsonSkill{Name: s.Name, From: s.FromCommit, To: s.ToCommit, Noop: s.Noop, BaseLost: s.BaseLost, Targets: []jsonTarget{}}
+		js := jsonSkill{Name: s.Name, Problem: s.Problem, From: s.FromCommit, To: s.ToCommit, Noop: s.Noop, BaseLost: s.BaseLost, Targets: []jsonTarget{}}
 		for _, t := range s.Targets {
 			jt := jsonTarget{Target: t.Target, Dir: t.Dir, Missing: t.Missing, Files: []jsonFile{}}
 			for _, f := range t.Files {
