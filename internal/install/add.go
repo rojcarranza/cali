@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/url"
 	"os"
 	"path"
@@ -327,7 +328,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 		}
 	}
 
-	oldSkills := maps(m.Skills)
+	oldSkills := maps.Clone(m.Skills)
 	res := Result{Manifest: sc.manifest, Created: created}
 	for _, pl := range plans {
 		m.Skills[pl.name] = manifest.Skill{Source: pl.source, Ref: spec.Ref, Targets: pl.skillTargets}
@@ -368,14 +369,6 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 		}
 	}
 	return res, nil
-}
-
-func maps(in map[string]manifest.Skill) map[string]manifest.Skill {
-	out := make(map[string]manifest.Skill, len(in))
-	for k, v := range in {
-		out[k] = v
-	}
-	return out
 }
 
 func planSkill(d Deps, sc scope, m manifest.Manifest, repo *gitx.Repo, commit string, spec source.Spec,
