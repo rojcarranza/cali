@@ -22,7 +22,7 @@ Cali is one Go binary that installs, pins, updates and syncs agent skills from a
 - Same `cali.lock` produces byte-identical skill folders on macOS, Windows and WSL.
 
 ## MVP scope
-- Commands: `init`, `add`, `list`, `show`, `find`, `status`, `update` (dry run by default, `--apply` merges), `remove`, `sync`, `import apm.yml`.
+- Commands: `init`, `add`, `list`, `show`, `find`, `status`, `update` (dry run by default, `--apply` merges), `remove`, `sync`, ~~`import apm.yml`~~ (removed 2026-10-17, issue #13: APM is retired, so `cali import` was dropped).
 - Sources: any git repo (GitHub first), pinned to an exact commit in `cali.lock`; project scope and global scope.
 - Targets: Claude Code and GitHub Copilot skill folders on macOS, Windows (Git Bash) and WSL. Files are copied, not symlinked.
 - Safe updates: Cali stores the pristine upstream copy of each installed version and runs a 3-way merge on update; conflicts stop and show the conflicting lines.
@@ -49,7 +49,7 @@ Cali is one Go binary that installs, pins, updates and syncs agent skills from a
 - Timeline: about 6 weeks at 5 to 6 hours per week (2026-10-19 to 2026-11-27).
   - Week 2: walking skeleton (one skill from one git repo into one agent folder, CI green).
   - Week 4: `add`, `sync`, `status`, `list`.
-  - Week 6: `update` with 3-way merge, `import apm.yml`, retire `install.py`.
+  - Week 6: `update` with 3-way merge, ~~`import apm.yml`~~ (removed 2026-10-17, issue #13), retire `install.py`.
 - Compliance: no secrets in config or lockfile; tokens come from the environment or `gh auth token`.
 
 ## Open questions
@@ -57,5 +57,5 @@ Cali is one Go binary that installs, pins, updates and syncs agent skills from a
 - What are the exact Copilot skill folder paths for VS Code and JetBrains on each OS?
 - Should a skill be installable from a subfolder of a monorepo (e.g. `obra/superpowers/skills/x`) with history per subfolder, or per repo?
 - Where does Cali keep pristine copies and cache (`~/.cache/cali`, `~/.local/share/cali`, `%LOCALAPPDATA%`)?
-- What happens to skills APM installed that are not in `apm.yml` (cleanup on import)?
+- What happens to skills APM installed that are not in `apm.yml` (cleanup on import)? (Moot since 2026-10-17: `import` was removed, issue #13.)
 - Name clashes: two sources with the same skill name.

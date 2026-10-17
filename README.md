@@ -32,7 +32,6 @@ System `git` must be on PATH (ADR 0001). GitHub tokens come from `GITHUB_TOKEN` 
 - `cali update [names...]`: dry run by default; `--apply` writes it. Conflicts: `--resolve <file>=ours|theirs|merge` (repeatable, one skill), `--take-upstream`, `--keep-mine`, `--accept-recommended`. `--json`. A skill whose ref or folder is gone upstream, or whose upstream folder is invalid, is reported as skipped; the rest is still planned or applied and the exit code is 1. A manifest skill that is not locked yet is noted (`run cali sync`) and also makes the exit code 1.
 - `cali remove <name>`: back up and remove a skill (`--force` when it has local edits).
 - `cali sync`: install every skill in `cali.lock` and lock manifest skills not locked yet (`--frozen` fails instead of changing `cali.lock`). A skill whose upstream folder is invalid (bad `SKILL.md`, a symlink, a file over the size limit), or whose ref or folder is gone upstream before it is locked, is reported as skipped and left as it was; the rest is installed and the exit code is 1.
-- `cali import <apm.yml>`: add the skills of an `apm.yml` to `cali.yaml` (`--local-source <spec>`).
 - `-g`, `--global` (all commands): use the global scope instead of the project.
 - `--manifest <path>` (all commands): use this manifest file; `cali.lock` sits next to it. In project scope its folder is the project root; with `-g` skills still install into `~/.claude/skills` and `~/.copilot/skills`.
 
@@ -54,15 +53,6 @@ Project scope keeps `<project>/cali.yaml` and `<project>/cali.lock`; global scop
 | `<cache>` | `$CALI_CACHE_DIR`, else `$XDG_CACHE_HOME/cali`, else `~/.cache/cali` | `%LOCALAPPDATA%\cali\cache` |
 
 `<cache>` holds disposable git mirrors. `<data>` holds the pristine upstream copies (the merge base for updates) and backups taken before any update or remove; deleting it can make skills `base-lost`.
-
-## Migrating from APM
-
-```sh
-cali import /path/to/apm.yml --local-source github:rojcarranza/agent-skills -g
-cali sync -g
-```
-
-MCP servers are not managed by Cali; the import skips what it cannot map and prints a warning for each.
 
 ## Known limits
 
