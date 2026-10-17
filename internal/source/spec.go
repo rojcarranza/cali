@@ -113,6 +113,9 @@ func ParseWith(s string, o Options) (Spec, error) {
 // canonical url. It canonicalises lockURL first, so an entry written before
 // a canonical-form change (github.com owner/repo case) still matches.
 func SameURL(lockURL, url string, o Options) bool {
+	if lockURL == url { // a bare URL may not re-parse to itself, e.g. a file path with @
+		return true
+	}
 	s, err := ParseWith(lockURL, o)
 	return err == nil && s.URL == url
 }

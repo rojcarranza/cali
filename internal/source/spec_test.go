@@ -217,4 +217,8 @@ func TestSameURLFoldsOldLockEntries(t *testing.T) {
 	if !SameURL("file:///tmp/r", "file:///tmp/r", Options{AllowFile: true}) {
 		t.Error("file URL does not match itself")
 	}
+	// Re-parsing a bare URL would read "@b/r" as a ref; an exact match must still count.
+	if !SameURL("file:///tmp/a@b/r", "file:///tmp/a@b/r", Options{AllowFile: true}) {
+		t.Error("file URL with @ does not match itself")
+	}
 }
