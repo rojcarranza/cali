@@ -447,3 +447,37 @@ func TestOpenWritesConfigOnlyWhenNeeded(t *testing.T) {
 		t.Errorf("url = %q, want %q", got, spec.URL)
 	}
 }
+
+func TestFetchFallsBackOnlyWhenTheFilterIsRejected(t *testing.T) {
+	src := fixture(t)
+	git(t, src, "config", "uploadpack.allowFilter", "true")
+	git(t, src, "config", "uploadpackfilter.allow", "false")
+	r, err := Open(t.TempDir(), fixtureSpec(t, src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Fetch(context.Background(), nil); err != nil {
+		t.Fatalf("no fallback to a full fetch: %v", err)
+	}
+	if _, err := r.Resolve("main"); err != nil {
+		t.Fatal(err)
+	}
+
+	// Any other failure is returned as is, without a second, full fetch.
+	gone, err := Open(t.TempDir(), fixtureSpec(t, filepath.Join(t.TempDir(), "missing")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
+	if err := gone.Fetch(context.Background(), nil); err == nil {
+		t.Fatal("fetch of a missing repo succeeded")
+	}
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(log), "--no-filter") {
+		t.Errorf("fell back to a full fetch:\n%s", log)
+	}
+}

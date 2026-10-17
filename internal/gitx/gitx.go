@@ -200,7 +200,8 @@ func scrub(s string, env []string) string {
 
 // Fetch updates the mirror's branches, tags and default branch. It first
 // tries a blob-less fetch (--filter=blob:none) and falls back to a full one
-// (--no-filter) if that fails, e.g. because the server refuses the filter.
+// (--no-filter) only when the server rejects that filter. A server without
+// filter support needs no fallback: git warns and fetches everything.
 // env is extra environment, e.g. AuthEnv; it is kept for later lazy blob
 // fetches, so Fetch must run before Export.
 func (r *Repo) Fetch(ctx context.Context, env []string) error {
@@ -215,13 +216,14 @@ func (r *Repo) Fetch(ctx context.Context, env []string) error {
 		a := append(append([]string{}, base...), filter, "origin")
 		return append(a, specs...)
 	}
-	if _, err := r.git(ctx, env, build("--filter=blob:none")...); err == nil {
-		return nil
-	} else if ctx.Err() != nil {
+	_, err := r.git(ctx, env, build("--filter=blob:none")...)
+	if err == nil || ctx.Err() != nil || !strings.Contains(err.Error(), "filter 'blob:none' not supported") {
 		return err
 	}
-	_, err := r.git(ctx, env, build("--no-filter")...)
-	return err
+	if _, err2 := r.git(ctx, env, build("--no-filter")...); err2 != nil {
+		return errors.Join(err, err2)
+	}
+	return nil
 }
 
 // HasCommit reports whether commit exists in the mirror.
