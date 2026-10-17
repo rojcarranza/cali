@@ -63,7 +63,7 @@ skills:                           # map keyed by install name, so a name can app
     requires: [writing-plans]     # see section 7
 ```
 
-Rules: unknown keys are an error (typos must not pass silently); no secrets are ever stored here; `ref` set to a full commit SHA means "pinned, never moves". Cali rewrites the file only for `add`/`remove`/`import`, and preserves comments if the YAML library allows it (**Verify** when the library is chosen; if not, say so in the ADR).
+Rules: unknown keys are an error (typos must not pass silently); no secrets are ever stored here; `ref` set to a full commit SHA means "pinned, never moves". Cali rewrites the file only for `add`/`remove`/`import` (`import` removed 2026-10-17, issue #13), and preserves comments if the YAML library allows it (**Verify** when the library is chosen; if not, say so in the ADR).
 
 ## 4. `cali.lock` (generated, deterministic)
 
@@ -260,5 +260,5 @@ Package layout, library choices (via the ADRs above), exact JSON output shapes, 
 | Copilot paths for VS Code / JetBrains per OS | Section 6: `.github/skills` and `~/.copilot/skills`, same shape on every OS. VS Code/CLI documented; JetBrains undocumented, V1. |
 | Monorepo subfolder, history per subfolder or per repo? | Per repo, with change detection per subfolder: the lock pins one repo commit plus the subfolder's tree SHA; a skill is outdated only if its own tree changed (sections 1, 4, 5). |
 | Where do pristine copies and cache live? | Section 2 and 5: pristine in `<data>`, git mirrors in `<cache>`. |
-| APM leftovers on import | Section 9: never deleted, reported `unmanaged`. |
+| APM leftovers on import | Section 9: never deleted, reported `unmanaged` (import removed 2026-10-17, issue #13; the rule still holds via section 8). |
 | Name clashes | Section 8: error (remove, then add the new source), no aliases; project shadows global. |
