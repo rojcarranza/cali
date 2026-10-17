@@ -14,6 +14,7 @@ import (
 	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/lock"
 	"github.com/rojcarranza/cali/internal/manifest"
+	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/skillfs"
 	"github.com/rojcarranza/cali/internal/source"
 	"github.com/rojcarranza/cali/internal/store"
@@ -22,14 +23,16 @@ import (
 
 // Action is one thing Sync did or reports.
 type Action struct {
-	Kind   string // installed, adopted, kept, base-lost or ref changed
+	Kind   string // installed, adopted, kept, base-lost, ref changed or skipped
 	Name   string
 	Target string // empty for base-lost and ref changed
-	Detail string // for kept: modified or unmanaged; for ref changed: the hint
+	Detail string // for kept: modified or unmanaged; for ref changed: the hint; for skipped: the reason
 }
 
 func (a Action) String() string {
 	switch {
+	case a.Kind == "skipped":
+		return a.Name + ": skipped: " + a.Detail
 	case a.Target == "" && a.Detail != "":
 		return a.Kind + " " + a.Name + ": " + a.Detail
 	case a.Target == "":
@@ -41,6 +44,10 @@ func (a Action) String() string {
 	}
 }
 
+// ErrSkipped is returned, after everything else was done, when a skill was
+// skipped because its upstream folder cannot be installed.
+var ErrSkipped = errors.New("one or more skills were skipped")
+
 // Report is what Sync did.
 type Report struct{ Actions []Action }
 
@@ -48,7 +55,9 @@ type Report struct{ Actions []Action }
 // scope). Manifest skills missing from the lock are resolved and locked; lock
 // entries no longer in the manifest are dropped. With frozen, either case is
 // an error and nothing is written. Sync never deletes or overwrites a folder:
-// a folder that differs is reported and left alone.
+// a folder that differs is reported and left alone. A skill whose upstream folder
+// fails validation is reported as skipped, with its lock entry and folders
+// left as they were; the rest is done and Sync then returns ErrSkipped.
 func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	opts := source.Options{AllowFile: d.AllowFileScheme}
 	out := d.Stdout
@@ -144,6 +153,14 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 
 	var rep Report
 	trees := map[string]skillfs.Tree{} // pristine tree per skill that can be checked
+	// skip reports a skill whose upstream folder cannot be installed; its lock
+	// entry and folders stay as they were.
+	skip := func(n string, err error) {
+		if e, ok := l.Skills[n]; ok {
+			newL.Skills[n] = e
+		}
+		rep.Actions = append(rep.Actions, Action{Kind: "skipped", Name: n, Detail: render.Sanitize(err.Error())})
+	}
 	for _, n := range names {
 		spec := specs[n]
 		if slices.Contains(refChanged, n) {
@@ -163,6 +180,10 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			}
 			p := strings.Trim(spec.Path, "/")
 			tree, t, err := exportSkill(repo, commit, p, n)
+			if errors.Is(err, skillfs.ErrInvalid) {
+				skip(n, err)
+				continue
+			}
 			if err != nil {
 				return Report{}, err
 			}
@@ -195,6 +216,10 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 				return Report{}, fmt.Errorf("skill %s: tree at commit %s is %s, but the lock says %s", n, e.Commit, tree, e.Tree)
 			}
 			et, err := exportTree(repo, tree, n) // only after the check: no blobs fetched for a mismatched tree
+			if errors.Is(err, skillfs.ErrInvalid) {
+				skip(n, err)
+				continue
+			}
 			if err != nil {
 				return Report{}, err
 			}
@@ -299,8 +324,13 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			return Report{}, err
 		}
 	}
+	skipped := false
 	for _, a := range rep.Actions {
 		_, _ = fmt.Fprintln(out, a.String())
+		skipped = skipped || a.Kind == "skipped"
+	}
+	if skipped {
+		return rep, ErrSkipped
 	}
 	return rep, nil
 }
