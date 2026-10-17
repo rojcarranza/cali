@@ -61,14 +61,22 @@ func ParseFrontmatter(data []byte) (Frontmatter, error) {
 	}
 	fm.Name, fm.Description = raw.Name, raw.Description
 	for k, v := range raw.Metadata {
-		if v.Kind == yaml.ScalarNode && v.Tag != "!!null" {
-			if fm.Metadata == nil {
-				fm.Metadata = map[string]string{}
-			}
-			fm.Metadata[k] = v.Value
-		} else if k == "cali-requires" && v.Tag != "!!null" {
-			return Frontmatter{}, errors.New("SKILL.md metadata.cali-requires must be a string of comma-separated skill names")
+		// Decode follows aliases and tags as the old map[string]string decode did;
+		// a list or map fails it and is skipped. Null stays absent.
+		var str string
+		if v.Tag == "!!null" || (v.Kind == yaml.AliasNode && v.Alias.Tag == "!!null") {
+			continue
 		}
+		if err := v.Decode(&str); err != nil || v.Kind == yaml.MappingNode || v.Kind == yaml.SequenceNode {
+			if k == "cali-requires" {
+				return Frontmatter{}, errors.New("SKILL.md metadata.cali-requires must be a string of comma-separated skill names")
+			}
+			continue
+		}
+		if fm.Metadata == nil {
+			fm.Metadata = map[string]string{}
+		}
+		fm.Metadata[k] = str
 	}
 	return fm, nil
 }

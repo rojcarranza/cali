@@ -45,6 +45,19 @@ func TestParseFrontmatterIgnoresNonStringMetadata(t *testing.T) {
 	}
 }
 
+func TestParseFrontmatterMetadataAlias(t *testing.T) {
+	fm, err := ParseFrontmatter([]byte("---\nname: x\ndeps: &d \"a, b\"\nmetadata:\n  cali-requires: *d\n---\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fm.Metadata["cali-requires"] != "a, b" {
+		t.Fatalf("metadata = %#v", fm.Metadata)
+	}
+	if fm, err = ParseFrontmatter([]byte("---\nname: x\nmetadata:\n  cali-requires: !!binary YQ==\n---\n")); err != nil || fm.Metadata["cali-requires"] != "a" {
+		t.Fatalf("binary = %#v, %v", fm.Metadata, err)
+	}
+}
+
 func TestParseFrontmatterErrors(t *testing.T) {
 	const secret = "s3cr3t-content"
 	for name, in := range map[string]string{
