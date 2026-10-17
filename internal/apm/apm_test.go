@@ -90,3 +90,13 @@ func TestParseErrors(t *testing.T) {
 		}
 	}
 }
+
+func TestParseLocalSourceWithRef(t *testing.T) {
+	r, err := Parse(strings.NewReader("dependencies:\n  apm:\n    - ./skills/a\n"), local+"@v1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := r.Skills["a"], (manifest.Skill{Source: local + "//skills/a", Ref: "v1"}); got.Source != want.Source || got.Ref != want.Ref {
+		t.Fatalf("got %+v, want %+v", got, want)
+	}
+}

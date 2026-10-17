@@ -59,7 +59,12 @@ func Parse(r io.Reader, localSource string) (Result, error) {
 				res.Skipped = append(res.Skipped, "local skill "+n.Value+" needs --local-source")
 				continue
 			}
-			s.Source = localSource + "//" + strings.Trim(n.Value[2:], "/")
+			// A ref on localSource must move to Ref: "src@ref//path" does not parse.
+			src, ref := localSource, ""
+			if i := strings.LastIndex(src, "@"); i >= 0 {
+				src, ref = src[:i], src[i+1:]
+			}
+			s.Source, s.Ref = src+"//"+strings.Trim(n.Value[2:], "/"), ref
 		case n.Kind == yaml.ScalarNode:
 			spec, ref, _ := strings.Cut(n.Value, "#")
 			p := strings.SplitN(spec, "/", 3)

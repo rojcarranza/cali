@@ -24,12 +24,10 @@ func Save(dataDir, name string, t skillfs.Tree, patch []byte) (string, error) {
 		return "", fmt.Errorf("invalid skill name %q for a backup", name)
 	}
 	// 0700: a backup can hold the user's own edits, secrets included.
-	root := filepath.Join(dataDir, "backups")
-	parent := filepath.Join(root, name)
-	for _, dir := range []string{root, parent} {
-		if err := os.Mkdir(dir, 0o700); err != nil && !errors.Is(err, os.ErrExist) {
-			return "", err
-		}
+	// MkdirAll: the data dir itself may not exist yet (nothing was ever synced).
+	parent := filepath.Join(dataDir, "backups", name)
+	if err := os.MkdirAll(parent, 0o700); err != nil {
+		return "", err
 	}
 	base := filepath.Join(parent, now().UTC().Format("20060102T150405Z"))
 	dir := base

@@ -119,3 +119,11 @@ func TestSaveUserTreeBreakingUpstreamRules(t *testing.T) {
 		t.Fatalf("backup = %v, %v", got, err)
 	}
 }
+
+func TestSaveCreatesMissingDataDir(t *testing.T) {
+	fixedNow(t)
+	data := filepath.Join(t.TempDir(), "not", "yet")
+	if _, err := Save(data, "x", tree, nil); err != nil {
+		t.Fatal(err)
+	}
+}
