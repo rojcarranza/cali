@@ -91,10 +91,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		if err != nil {
 			return Report{}, fmt.Errorf("skill %s: %w", n, err)
 		}
-		ref := s.Ref
-		if ref == "" {
-			ref = spec.Ref
-		}
+		ref := s.EffectiveRef(spec)
 		specs[n], refs[n] = spec, ref
 		e, ok := l.Skills[n]
 		switch {

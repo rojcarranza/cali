@@ -156,10 +156,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 				warnLeftovers(note, dir)
 			}
 		}
-		ref := s.Ref
-		if ref == "" {
-			ref = spec.Ref
-		}
+		ref := s.EffectiveRef(spec)
 		repo, ok := repos[spec.URL]
 		if !ok {
 			if repo, err = install.OpenFetch(ctx, d, spec); err != nil {

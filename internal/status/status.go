@@ -90,10 +90,7 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 			if err != nil {
 				return nil, nil, fmt.Errorf("skill %s: %w", name, err)
 			}
-			ref := sk.Ref // the effective ref, as sync and update use it
-			if ref == "" {
-				ref = spec.Ref
-			}
+			ref := sk.EffectiveRef(spec)
 			spec.Ref, spec.Path = ref, e.Path
 			if !fullSHA.MatchString(ref) { // a commit pin is never outdated: nothing to fetch
 				if err := ctx.Err(); err != nil {

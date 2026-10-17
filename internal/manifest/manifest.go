@@ -29,6 +29,15 @@ type Skill struct {
 	Requires []string `yaml:"requires,omitempty"`
 }
 
+// EffectiveRef is the ref sync, update and status use for s: its own ref,
+// else the @ref of its source spec (empty means the default branch).
+func (s Skill) EffectiveRef(spec source.Spec) string {
+	if s.Ref != "" {
+		return s.Ref
+	}
+	return spec.Ref
+}
+
 // Manifest is the in-memory form of cali.yaml.
 type Manifest struct {
 	Version int              `yaml:"version"`
