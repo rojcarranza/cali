@@ -190,7 +190,8 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 }
 
 // UnmanagedRows returns an Unmanaged row for every folder holding a regular
-// SKILL.md in the skills dir of any target m uses, that m does not manage.
+// SKILL.md in the skills dir of any target m uses (both targets when m uses
+// none, e.g. no cali.yaml yet), that m does not manage.
 // Names starting with "." (Cali's staging and moved-aside folders) are skipped.
 func UnmanagedRows(m manifest.Manifest, scope targets.Scope, root, home string) ([]Row, error) {
 	used := slices.Clone(m.Targets)
@@ -200,6 +201,9 @@ func UnmanagedRows(m manifest.Manifest, scope targets.Scope, root, home string) 
 				used = append(used, tg)
 			}
 		}
+	}
+	if len(used) == 0 {
+		used = []string{"claude", "copilot"}
 	}
 	var rows []Row
 	for _, tg := range used {

@@ -252,12 +252,13 @@ func TestStatusReportsMissingDependency(t *testing.T) {
 	}
 }
 
-func TestStatusNoManifestNoRows(t *testing.T) {
+// With no manifest targets both targets are scanned, so the fixture's folder x shows as unmanaged.
+func TestStatusNoManifestOnlyUnmanaged(t *testing.T) {
 	in, _, _ := fixture(t)
 	in.Manifest = manifest.Manifest{Version: 1, Skills: map[string]manifest.Skill{}}
 	in.Lock = lock.Lock{Version: 1, Skills: map[string]lock.Entry{}}
 	rows, warns := compute(t, in)
-	if len(rows) != 0 || len(warns) != 0 {
+	if len(rows) != 1 || rows[0].Skill != "x" || rows[0].Target != "claude" || !slices.Equal(rows[0].States, []State{Unmanaged}) || len(warns) != 0 {
 		t.Fatalf("rows=%+v warns=%+v", rows, warns)
 	}
 }

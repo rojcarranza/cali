@@ -204,3 +204,22 @@ func TestFindOfflineNoMirror(t *testing.T) {
 		t.Fatalf("cache dir was created: %v", err)
 	}
 }
+
+func TestListUnmanagedWithoutManifest(t *testing.T) {
+	_, project := setup(t)
+	p := filepath.Join(project, ".claude", "skills", "foo", "SKILL.md")
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(p, []byte("---\nname: foo\ndescription: Foo.\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := run("list")
+	if code != 0 {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+	lines := strings.Split(strings.TrimSpace(out), "\n")
+	if len(lines) != 2 || strings.Join(strings.Fields(lines[1]), " ") != "foo unmanaged - claude" {
+		t.Fatalf("out = %q", out)
+	}
+}
