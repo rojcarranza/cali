@@ -31,9 +31,11 @@ Cali sends the token only to `github.com`, through git's environment, never on t
 
 ### First run
 
+Install your skills from the agent-skills clone. Its `install.py` runs `cali sync -g --manifest <clone>/cali.yaml`:
+
 ```sh
-cali add -g github:rojcarranza/agent-skills --all
-cali status -g
+cd ~/Dev/projects/agent-skills && python3 install.py
+cali status -g --manifest ~/Dev/projects/agent-skills/cali.yaml
 ```
 
 The README walks through the rest: [Example: your agent-skills on every machine](README.md#example-your-agent-skills-on-every-machine).

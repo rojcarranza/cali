@@ -18,59 +18,67 @@ github:rojcarranza/agent-skills//skills/roj-code-review-pr@main
 
 ## Example: your agent-skills on every machine
 
-`rojcarranza/agent-skills` is private, so log in once and Cali takes the token from `gh`:
+agent-skills commits the skill list as `cali.yaml`, with `cali.lock` next to it pinning each skill to a commit. That repo file is the only manifest. Every command points at it with `-g --manifest`:
+
+- `-g` is where skills go: your home folder (`~/.claude/skills`, `~/.copilot/skills`), so they work in every project.
+- `--manifest` is which list: the repo's `cali.yaml`, not the default global one.
+
+**1. Install (new machine or after a pull).** The repo is private, so log in to `gh` once. `install.py` runs `cali sync -g --manifest <clone>/cali.yaml` for you:
 
 ```sh
 gh auth login
+git clone https://github.com/rojcarranza/agent-skills.git ~/Dev/projects/agent-skills
+cd ~/Dev/projects/agent-skills
+python3 install.py
 ```
 
-**1. Install all your skills, globally, for Claude and Copilot:**
+**2. Check what you have.** Run the rest from the agent-skills clone:
 
 ```sh
-cali add -g github:rojcarranza/agent-skills --all
+cali list   -g --manifest cali.yaml    # NAME, SOURCE, COMMIT, TARGETS
+cali status -g --manifest cali.yaml    # ok, modified (you edited it), or a newer upstream commit
 ```
 
-The two flags answer different questions. `-g` is where: your home folder, so the skills work in every project. `--all` is which: every skill in the repo. Leave out `-g` to install into the current project. Use `--skill <name>` instead of `--all` to install one skill.
+Leave out `--manifest` and `cali status -g` reads the default global `cali.yaml` in `<config>` instead, so the repo's skills show as `unmanaged`.
 
-This creates the global `cali.yaml`, then copies each skill to `~/.claude/skills/<name>` and `~/.copilot/skills/<name>`. If `install.py` already copied a skill there and your copy differs, Cali stops with `exists, is not managed by Cali and differs from upstream; pass --adopt`. Re-run with `--adopt` to keep your copy and manage it from now on.
-
-**2. Add a community skill, pinned to a commit:**
+**3. After you push a change to a skill, pull it in:**
 
 ```sh
-cali add -g github:github/awesome-copilot//skills/code-tour@7cce7cfb4b61196c36d7e8eb8475ae84b356b126
+cali update -g --manifest cali.yaml            # dry run: shows what would change
+cali update -g --manifest cali.yaml --apply    # writes it, and moves the commit in cali.lock
+git commit -am "chore(skills): bump to latest"
 ```
 
-**3. Check what you have:**
+If you edited an installed skill, Cali merges upstream into your edit. When both changed the same lines it stops and reports a conflict. Keep your version (`--keep-mine`), take upstream (`--take-upstream`), or decide per file for one named skill: `cali update -g --manifest cali.yaml roj-grill-plan --apply --resolve SKILL.md=ours|theirs|merge`.
+
+**4. Add a skill.** `add` installs it and writes it into the repo's `cali.yaml` and `cali.lock`. Comments in the file are kept. Pin community skills to a commit:
 
 ```sh
-cali list -g      # NAME, SOURCE, COMMIT, TARGETS
-cali status -g    # ok, modified (you edited it), or a newer upstream commit
+cali add -g --manifest cali.yaml github:rojcarranza/agent-skills//skills/roj-grill-plan
+cali add -g --manifest cali.yaml github:github/awesome-copilot//skills/code-tour@7cce7cfb4b61196c36d7e8eb8475ae84b356b126
+git add cali.yaml cali.lock && git commit -m "feat(skills): add code-tour"
 ```
 
-**4. After you push a change to agent-skills, pull it in:**
+You can also edit `cali.yaml` by hand and run `python3 install.py` (or `cali sync -g --manifest cali.yaml`). An entry looks like this:
+
+```yaml
+  caveman:
+    source: https://github.com/juliusbrussee/caveman//skills/caveman
+    ref: 2e08b9177c07bb7249a8a2d1a6758e5db281d002
+    targets: [copilot]      # this skill only; default is the top-level targets
+```
+
+**5. Remove one.** It is backed up first. Add `--force` if you edited it:
 
 ```sh
-cali update -g            # dry run: shows what would change
-cali update -g --apply    # writes it
+cali remove -g --manifest cali.yaml roj-interview-prep
 ```
 
-If you edited a skill locally, Cali merges upstream into your edit. When both changed the same lines it stops and reports a conflict. Keep your version (`--keep-mine`), take upstream (`--take-upstream`), or decide per file for one named skill: `cali update -g roj-grill-plan --apply --resolve SKILL.md=ours|theirs|merge`.
-
-**5. Remove one:**
-
-```sh
-cali remove -g roj-interview-prep    # backs it up first; --force if you edited it
-```
-
-**6. New machine:** copy the global `cali.yaml` and `cali.lock` (paths under [Where things live](#where-things-live)), then:
-
-```sh
-cali sync -g
-```
+If a folder that Cali did not install is already in place and differs from upstream, `add` stops with `exists, is not managed by Cali and differs from upstream; pass --adopt`. Re-run with `--adopt` to keep that copy and manage it from now on.
 
 ## Example: one skill in one project
 
-Run this from the project root. Skills land in the repo, so they are committed with the project:
+Leave out `-g` and `--manifest`, and Cali works on the current project: `cali.yaml` sits in the project root, and skills land in the repo, so they are committed with it:
 
 ```sh
 cd ~/Dev/projects/worship-lineup
@@ -80,42 +88,13 @@ cali add github:rojcarranza/agent-skills --skill roj-explain-logic --target clau
 git add cali.yaml cali.lock .claude/skills .github/skills
 ```
 
-A teammate who clones the repo runs `cali sync` to get the same commits.
-
-## Example: a manifest kept in agent-skills
-
-You can keep the skill list in a `cali.yaml` inside agent-skills itself and point Cali at it:
-
-```yaml
-# ~/Dev/projects/agent-skills/cali.yaml
-version: 1
-targets: [claude, copilot]
-skills:
-  roj-code-review-pr:
-    source: github:rojcarranza/agent-skills//skills/roj-code-review-pr
-  code-tour:
-    source: github:github/awesome-copilot//skills/code-tour
-    ref: 7cce7cfb4b61196c36d7e8eb8475ae84b356b126
-  caveman:
-    source: https://github.com/juliusbrussee/caveman//skills/caveman
-    ref: 2e08b9177c07bb7249a8a2d1a6758e5db281d002
-    targets: [copilot]      # this skill only
-```
-
-```sh
-cd ~/Dev/projects/agent-skills
-cali sync -g --manifest cali.yaml        # install, and write cali.lock next to it
-cali status -g --manifest cali.yaml
-cali update -g --manifest cali.yaml --apply
-```
-
-Pass `--manifest` on every command. Without it, `cali status -g` reads the default global `cali.yaml` and lists these skills as `unmanaged`.
+Anyone who clones the project runs `cali sync` to get the same commits.
 
 ## Commands
 
 | Command | What it does | Useful flags |
 |---|---|---|
-| `cali init` | Create `cali.yaml` in the project (`add -g` creates the global one itself) | |
+| `cali init` | Create `cali.yaml` in the project | |
 | `cali add <spec>` | Install a skill and record it | `--skill <name>`, `--all`, `--target claude\|copilot`, `--adopt` |
 | `cali list` | List installed skills | `--json` |
 | `cali show <name>` | Source, commit and install paths of one skill | `--json` |
@@ -134,7 +113,7 @@ On every command: `-g` uses your home folder instead of the project, and `--mani
 | Scope | Claude | Copilot | `cali.yaml` and `cali.lock` |
 |---|---|---|---|
 | Project | `<project>/.claude/skills/<name>` | `<project>/.github/skills/<name>` | `<project>/` |
-| Global (`-g`) | `~/.claude/skills/<name>` | `~/.copilot/skills/<name>` | `<config>/` |
+| Global (`-g`) | `~/.claude/skills/<name>` | `~/.copilot/skills/<name>` | `<config>/`, or the `--manifest` file's folder |
 
 | Dir | macOS / Linux / WSL | Windows | Holds |
 |---|---|---|---|
