@@ -424,3 +424,48 @@ func TestHomeCwdRefusedInProject(t *testing.T) {
 		t.Fatalf("home not empty: %v %v", ents, err)
 	}
 }
+
+func TestSyncSkipExitsNonZero(t *testing.T) {
+	repoURL, project := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	if err := os.MkdirAll(filepath.Join(repo, "skills", "y"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "skills", "y", "SKILL.md"), []byte("---\nname: [y]\ndescription: Y.\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "bad y")
+	cy := "version: 1\ntargets: [claude]\nskills:\n  x:\n    source: " + repoURL + "//skills/x\n  y:\n    source: " + repoURL + "//skills/y\n"
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte(cy), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// --frozen still fails before anything is skipped: the lock would change.
+	if code, out, errs := run("sync", "--frozen"); code != 1 || out != "" || !strings.Contains(errs, "needs changes") {
+		t.Fatalf("frozen: code=%d out=%q err=%q", code, out, errs)
+	}
+	code, out, errs := run("sync")
+	if code != 1 || errs != "" || !strings.Contains(out, "installed x (claude)\n") || !strings.Contains(out, "y: skipped: ") {
+		t.Fatalf("sync: code=%d out=%q err=%q", code, out, errs)
+	}
+}
+
+func TestUpdateSkipExitsNonZero(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	gitRun(t, repo, "rm", "-q", "-r", "skills/x")
+	if err := os.WriteFile(filepath.Join(repo, "README"), []byte("x is gone\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "drop x")
+	if code, out, errs := run("update"); code != 1 || errs != "" || !strings.HasPrefix(out, "x: skipped: ") {
+		t.Fatalf("dry run: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("update", "--apply"); code != 1 || errs != "" || !strings.HasPrefix(out, "kept x: skipped: ") {
+		t.Fatalf("apply: code=%d out=%q err=%q", code, out, errs)
+	}
+}

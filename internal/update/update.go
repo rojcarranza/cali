@@ -314,6 +314,11 @@ func (p Proposal) Conflicts() int {
 	return n
 }
 
+// Skipped reports whether a skill was skipped because its ref or folder is gone upstream.
+func (p Proposal) Skipped() bool {
+	return slices.ContainsFunc(p.Skills, func(s SkillPlan) bool { return s.Problem != "" })
+}
+
 // baseLostHint is what dry run and apply say for a lost base: sync can often rebuild it.
 const baseLostHint = "base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream"
 

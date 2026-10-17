@@ -35,7 +35,7 @@ func Execute(args []string, out, errw io.Writer) int {
 	root.SetOut(out)
 	root.SetErr(errw)
 	if err := root.ExecuteContext(context.Background()); err != nil {
-		if !errors.Is(err, errFindings) {
+		if !errors.Is(err, errFindings) && !errors.Is(err, install.ErrSkipped) { // already reported on stdout
 			_, _ = fmt.Fprintln(errw, "cali: "+err.Error())
 		}
 		return 1

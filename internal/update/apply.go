@@ -43,7 +43,8 @@ var beforeLockWrite func()
 // Apply writes the update planned in p (design §5 steps 4 to 6). Every
 // conflict must be resolved, by p.Opts or by prompt (nil: never asks), before
 // anything is written; otherwise nothing is written and the error lists the
-// open conflicts. Folders with local edits are backed up first, each folder
+// open conflicts. A skill skipped because it is gone upstream is reported and,
+// after the rest is written, makes Apply return install.ErrSkipped. Folders with local edits are backed up first, each folder
 // is swapped in by rename and restored on any failure, and the lock is
 // written last.
 func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) error {
@@ -231,6 +232,9 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	}
 	for _, k := range kept {
 		_, _ = fmt.Fprintf(out, "kept %s\n", k)
+	}
+	if p.Skipped() {
+		return install.ErrSkipped
 	}
 	return nil
 }
