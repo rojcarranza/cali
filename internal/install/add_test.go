@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -382,7 +383,7 @@ func TestAddLeavesForeignStagingNameAlone(t *testing.T) {
 		t.Fatal("x.cali-new must be left untouched and not used")
 	}
 	fi, err := os.Stat(filepath.Join(e.project, ".claude", "skills", "x"))
-	if err != nil || fi.Mode().Perm() != 0o755 {
+	if err != nil || (runtime.GOOS != "windows" && fi.Mode().Perm() != 0o755) {
 		t.Fatalf("installed dir mode = %v, %v; want 0755", fi.Mode().Perm(), err)
 	}
 }

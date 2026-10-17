@@ -47,6 +47,9 @@ func TestEqualBinaryExact(t *testing.T) {
 }
 
 func TestEqualComparesExecAndFileSet(t *testing.T) {
+	old := compareExec
+	t.Cleanup(func() { compareExec = old })
+	compareExec = true // test the exec logic on every OS
 	a := Tree{skillMD()}
 	b := Tree{{Path: "SKILL.md", Data: []byte("# s\n"), Exec: true}}
 	if Equal(a, b) {
@@ -315,6 +318,9 @@ func TestReadDirLimits(t *testing.T) {
 }
 
 func TestDiffKinds(t *testing.T) {
+	old := compareExec
+	t.Cleanup(func() { compareExec = old })
+	compareExec = true // test the exec logic on every OS
 	base := Tree{
 		{Path: "SKILL.md", Data: []byte("a\n")},
 		{Path: "gone.txt", Data: []byte("g")},

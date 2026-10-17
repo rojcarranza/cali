@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -49,6 +50,8 @@ func fixture(t *testing.T) string {
 	write(t, dir, "skills/a/scripts/run.sh", "#!/bin/sh\n", 0o755)
 	write(t, dir, "skills/b/SKILL.md", "b\n", 0o644)
 	git(t, dir, "add", ".")
+	// Windows git does not record the OS file mode; set the bit in the index.
+	git(t, dir, "update-index", "--chmod=+x", "skills/a/scripts/run.sh")
 	git(t, dir, "commit", "-q", "-m", "one")
 	// From here on the author's clone has autocrlf=true, as on Windows.
 	git(t, dir, "config", "core.autocrlf", "true")
@@ -307,6 +310,9 @@ func TestSanitizeStderr(t *testing.T) {
 }
 
 func TestSymlinkErrorQuotesPath(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip(`a path containing " is illegal on Windows`)
+	}
 	// Paths in errors are %q-quoted so a hostile name cannot inject text.
 	dir := fixture(t)
 	linkBlob := hashString(t, dir, "x")
