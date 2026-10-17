@@ -51,7 +51,7 @@ type SkillPlan struct {
 	Noop                                   bool
 	Targets                                []TargetPlan
 	base, theirs                           skillfs.Tree
-	ref, fromRef                           string // effective manifest ref (written to the lock) and the locked one
+	ref, fromRef                           string       // effective manifest ref (written to the lock) and the locked one
 	lost                                   []TargetPlan // BaseLost only: the folders --take-upstream replaces
 }
 
