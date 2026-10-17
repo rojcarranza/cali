@@ -17,7 +17,9 @@ import (
 
 	"github.com/rojcarranza/cali/internal/dirs"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/manifest"
 	"github.com/rojcarranza/cali/internal/merge"
+	"github.com/rojcarranza/cali/internal/source"
 )
 
 type fx struct {
@@ -361,6 +363,24 @@ func TestPlanKeepsGoingWhenOneFolderIsGoneUpstream(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "kept x: skipped: ") {
 		t.Fatalf("apply out = %q", out.String())
+	}
+}
+
+func TestPlanFailsOnInvalidRef(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	cy, opts := filepath.Join(f.d.Cwd, "cali.yaml"), source.Options{AllowFile: true}
+	m, err := manifest.ReadWith(cy, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sk := m.Skills["x"]
+	sk.Ref = "main~1"
+	m.Skills["x"] = sk
+	if err := manifest.WriteWith(cy, m, opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Plan(context.Background(), f.d, Options{}); err == nil || !strings.Contains(err.Error(), "invalid ref") {
+		t.Fatalf("err = %v, want invalid ref", err)
 	}
 }
 

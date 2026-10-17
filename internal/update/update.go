@@ -168,13 +168,18 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		}
 		// A ref or folder gone upstream skips this skill, not the whole update.
 		commit, err := repo.Resolve(ref)
+		if err != nil && !errors.Is(err, gitx.ErrNotFound) {
+			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
+		}
 		if err != nil {
-			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error()})
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
 			continue
 		}
 		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref}
-		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil {
-			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error()})
+		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil && !errors.Is(err, gitx.ErrNotFound) {
+			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
+		} else if err != nil {
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
 			continue
 		}
 		if sp.ToTree == e.Tree {

@@ -25,6 +25,10 @@ import (
 
 var hex40 = regexp.MustCompile(`^[0-9a-f]{40}$`)
 
+// ErrNotFound is wrapped by Resolve and TreeSHA when the ref, or the folder at
+// the commit, does not exist upstream (as opposed to an invalid input).
+var ErrNotFound = errors.New("not found upstream")
+
 // maxStderr caps the git stderr text that is placed into an error.
 const maxStderr = 4096
 
@@ -255,7 +259,7 @@ func (r *Repo) Resolve(ref string) (string, error) {
 			return c, nil
 		}
 	}
-	return "", fmt.Errorf("ref %q not found in %s", ref, r.url)
+	return "", fmt.Errorf("ref %q not found in %s: %w", ref, r.url, ErrNotFound)
 }
 
 func (r *Repo) revParse(rev, what string) (string, error) {
@@ -277,12 +281,12 @@ func (r *Repo) TreeSHA(commit, path string) (string, error) {
 	}
 	out, err := r.git(context.Background(), r.env, "rev-parse", "--verify", "-q", "--end-of-options", rev)
 	if err != nil {
-		return "", fmt.Errorf("path %q not found at commit %s", path, commit)
+		return "", fmt.Errorf("path %q not found at commit %s: %w", path, commit, ErrNotFound)
 	}
 	sha := strings.TrimSpace(string(out))
 	typ, err := r.git(context.Background(), r.env, "cat-file", "-t", sha)
 	if err != nil || strings.TrimSpace(string(typ)) != "tree" {
-		return "", fmt.Errorf("path %q at commit %s is not a directory", path, commit)
+		return "", fmt.Errorf("path %q at commit %s is not a directory: %w", path, commit, ErrNotFound)
 	}
 	return sha, nil
 }
