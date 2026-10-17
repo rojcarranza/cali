@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 
@@ -107,14 +108,14 @@ func deps(out io.Writer) (install.Deps, error) {
 		Dirs:            dirs.Resolve(runtime.GOOS, os.Getenv, home),
 		Stdout:          out,
 		Getenv:          os.Getenv,
-		GhToken:         ghToken,
+		GhToken:         sync.OnceValues(ghToken), // at most one gh run per command
 		AllowFileScheme: allowFileScheme,
 		Cwd:             cwd,
 	}, nil
 }
 
-// ghToken asks the GitHub CLI for a token; any failure means no token.
-func ghToken() (string, error) {
+// ghToken asks the GitHub CLI for a token; any failure means no token. A var so tests can count runs.
+var ghToken = func() (string, error) {
 	b, err := exec.Command("gh", "auth", "token").Output()
 	if err != nil {
 		return "", err

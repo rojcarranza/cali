@@ -275,3 +275,23 @@ func TestUpdateDryRunCommand(t *testing.T) {
 		t.Fatalf("after apply: code=%d out=%q", code, out)
 	}
 }
+
+func TestGhTokenRunsOncePerCommand(t *testing.T) {
+	setup(t)
+	runs := 0
+	orig := ghToken
+	ghToken = func() (string, error) { runs++; return "tok", nil }
+	t.Cleanup(func() { ghToken = orig })
+	d, err := deps(&bytes.Buffer{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range 2 {
+		if tok, err := d.GhToken(); tok != "tok" || err != nil {
+			t.Fatalf("token = %q, %v", tok, err)
+		}
+	}
+	if runs != 1 {
+		t.Fatalf("gh auth token ran %d times, want 1", runs)
+	}
+}
