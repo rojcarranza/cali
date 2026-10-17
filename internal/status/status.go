@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -275,12 +274,10 @@ func sortedKeys[V any](m map[string]V) []string {
 }
 
 // GitFetcher is the real Fetcher: it fetches each source URL's mirror once
-// per run and resolves the ref in it.
+// per run, through Open (install.OpenFetch), and resolves the ref in it.
 type GitFetcher struct {
-	Ctx      context.Context
-	CacheDir string
-	Getenv   func(string) string
-	GhToken  func() (string, error)
+	Ctx  context.Context
+	Open func(context.Context, source.Spec) (*gitx.Repo, error)
 
 	repos map[string]*gitx.Repo
 	errs  map[string]error
@@ -291,20 +288,13 @@ func (f *GitFetcher) Latest(s source.Spec) (string, string, error) {
 	if f.repos == nil {
 		f.repos, f.errs = map[string]*gitx.Repo{}, map[string]error{}
 	}
-	r, ok := f.repos[s.URL]
 	if err := f.errs[s.URL]; err != nil {
 		return "", "", err
 	}
+	r, ok := f.repos[s.URL]
 	if !ok {
 		var err error
-		if r, err = gitx.Open(f.CacheDir, s); err == nil {
-			host := ""
-			if u, perr := url.Parse(s.URL); perr == nil {
-				host = u.Hostname()
-			}
-			err = r.Fetch(f.Ctx, gitx.AuthEnv(host, f.Getenv, f.GhToken))
-		}
-		if err != nil {
+		if r, err = f.Open(f.Ctx, s); err != nil {
 			f.errs[s.URL] = err
 			return "", "", err
 		}

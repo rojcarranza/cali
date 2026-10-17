@@ -1,12 +1,15 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"io"
 	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/rojcarranza/cali/internal/gitx"
+	"github.com/rojcarranza/cali/internal/install"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
 	"github.com/rojcarranza/cali/internal/status"
@@ -33,7 +36,9 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 			in := status.Input{
 				Scope: s.loc.Scope, Root: s.loc.Root, Home: s.home, DataDir: d.Dirs.Data,
 				Manifest: s.m, Lock: s.l, Offline: offline,
-				Fetcher:       &status.GitFetcher{Ctx: cmd.Context(), CacheDir: d.Dirs.Cache, Getenv: d.Getenv, GhToken: d.GhToken},
+				Fetcher: &status.GitFetcher{Ctx: cmd.Context(), Open: func(ctx context.Context, sp source.Spec) (*gitx.Repo, error) {
+					return install.OpenFetch(ctx, d, sp)
+				}},
 				SourceOptions: source.Options{AllowFile: allowFileScheme},
 				Warn:          cmd.ErrOrStderr(),
 			}
