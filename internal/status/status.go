@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -36,6 +35,7 @@ const (
 	Outdated  State = "outdated"
 	Missing   State = "missing"
 	BaseLost  State = "base-lost"
+	Unlocked  State = "unlocked"
 	Unmanaged State = "unmanaged"
 	Shadowed  State = "shadowed"
 )
@@ -90,10 +90,7 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 			if err != nil {
 				return nil, nil, fmt.Errorf("skill %s: %w", name, err)
 			}
-			ref := sk.Ref // the effective ref, as sync and update use it
-			if ref == "" {
-				ref = spec.Ref
-			}
+			ref := sk.EffectiveRef(spec)
 			spec.Ref, spec.Path = ref, e.Path
 			if !fullSHA.MatchString(ref) { // a commit pin is never outdated: nothing to fetch
 				if err := ctx.Err(); err != nil {
@@ -127,7 +124,7 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 			case !present:
 				r.States = append(r.States, Missing)
 			case !locked:
-				r.States, r.Detail = append(r.States, BaseLost), "run cali sync"
+				r.States, r.Detail = append(r.States, Unlocked), "not in cali.lock yet; run cali sync"
 			default:
 				pristine, ok, err := store.Get(in.DataDir, e.Tree)
 				if err != nil {
@@ -278,12 +275,10 @@ func sortedKeys[V any](m map[string]V) []string {
 }
 
 // GitFetcher is the real Fetcher: it fetches each source URL's mirror once
-// per run and resolves the ref in it.
+// per run, through Open (install.OpenFetch), and resolves the ref in it.
 type GitFetcher struct {
-	Ctx      context.Context
-	CacheDir string
-	Getenv   func(string) string
-	GhToken  func() (string, error)
+	Ctx  context.Context
+	Open func(context.Context, source.Spec) (*gitx.Repo, error)
 
 	repos map[string]*gitx.Repo
 	errs  map[string]error
@@ -294,20 +289,13 @@ func (f *GitFetcher) Latest(s source.Spec) (string, string, error) {
 	if f.repos == nil {
 		f.repos, f.errs = map[string]*gitx.Repo{}, map[string]error{}
 	}
-	r, ok := f.repos[s.URL]
 	if err := f.errs[s.URL]; err != nil {
 		return "", "", err
 	}
+	r, ok := f.repos[s.URL]
 	if !ok {
 		var err error
-		if r, err = gitx.Open(f.CacheDir, s); err == nil {
-			host := ""
-			if u, perr := url.Parse(s.URL); perr == nil {
-				host = u.Hostname()
-			}
-			err = r.Fetch(f.Ctx, gitx.AuthEnv(host, f.Getenv, f.GhToken))
-		}
-		if err != nil {
+		if r, err = f.Open(f.Ctx, s); err != nil {
 			f.errs[s.URL] = err
 			return "", "", err
 		}

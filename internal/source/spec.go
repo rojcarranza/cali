@@ -81,7 +81,8 @@ func ParseWith(s string, o Options) (Spec, error) {
 		if err != nil {
 			return Spec{}, err
 		}
-		spec.URL = "https://github.com/" + owner + "/" + repo
+		// GitHub ignores case in owner and repo, so fold it: one repo, one source.
+		spec.URL = "https://github.com/" + strings.ToLower(owner) + "/" + strings.ToLower(repo)
 	case "https":
 		parts := strings.Split(head, "/")
 		if parts[0] == "" {
@@ -94,7 +95,11 @@ func ParseWith(s string, o Options) (Spec, error) {
 		if err != nil {
 			return Spec{}, err
 		}
-		spec.URL = "https://" + strings.ToLower(parts[0]) + "/" + owner + "/" + repo
+		host := strings.ToLower(parts[0])
+		if host == "github.com" {
+			owner, repo = strings.ToLower(owner), strings.ToLower(repo)
+		}
+		spec.URL = "https://" + host + "/" + owner + "/" + repo
 	case "file":
 		if strings.Trim(head, "/") == "" {
 			return Spec{}, reject("empty file path")
@@ -102,6 +107,17 @@ func ParseWith(s string, o Options) (Spec, error) {
 		spec.URL = "file://" + head
 	}
 	return spec, nil
+}
+
+// SameURL reports whether lockURL, a source URL from cali.lock, names the
+// canonical url. It canonicalises lockURL first, so an entry written before
+// a canonical-form change (github.com owner/repo case) still matches.
+func SameURL(lockURL, url string, o Options) bool {
+	if lockURL == url { // a bare URL may not re-parse to itself, e.g. a file path with @
+		return true
+	}
+	s, err := ParseWith(lockURL, o)
+	return err == nil && s.URL == url
 }
 
 // reject is the only way ParseWith builds an error. It takes a fixed reason and

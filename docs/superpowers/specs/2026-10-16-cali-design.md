@@ -23,6 +23,8 @@ github:owner/repo//skills/x@v1.2.0      branch, tag or full commit
 https://host/owner/repo.git//path@ref   explicit URL
 ```
 
+The canonical URL lowercases the host, and for `github.com` also the owner and repo, because GitHub ignores their case. Other hosts keep the owner and repo as written.
+
 ## 2. Files and where they live
 
 | What | Project scope | Global scope |
@@ -215,7 +217,7 @@ Semantics: names only, no versions. A dependency is satisfied when a skill with 
 | `list [-g]` | Installed skills, source, short commit, targets. Offline. |
 | `show <name>` | Resolved source, locked commit/tree, paths per target, requires. Offline. |
 | `find <text>` | Search `name` + `description` of skills in repos listed under `sources:` and in already installed sources, using the local mirrors (fetched if stale). There is no registry (non-goal 5). |
-| `status [--offline] [--exit-code]` | One row per skill x target: `ok`, `modified`, `outdated`, `missing`, `base-lost`, `unmanaged`, `shadowed`, plus dependency warnings. Fetches by default (needed to see new upstream commits); `--offline` skips it. Exit 0 unless `--exit-code` is given. |
+| `status [--offline] [--exit-code]` | One row per skill x target: `ok`, `modified`, `outdated`, `missing`, `base-lost`, `unlocked` (in the manifest, not yet in the lock), `unmanaged`, `shadowed`, plus dependency warnings. Fetches by default (needed to see new upstream commits); `--offline` skips it. Exit 0 unless `--exit-code` is given. |
 | `update [names] [--apply] [--resolve f=ours\|theirs] [--take-upstream] [--keep-mine] [--accept-recommended]` | Section 5: dry run by default; conflicts get a classification and a recommendation. |
 | `remove <name>` | Back up the installed folders, remove them, drop the manifest and lock entries. Blocks if the folder has local edits unless `--force`. |
 | `sync [--frozen]` | Make installed folders match the lock; resolve manifest entries missing from the lock and write them. `--frozen` fails instead of changing the lock. Never overwrites a `modified` or `unmanaged` folder (reports it). |

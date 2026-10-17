@@ -108,6 +108,8 @@ func TestCanonicalURL(t *testing.T) {
 		"github:o/r.git",
 		"https://github.com/o/r.git",
 		"https://GitHub.com/o/r",
+		"github:O/R",
+		"https://github.com/O/R.git",
 	} {
 		s, err := Parse(in)
 		if err != nil {
@@ -119,6 +121,16 @@ func TestCanonicalURL(t *testing.T) {
 		if s.Key() != "github.com/o/r" {
 			t.Errorf("Parse(%q).Key() = %q", in, s.Key())
 		}
+	}
+}
+
+func TestOtherHostsKeepOwnerRepoCase(t *testing.T) {
+	s, err := Parse("https://git.example.com/O/R")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.URL != "https://git.example.com/O/R" {
+		t.Errorf("URL = %q", s.URL)
 	}
 }
 
@@ -192,5 +204,21 @@ func TestKeyFileURLIsShortHash(t *testing.T) {
 	}
 	if k != long.Key() || k == (Spec{URL: "file:///tmp/other"}).Key() {
 		t.Fatalf("Key() must be stable and distinct per path")
+	}
+}
+
+func TestSameURLFoldsOldLockEntries(t *testing.T) {
+	if !SameURL("https://github.com/Owner/Repo", "https://github.com/owner/repo", Options{}) {
+		t.Error("upper-case github.com lock entry does not match")
+	}
+	if SameURL("https://github.com/o/other", "https://github.com/o/r", Options{}) {
+		t.Error("different repo matches")
+	}
+	if !SameURL("file:///tmp/r", "file:///tmp/r", Options{AllowFile: true}) {
+		t.Error("file URL does not match itself")
+	}
+	// Re-parsing a bare URL would read "@b/r" as a ref; an exact match must still count.
+	if !SameURL("file:///tmp/a@b/r", "file:///tmp/a@b/r", Options{AllowFile: true}) {
+		t.Error("file URL with @ does not match itself")
 	}
 }

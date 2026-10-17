@@ -66,6 +66,9 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	var kept, open []string
 	for _, s := range p.Skills {
 		switch {
+		case s.Problem != "":
+			kept = append(kept, s.Name+": skipped: "+render.Sanitize(s.Problem))
+			continue
 		case s.Noop:
 			if s.ref != s.fromRef {
 				refOnly = append(refOnly, s) // same folder at the new ref: only the lock changes
@@ -267,14 +270,14 @@ func checkFlags(p Proposal) error {
 // the skill must not advance (a conflict kept without an explicit choice, or
 // skipped at the prompt); unres lists conflicts nothing decided.
 func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job, skip string, unres []string, err error) {
-	tm := index(s.theirs)
+	tm := skillfs.Index(s.theirs)
 	for _, tp := range s.Targets {
 		j := job{skill: s.Name, target: tp.Target, dir: tp.Dir, exists: !tp.Missing, ours: tp.ours, base: s.base, next: s.theirs}
 		if tp.Missing {
 			jobs = append(jobs, j)
 			continue
 		}
-		om := index(tp.ours)
+		om := skillfs.Index(tp.ours)
 		open := len(unres)
 		next := skillfs.Tree{}
 		put := func(f *skillfs.File) {
@@ -363,30 +366,15 @@ func swap(j job, rename func(string, string) error, root string) (swapped, error
 			return sw, err
 		}
 	}
-	staging, err := os.MkdirTemp(parent, ".cali-staging-*")
+	staging, err := install.Stage(parent, j.next)
 	if err != nil {
 		return sw, err
 	}
-	// MkdirTemp creates 0700; the installed folder must be readable like any other.
-	if err := os.Chmod(staging, 0o755); err != nil {
-		_ = os.RemoveAll(staging)
-		return sw, err
-	}
-	if err := j.next.WriteTo(staging); err != nil {
-		_ = os.RemoveAll(staging)
-		return sw, fmt.Errorf("write %s: %w", staging, err)
-	}
 	if j.exists {
-		old, err := os.MkdirTemp(parent, ".cali-old-*")
-		if err == nil {
-			err = os.Remove(old) // reserve a unique name, then free it for the rename
-		}
-		if err == nil {
-			err = rename(j.dir, old)
-		}
+		old, err := install.MoveAside(j.dir, rename)
 		if err != nil {
 			_ = os.RemoveAll(staging)
-			return sw, fmt.Errorf("move %s aside: %w", j.dir, err)
+			return sw, err
 		}
 		// An edit saved after the backup would be deleted with old: put it back and stop.
 		if cur, err := skillfs.ReadDir(old); err != nil || !skillfs.SameBytes(cur, j.ours) {

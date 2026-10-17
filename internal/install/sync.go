@@ -91,14 +91,11 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		if err != nil {
 			return Report{}, fmt.Errorf("skill %s: %w", n, err)
 		}
-		ref := s.Ref
-		if ref == "" {
-			ref = spec.Ref
-		}
+		ref := s.EffectiveRef(spec)
 		specs[n], refs[n] = spec, ref
 		e, ok := l.Skills[n]
 		switch {
-		case !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/"):
+		case !ok || !source.SameURL(e.Source, spec.URL, opts) || e.Path != strings.Trim(spec.Path, "/"):
 			missing = append(missing, n)
 		case e.Ref != ref:
 			refChanged = append(refChanged, n)
@@ -190,12 +187,16 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 				rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
 				continue
 			}
-			tree, et, err := exportSkill(repo, e.Commit, e.Path, n)
+			tree, err := repo.TreeSHA(e.Commit, e.Path)
 			if err != nil {
 				return Report{}, err
 			}
 			if tree != e.Tree {
 				return Report{}, fmt.Errorf("skill %s: tree at commit %s is %s, but the lock says %s", n, e.Commit, tree, e.Tree)
+			}
+			et, err := exportTree(repo, tree, n) // only after the check: no blobs fetched for a mismatched tree
+			if err != nil {
+				return Report{}, err
 			}
 			if err := store.Put(d.Dirs.Data, tree, et); err != nil {
 				return Report{}, fmt.Errorf("store pristine copy of %s: %w", n, err)

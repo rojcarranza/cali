@@ -44,9 +44,11 @@ type Proposal struct {
 }
 
 // SkillPlan is one skill: Noop when upstream did not change its folder,
-// BaseLost when the pristine copy of the locked tree is gone.
+// BaseLost when the pristine copy of the locked tree is gone, Problem when
+// its ref or folder is not found upstream (the skill is skipped).
 type SkillPlan struct {
 	Name                                   string
+	Problem                                string
 	FromCommit, ToCommit, FromTree, ToTree string
 	BaseLost                               bool
 	Noop                                   bool
@@ -143,7 +145,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			_, _ = fmt.Fprintf(note, "%s: not locked, run cali sync\n", n)
 			continue
 		}
-		if e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") {
+		if !source.SameURL(e.Source, spec.URL, opts) || e.Path != strings.Trim(spec.Path, "/") {
 			return Proposal{}, fmt.Errorf("%s: source or path changed in cali.yaml; run cali remove %s and cali add again", n, n)
 		}
 		for _, tg := range m.TargetsFor(n) { // also for up-to-date skills: the leftover may be from any run
@@ -156,10 +158,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 				warnLeftovers(note, dir)
 			}
 		}
-		ref := s.Ref
-		if ref == "" {
-			ref = spec.Ref
-		}
+		ref := s.EffectiveRef(spec)
 		repo, ok := repos[spec.URL]
 		if !ok {
 			if repo, err = install.OpenFetch(ctx, d, spec); err != nil {
@@ -167,13 +166,21 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			}
 			repos[spec.URL] = repo
 		}
+		// A ref or folder gone upstream skips this skill, not the whole update.
 		commit, err := repo.Resolve(ref)
-		if err != nil {
+		if err != nil && !errors.Is(err, gitx.ErrNotFound) {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		}
+		if err != nil {
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
+			continue
+		}
 		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref}
-		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil {
+		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil && !errors.Is(err, gitx.ErrNotFound) {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
+		} else if err != nil {
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
+			continue
 		}
 		if sp.ToTree == e.Tree {
 			sp.Noop = true
@@ -184,7 +191,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if err != nil {
 			return Proposal{}, fmt.Errorf("pristine copy of %s: %w", n, err)
 		}
-		_, theirs, err := install.ExportSkill(repo, commit, e.Path, n)
+		theirs, err := install.ExportTree(repo, sp.ToTree, n)
 		if err != nil {
 			return Proposal{}, err
 		}
@@ -240,21 +247,6 @@ func warnLeftovers(w io.Writer, dir string) {
 	}
 }
 
-func index(t skillfs.Tree) map[string]*skillfs.File {
-	m := make(map[string]*skillfs.File, len(t))
-	for i := range t {
-		m[t[i].Path] = &t[i]
-	}
-	return m
-}
-
-func eq(a, b *skillfs.File) bool {
-	if a == nil || b == nil {
-		return a == b
-	}
-	return skillfs.FileEqual(*a, *b)
-}
-
 func text(sides ...[]byte) bool {
 	for _, b := range sides {
 		if !skillfs.IsText(b) {
@@ -271,10 +263,10 @@ func decide(base, ours, theirs skillfs.Tree) ([]FileDecision, error) {
 	if err != nil {
 		return nil, err
 	}
-	bm, om, tm := index(base), index(ours), index(theirs)
+	bm, om, tm := skillfs.Index(base), skillfs.Index(ours), skillfs.Index(theirs)
 	out := make([]FileDecision, 0, len(fps))
 	for _, fp := range fps {
-		fd := FileDecision{FilePlan: fp, same: eq(bm[fp.Path], om[fp.Path]) && eq(om[fp.Path], tm[fp.Path])}
+		fd := FileDecision{FilePlan: fp, same: skillfs.FileEqualPtr(bm[fp.Path], om[fp.Path]) && skillfs.FileEqualPtr(om[fp.Path], tm[fp.Path])}
 		if fp.Action == merge.Conflicted {
 			c := *fp.Conflict
 			if res, ok := merge.PreResolve(c.Base, c.Ours, c.Theirs); ok {
@@ -345,6 +337,9 @@ func (p Proposal) WriteText(w io.Writer) error {
 	n := 0
 	for _, s := range p.Skills {
 		switch {
+		case s.Problem != "":
+			fmt.Fprintf(&b, "%s: skipped: %s\n", s.Name, render.Sanitize(s.Problem))
+			continue
 		case s.Noop:
 			fmt.Fprintf(&b, "%s: up to date\n", s.Name)
 			continue
@@ -424,6 +419,7 @@ type jsonTarget struct {
 
 type jsonSkill struct {
 	Name     string       `json:"name"`
+	Problem  string       `json:"problem,omitempty"`
 	From     string       `json:"from"`
 	To       string       `json:"to"`
 	Noop     bool         `json:"noop"`
@@ -435,7 +431,7 @@ type jsonSkill struct {
 func (p Proposal) WriteJSON(w io.Writer) error {
 	skills := []jsonSkill{}
 	for _, s := range p.Skills {
-		js := jsonSkill{Name: s.Name, From: s.FromCommit, To: s.ToCommit, Noop: s.Noop, BaseLost: s.BaseLost, Targets: []jsonTarget{}}
+		js := jsonSkill{Name: s.Name, Problem: s.Problem, From: s.FromCommit, To: s.ToCommit, Noop: s.Noop, BaseLost: s.BaseLost, Targets: []jsonTarget{}}
 		for _, t := range s.Targets {
 			jt := jsonTarget{Target: t.Target, Dir: t.Dir, Missing: t.Missing, Files: []jsonFile{}}
 			for _, f := range t.Files {

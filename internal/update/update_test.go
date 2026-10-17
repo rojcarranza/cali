@@ -17,7 +17,9 @@ import (
 
 	"github.com/rojcarranza/cali/internal/dirs"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/manifest"
 	"github.com/rojcarranza/cali/internal/merge"
+	"github.com/rojcarranza/cali/internal/source"
 )
 
 type fx struct {
@@ -321,6 +323,64 @@ func TestPlanBaseLost(t *testing.T) {
 	}
 	if !strings.HasPrefix(out.String(), "x: base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream\n") {
 		t.Fatalf("out = %q", out.String())
+	}
+}
+
+func TestPlanKeepsGoingWhenOneFolderIsGoneUpstream(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	write(t, f.repo, "skills/y/SKILL.md", skillMD("y", ""))
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "add y")
+	if _, err := install.Add(context.Background(), f.d, install.AddRequest{
+		Spec: "file://" + filepath.ToSlash(f.repo) + "//skills/y", Targets: []string{"claude"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	git(t, f.repo, "rm", "-q", "-r", "skills/x")
+	write(t, f.repo, "skills/y/more.md", "more\n")
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "drop x, change y")
+
+	p := f.plan(t)
+	if len(p.Skills) != 2 || p.Skills[0].Name != "x" || !strings.Contains(p.Skills[0].Problem, "not found") ||
+		p.Skills[1].Name != "y" || p.Skills[1].Problem != "" || p.Skills[1].Noop {
+		t.Fatalf("proposal = %+v", p)
+	}
+	var out bytes.Buffer
+	if err := p.WriteText(&out); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out.String(), "x: skipped: ") || !strings.Contains(out.String(), "1 skill(s) to update") {
+		t.Fatalf("out = %q", out.String())
+	}
+	out.Reset()
+	f.d.Stdout = &out
+	if err := Apply(context.Background(), f.d, p, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(filepath.Dir(f.local), "y", "more.md")); err != nil {
+		t.Fatalf("y was not updated: %v", err)
+	}
+	if !strings.Contains(out.String(), "kept x: skipped: ") {
+		t.Fatalf("apply out = %q", out.String())
+	}
+}
+
+func TestPlanFailsOnInvalidRef(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	cy, opts := filepath.Join(f.d.Cwd, "cali.yaml"), source.Options{AllowFile: true}
+	m, err := manifest.ReadWith(cy, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sk := m.Skills["x"]
+	sk.Ref = "main~1"
+	m.Skills["x"] = sk
+	if err := manifest.WriteWith(cy, m, opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Plan(context.Background(), f.d, Options{}); err == nil || !strings.Contains(err.Error(), "invalid ref") {
+		t.Fatalf("err = %v, want invalid ref", err)
 	}
 }
 

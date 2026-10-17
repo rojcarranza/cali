@@ -5,6 +5,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -185,6 +186,79 @@ func TestRemoveAbortsWhenFolderChangesDuringBackup(t *testing.T) {
 	}
 	if l, _ := lock.Read(filepath.Join(e.project, "cali.lock")); l.Skills["x"].Tree == "" {
 		t.Fatal("lock entry dropped")
+	}
+}
+
+func TestRemoveLeavesEveryTargetWhenOneChangesDuringBackup(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude", "copilot"}}); err != nil {
+		t.Fatal(err)
+	}
+	claude := filepath.Join(e.project, ".claude", "skills", "x")
+	copilot := filepath.Join(e.project, ".github", "skills", "x")
+	afterBackup = func(dir string) {
+		if dir == copilot {
+			write(t, dir, "SKILL.md", "late edit\n")
+		}
+	}
+	t.Cleanup(func() { afterBackup = nil })
+
+	if err := Remove(context.Background(), e.deps, "x", false); err == nil || !strings.Contains(err.Error(), copilot) {
+		t.Fatalf("err = %v, want abort naming %s", err, copilot)
+	}
+	if _, err := os.Stat(filepath.Join(claude, "SKILL.md")); err != nil {
+		t.Fatalf("claude folder removed although the remove stopped: %v", err)
+	}
+	if got := readFile(t, filepath.Join(copilot, "SKILL.md")); got != "late edit\n" {
+		t.Fatalf("copilot SKILL.md = %q", got)
+	}
+	for _, dir := range []string{filepath.Dir(claude), filepath.Dir(copilot)} {
+		ents, _ := os.ReadDir(dir)
+		for _, en := range ents {
+			if strings.HasPrefix(en.Name(), ".cali-") {
+				t.Errorf("leftover %s in %s", en.Name(), dir)
+			}
+		}
+	}
+}
+
+func TestRemoveDoesNotMoveBackFoldersAlreadyDeleted(t *testing.T) {
+	if runtime.GOOS == "windows" || os.Geteuid() == 0 {
+		t.Skip("needs a read-only directory to stop the delete")
+	}
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude", "copilot"}}); err != nil {
+		t.Fatal(err)
+	}
+	claude := filepath.Join(e.project, ".claude", "skills", "x")
+	copilot := filepath.Join(e.project, ".github", "skills", "x")
+	afterBackup = func(dir string) {
+		if dir == copilot { // the second delete fails: its files cannot be removed
+			if err := os.Chmod(dir, 0o555); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	t.Cleanup(func() {
+		afterBackup = nil
+		parent := filepath.Dir(copilot)
+		ents, _ := os.ReadDir(parent)
+		for _, en := range ents {
+			_ = os.Chmod(filepath.Join(parent, en.Name()), 0o755)
+		}
+	})
+
+	err := Remove(context.Background(), e.deps, "x", false)
+	if err == nil || !strings.Contains(err.Error(), "remove "+copilot) {
+		t.Fatalf("err = %v, want delete failure naming %s", err, copilot)
+	}
+	if strings.Contains(err.Error(), "could not move") {
+		t.Fatalf("tried to move back a folder already deleted: %v", err)
+	}
+	if exists(claude) {
+		t.Fatal("claude folder came back after it was deleted")
 	}
 }
 

@@ -96,7 +96,7 @@ func TestExportEqualsCommittedBytes(t *testing.T) {
 	if !r.HasCommit(commit) || r.HasCommit(strings.Repeat("0", 40)) {
 		t.Fatal("HasCommit wrong")
 	}
-	tr, err := r.Export(commit, "skills/a")
+	tr, err := exportAt(r, commit, "skills/a")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 	git(t, dir, "commit", "-q", "-m", "link")
 	r := openFetched(t, dir)
 	c, _ := r.Resolve("")
-	_, err := r.Export(c, "skills/b")
+	_, err := exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), "link") {
 		t.Fatalf("symlink err = %v", err)
 	}
@@ -199,7 +199,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 		t.Fatal(err)
 	}
 	c, _ = r.Resolve("")
-	_, err = r.Export(c, "skills/b")
+	_, err = exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), "sub") {
 		t.Fatalf("submodule err = %v", err)
 	}
@@ -218,9 +218,19 @@ func TestFilteredFetchIsBlobless(t *testing.T) {
 		t.Fatalf("fetch was not blob-less, no missing objects:\n%s", out)
 	}
 	c, _ := r.Resolve("")
-	tr, err := r.Export(c, "skills/a")
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
+	tr, err := exportAt(r, c, "skills/a")
 	if err != nil || len(tr) != 2 {
 		t.Fatalf("Export over lazy fetch = %v, %v", tr, err)
+	}
+	// Both missing blobs come down in one fetch, not one fetch per blob.
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := strings.Count(string(log), "built-in: git fetch"); n != 1 {
+		t.Errorf("Export ran %d fetches, want 1:\n%s", n, log)
 	}
 	if string(tr[0].Data) != "---\nname: a\n---\r\nline\r\n" {
 		t.Fatalf("bytes = %q", tr[0].Data)
@@ -246,15 +256,15 @@ func TestExportEnforcesLimitsBeforeReading(t *testing.T) {
 	t.Cleanup(func() { limits = old })
 
 	limits.files = 1
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
 		t.Fatalf("file count err = %v", err)
 	}
 	limits.files, limits.file = old.files, 5
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
 		t.Fatalf("file size err = %v", err)
 	}
 	limits.file, limits.tree = old.file, 10
-	if _, err := r.Export(c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
 		t.Fatalf("tree size err = %v", err)
 	}
 }
@@ -320,7 +330,7 @@ func TestSymlinkErrorQuotesPath(t *testing.T) {
 	git(t, dir, "commit", "-q", "-m", "evil")
 	r := openFetched(t, dir)
 	c, _ := r.Resolve("")
-	_, err := r.Export(c, "skills/b")
+	_, err := exportAt(r, c, "skills/b")
 	if err == nil || !strings.Contains(err.Error(), `"ev\"il"`) {
 		t.Fatalf("err = %v", err)
 	}
@@ -403,5 +413,81 @@ func TestReadFile(t *testing.T) {
 	defer func() { limits.file = old }()
 	if _, err := r.ReadFile(commit, "skills/b/SKILL.md"); err == nil || !strings.Contains(err.Error(), "limit") {
 		t.Fatalf("oversize: err = %v", err)
+	}
+}
+
+// exportAt exports path at commit, as callers do: TreeSHA, then Export.
+func exportAt(r *Repo, commit, path string) (skillfs.Tree, error) {
+	tree, err := r.TreeSHA(commit, path)
+	if err != nil {
+		return nil, err
+	}
+	return r.Export(tree)
+}
+
+func TestOpenWritesConfigOnlyWhenNeeded(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("a read-only directory does not stop writes on windows")
+	}
+	cache, spec := t.TempDir(), fixtureSpec(t, fixture(t))
+	r, err := Open(cache, spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A configured mirror needs no write: Open must succeed with the dir read-only.
+	if err := os.Chmod(r.Dir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Open(cache, spec); err != nil {
+		t.Fatalf("second Open wrote config: %v", err)
+	}
+	if err := os.Chmod(r.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	// A missing or changed value is written back.
+	git(t, r.Dir, "config", "--unset", "remote.origin.promisor")
+	git(t, r.Dir, "config", "remote.origin.url", "https://example.invalid/x")
+	if _, err := Open(cache, spec); err != nil {
+		t.Fatal(err)
+	}
+	if got := git(t, r.Dir, "config", "remote.origin.promisor"); got != "true" {
+		t.Errorf("promisor = %q", got)
+	}
+	if got := git(t, r.Dir, "config", "remote.origin.url"); got != spec.URL {
+		t.Errorf("url = %q, want %q", got, spec.URL)
+	}
+}
+
+func TestFetchFallsBackOnlyWhenTheFilterIsRejected(t *testing.T) {
+	src := fixture(t)
+	git(t, src, "config", "uploadpack.allowFilter", "true")
+	git(t, src, "config", "uploadpackfilter.allow", "false")
+	r, err := Open(t.TempDir(), fixtureSpec(t, src))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Fetch(context.Background(), nil); err != nil {
+		t.Fatalf("no fallback to a full fetch: %v", err)
+	}
+	if _, err := r.Resolve("main"); err != nil {
+		t.Fatal(err)
+	}
+
+	// Any other failure is returned as is, without a second, full fetch.
+	gone, err := Open(t.TempDir(), fixtureSpec(t, filepath.Join(t.TempDir(), "missing")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
+	if err := gone.Fetch(context.Background(), nil); err == nil {
+		t.Fatal("fetch of a missing repo succeeded")
+	}
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(log), "--no-filter") {
+		t.Errorf("fell back to a full fetch:\n%s", log)
 	}
 }

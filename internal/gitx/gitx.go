@@ -25,6 +25,10 @@ import (
 
 var hex40 = regexp.MustCompile(`^[0-9a-f]{40}$`)
 
+// ErrNotFound is wrapped by Resolve and TreeSHA when the ref, or the folder at
+// the commit, does not exist upstream (as opposed to an invalid input).
+var ErrNotFound = errors.New("not found upstream")
+
 // maxStderr caps the git stderr text that is placed into an error.
 const maxStderr = 4096
 
@@ -84,6 +88,17 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 			return nil, err
 		}
 	}
+	// Read the config once and write only what is missing or different, so an
+	// existing mirror costs one git call and a half-configured one is repaired.
+	out, err := r.git(ctx, nil, "config", "--local", "-z", "--list")
+	if err != nil {
+		return nil, err
+	}
+	have := map[string]string{}
+	for _, rec := range strings.Split(string(out), "\x00") {
+		k, v, _ := strings.Cut(rec, "\n")
+		have[k] = v
+	}
 	for _, kv := range [][2]string{
 		{"core.repositoryformatversion", "1"},
 		{"extensions.partialclone", "origin"},
@@ -91,6 +106,9 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 		{"remote.origin.promisor", "true"},
 		{"remote.origin.partialclonefilter", "blob:none"},
 	} {
+		if v, ok := have[kv[0]]; ok && v == kv[1] {
+			continue
+		}
 		if _, err := r.git(ctx, nil, "config", kv[0], kv[1]); err != nil {
 			return nil, err
 		}
@@ -186,7 +204,8 @@ func scrub(s string, env []string) string {
 
 // Fetch updates the mirror's branches, tags and default branch. It first
 // tries a blob-less fetch (--filter=blob:none) and falls back to a full one
-// (--no-filter) if that fails, e.g. because the server refuses the filter.
+// (--no-filter) only when the server rejects that filter. A server without
+// filter support needs no fallback: git warns and fetches everything.
 // env is extra environment, e.g. AuthEnv; it is kept for later lazy blob
 // fetches, so Fetch must run before Export.
 func (r *Repo) Fetch(ctx context.Context, env []string) error {
@@ -201,13 +220,14 @@ func (r *Repo) Fetch(ctx context.Context, env []string) error {
 		a := append(append([]string{}, base...), filter, "origin")
 		return append(a, specs...)
 	}
-	if _, err := r.git(ctx, env, build("--filter=blob:none")...); err == nil {
-		return nil
-	} else if ctx.Err() != nil {
+	_, err := r.git(ctx, env, build("--filter=blob:none")...)
+	if err == nil || ctx.Err() != nil || !strings.Contains(err.Error(), "filter 'blob:none' not supported") {
 		return err
 	}
-	_, err := r.git(ctx, env, build("--no-filter")...)
-	return err
+	if _, err2 := r.git(ctx, env, build("--no-filter")...); err2 != nil {
+		return errors.Join(err, err2)
+	}
+	return nil
 }
 
 // HasCommit reports whether commit exists in the mirror.
@@ -239,7 +259,7 @@ func (r *Repo) Resolve(ref string) (string, error) {
 			return c, nil
 		}
 	}
-	return "", fmt.Errorf("ref %q not found in %s", ref, r.url)
+	return "", fmt.Errorf("ref %q not found in %s: %w", ref, r.url, ErrNotFound)
 }
 
 func (r *Repo) revParse(rev, what string) (string, error) {
@@ -261,12 +281,12 @@ func (r *Repo) TreeSHA(commit, path string) (string, error) {
 	}
 	out, err := r.git(context.Background(), r.env, "rev-parse", "--verify", "-q", "--end-of-options", rev)
 	if err != nil {
-		return "", fmt.Errorf("path %q not found at commit %s", path, commit)
+		return "", fmt.Errorf("path %q not found at commit %s: %w", path, commit, ErrNotFound)
 	}
 	sha := strings.TrimSpace(string(out))
 	typ, err := r.git(context.Background(), r.env, "cat-file", "-t", sha)
 	if err != nil || strings.TrimSpace(string(typ)) != "tree" {
-		return "", fmt.Errorf("path %q at commit %s is not a directory", path, commit)
+		return "", fmt.Errorf("path %q at commit %s is not a directory: %w", path, commit, ErrNotFound)
 	}
 	return sha, nil
 }
@@ -278,20 +298,26 @@ type entry struct {
 	exec bool
 }
 
-// Export reads the folder path at commit into a Tree straight from git
-// blobs, so no checkout filter can alter the bytes. Symlinks and submodules
+// Export reads the folder whose tree SHA is tree (from TreeSHA) into a Tree
+// straight from git blobs, so no checkout filter can alter the bytes. Symlinks and submodules
 // are errors naming the path. File count and sizes are checked against the
-// skillfs limits from the tree listing before any blob is read, and the
-// result is validated by skillfs.Validate.
+// skillfs limits from the tree listing before any blob is read into memory,
+// and the result is validated by skillfs.Validate. Blobs the blob-less
+// mirror lacks are downloaded first in one fetch (ls-tree -l needs them for
+// the sizes); only the file count is checked before that download.
 //
 // Fetch must have run on this Repo first: the mirror is blob-less, and the
 // auth environment given to Fetch is what lets git download blobs lazily.
-func (r *Repo) Export(commit, path string) (skillfs.Tree, error) {
-	tree, err := r.TreeSHA(commit, path)
-	if err != nil {
-		return nil, err
+func (r *Repo) Export(tree string) (skillfs.Tree, error) {
+	if !hex40.MatchString(tree) {
+		return nil, fmt.Errorf("invalid tree %q", tree)
 	}
 	ctx := context.Background()
+	if !r.offline {
+		if err := r.fetchMissing(ctx, tree); err != nil {
+			return nil, err
+		}
+	}
 	out, err := r.git(ctx, r.env, "ls-tree", "-r", "-z", "-l", tree)
 	if err != nil {
 		return nil, err
@@ -333,7 +359,7 @@ func (r *Repo) Export(commit, path string) (skillfs.Tree, error) {
 		entries = append(entries, entry{p, sha, size, mode == "100755"})
 	}
 	if len(entries) == 0 {
-		return nil, fmt.Errorf("no files at %q", path)
+		return nil, fmt.Errorf("no files in tree %s", tree)
 	}
 	t, err := r.readBlobs(ctx, entries)
 	if err != nil {
@@ -344,6 +370,40 @@ func (r *Repo) Export(commit, path string) (skillfs.Tree, error) {
 		return nil, err
 	}
 	return t, nil
+}
+
+// fetchMissing downloads every blob of tree the blob-less mirror lacks in one
+// fetch (the command git itself runs for a lazy fetch), instead of the one
+// lazy fetch per blob that ls-tree -l would trigger.
+func (r *Repo) fetchMissing(ctx context.Context, tree string) error {
+	out, err := r.git(ctx, r.env, "rev-list", "--objects", "--missing=print", tree)
+	if err != nil {
+		return err
+	}
+	var want strings.Builder
+	n := 0
+	for _, line := range strings.Split(string(out), "\n") {
+		if oid, ok := strings.CutPrefix(line, "?"); ok {
+			want.WriteString(oid + "\n")
+			n++
+		}
+	}
+	// Every missing object is a distinct blob, so n is at most the file count.
+	if n > limits.files {
+		return fmt.Errorf("skill has more than %d files", limits.files)
+	}
+	if n == 0 {
+		return nil
+	}
+	cmd := r.command(ctx, r.env, "--git-dir", r.Dir, "-c", "fetch.negotiationAlgorithm=noop",
+		"fetch", "-q", "--no-tags", "--no-write-fetch-head", "--recurse-submodules=no", "--filter=blob:none", "--stdin", "origin")
+	cmd.Stdin = strings.NewReader(want.String())
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("git fetch of missing blobs: %w: %s", err, sanitize(stderr.String(), r.env))
+	}
+	return nil
 }
 
 // readBlobs reads every entry through one git cat-file --batch process. Each

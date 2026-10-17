@@ -107,14 +107,39 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 		if afterBackup != nil {
 			afterBackup(f.final)
 		}
+	}
+
+	// Move every folder aside and check it before deleting any, so a folder
+	// that changed stops the remove with every target still in place.
+	var aside []string
+	restore := func(cause error) error {
+		errs := []error{cause}
+		for i, old := range aside {
+			if err := os.Rename(old, found[i].final); err != nil {
+				errs = append(errs, fmt.Errorf("could not move %s back, it is at %s: %w", found[i].final, old, err))
+			}
+		}
+		return errors.Join(errs...)
+	}
+	for _, f := range found {
+		old, err := MoveAside(f.final, os.Rename)
+		if err != nil {
+			return restore(err)
+		}
+		aside = append(aside, old)
 		// The folder may have changed since it was checked; never delete bytes the backup lacks.
-		if now, err := skillfs.ReadDir(f.final); err != nil || !skillfs.SameBytes(now, f.t) {
-			return fmt.Errorf("%s changed while it was being backed up; not removing it", f.final)
+		if now, err := skillfs.ReadDir(old); err != nil || !skillfs.SameBytes(now, f.t) {
+			return restore(fmt.Errorf("%s changed while it was being backed up; not removing it", f.final))
 		}
-		if err := os.RemoveAll(f.final); err != nil {
-			return fmt.Errorf("remove %s: %w", f.final, err)
+	}
+	for i, old := range aside {
+		if err := os.RemoveAll(old); err != nil {
+			cause := fmt.Errorf("remove %s (moved to %s): %w", found[i].final, old, err)
+			// Put the folders not yet removed back, so they are not stranded at .cali-old-*.
+			aside, found = aside[i+1:], found[i+1:]
+			return restore(cause)
 		}
-		_, _ = fmt.Fprintf(out, "removed %s (%s)\n", name, f.target)
+		_, _ = fmt.Fprintf(out, "removed %s (%s)\n", name, found[i].target)
 	}
 
 	delete(m.Skills, name)
