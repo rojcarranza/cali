@@ -591,3 +591,61 @@ func TestUnchangedOldFolderIsRemoved(t *testing.T) {
 		t.Fatalf("old folder %q not removed: %v", old, err)
 	}
 }
+
+// editScope rewrites the manifest entry and, when el is set, the lock entry of f.name.
+func (f fx) editScope(t *testing.T, em func(*manifest.Skill), el func(*lock.Entry)) {
+	t.Helper()
+	loc, err := install.Locate(f.d, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	o := source.Options{AllowFile: true}
+	m, err := manifest.ReadWith(loc.Manifest, o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := m.Skills[f.name]
+	em(&s)
+	m.Skills[f.name] = s
+	if err := manifest.WriteWith(loc.Manifest, m, o); err != nil {
+		t.Fatal(err)
+	}
+	if el != nil {
+		l := f.lock(t)
+		e := l.Skills[f.name]
+		el(&e)
+		l.Skills[f.name] = e
+		if err := lock.Write(loc.LockPath, l); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestApplyRefChangeWritesNewRef(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "one\n")})
+	git(t, f.repo, "tag", "v1")
+	f.editScope(t, func(s *manifest.Skill) { s.Ref = "v1" }, func(e *lock.Entry) { e.Ref = "v1" })
+	f.upstream(t, map[string]string{"SKILL.md": skillMD("x", "two\n")})
+	git(t, f.repo, "tag", "v2")
+	f.editScope(t, func(s *manifest.Skill) { s.Ref = "v2" }, nil)
+
+	if _, err := f.apply(t, Options{}, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := f.lock(t).Skills["x"].Ref; got != "v2" {
+		t.Fatalf("lock ref = %q, want v2", got)
+	}
+	if _, err := install.Sync(context.Background(), f.d, true); err != nil {
+		t.Fatalf("sync --frozen after update: %v", err)
+	}
+}
+
+func TestPlanRefusesPathChange(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "one\n")})
+	f.editScope(t, func(s *manifest.Skill) { s.Source = "file://" + filepath.ToSlash(f.repo) + "//skills/other" }, nil)
+	_, err := Plan(context.Background(), f.d, Options{})
+	want := "x: source or path changed in cali.yaml; run cali remove x and cali add again"
+	if err == nil || err.Error() != want {
+		t.Fatalf("err = %v, want %q", err, want)
+	}
+}

@@ -51,6 +51,7 @@ type SkillPlan struct {
 	Noop                                   bool
 	Targets                                []TargetPlan
 	base, theirs                           skillfs.Tree
+	ref, fromRef                           string // effective manifest ref (written to the lock) and the locked one
 	lost                                   []TargetPlan // BaseLost only: the folders --take-upstream replaces
 }
 
@@ -128,11 +129,15 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if err != nil {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		}
-		// As in sync: a lock entry for another origin or path does not count.
+		// As in sync: a lock entry for another origin or path does not count;
+		// update never moves a skill to another origin or path.
 		e, ok := l.Skills[n]
-		if !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") {
+		if !ok {
 			_, _ = fmt.Fprintf(note, "%s: not locked, run cali sync\n", n)
 			continue
+		}
+		if e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") {
+			return Proposal{}, fmt.Errorf("%s: source or path changed in cali.yaml; run cali remove %s and cali add again", n, n)
 		}
 		for _, tg := range m.TargetsFor(n) { // also for up-to-date skills: the leftover may be from any run
 			dir, err := targets.Dir(tg, loc.Scope, loc.Root, d.Dirs.Home)
@@ -159,7 +164,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		if err != nil {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		}
-		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree}
+		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref}
 		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		}

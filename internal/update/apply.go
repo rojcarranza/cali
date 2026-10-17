@@ -62,11 +62,14 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	}
 
 	var jobs []job
-	var advanced []SkillPlan
+	var advanced, refOnly []SkillPlan
 	var kept, open []string
 	for _, s := range p.Skills {
 		switch {
 		case s.Noop:
+			if s.ref != s.fromRef {
+				refOnly = append(refOnly, s) // same folder at the new ref: only the lock changes
+			}
 			continue
 		case s.BaseLost && o.KeepMine:
 			kept = append(kept, s.Name+": base lost, kept the installed folder")
@@ -191,12 +194,12 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	if err != nil {
 		return restore(err)
 	}
-	for _, s := range advanced {
+	for _, s := range append(advanced, refOnly...) {
 		e := l.Skills[s.Name]
-		e.Commit, e.Tree = s.ToCommit, s.ToTree
+		e.Ref, e.Commit, e.Tree = s.ref, s.ToCommit, s.ToTree
 		l.Skills[s.Name] = e
 	}
-	if len(advanced) > 0 {
+	if len(advanced) > 0 || len(refOnly) > 0 {
 		if err := lock.Write(loc.LockPath, l); err != nil {
 			return restore(err)
 		}
