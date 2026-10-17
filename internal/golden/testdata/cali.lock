@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "skills": {
+    "demo": {
+      "source": "@FIXTURE@",
+      "path": "skills/demo",
+      "ref": "main",
+      "commit": "b362669a582e2b5dcf5c2ffdbf814651628eee43",
+      "tree": "40ac6f8345c80100a2b671ba52d9a8e44b1498c1"
+    }
+  }
+}
