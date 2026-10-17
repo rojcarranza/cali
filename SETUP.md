@@ -131,14 +131,6 @@ cali sync -g
 cali status -g
 ```
 
-Moving from APM:
-
-```sh
-cali import ~/Dev/projects/agent-skills/apm.yml --local-source github:rojcarranza/agent-skills -g
-cali sync -g
-cali status -g
-```
-
 ### Uninstall
 
 Delete the binary. Cali's own state is in `<config>`, `<data>` and `<cache>` (see the README table). Deleting `<data>` also deletes your backups. Installed skill folders stay where they are; remove them with `cali remove <name>` first if you want them gone.

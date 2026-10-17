@@ -63,7 +63,7 @@ skills:                           # map keyed by install name, so a name can app
     requires: [writing-plans]     # see section 7
 ```
 
-Rules: unknown keys are an error (typos must not pass silently); no secrets are ever stored here; `ref` set to a full commit SHA means "pinned, never moves". Cali rewrites the file only for `add`/`remove`/`import`, and preserves comments if the YAML library allows it (**Verify** when the library is chosen; if not, say so in the ADR).
+Rules: unknown keys are an error (typos must not pass silently); no secrets are ever stored here; `ref` set to a full commit SHA means "pinned, never moves". Cali rewrites the file only for `add`/`remove`/`import` (`import` removed 2026-10-17, issue #13), and preserves comments if the YAML library allows it (**Verify** when the library is chosen; if not, say so in the ADR).
 
 ## 4. `cali.lock` (generated, deterministic)
 
@@ -204,6 +204,8 @@ Semantics: names only, no versions. A dependency is satisfied when a skill with 
 
 ## 9. `import apm.yml` and APM leftovers
 
+> **Removed 2026-10-17 (issue #13).** APM is retired on Roj's machines (agent-skills PR #38), so the `import` command and `internal/apm` were deleted. The bullets below are kept as history. Leftover folders are still reported `unmanaged` (section 8).
+
 - Import reads `apm.yml` and writes the matching `cali.yaml` entries (source, ref). Entries that are not skills (MCP servers, instructions) are skipped with one warning each (non-goal 7).
 - Skills APM installed that are not in `apm.yml`: **Decided** Cali never deletes anything it did not install. They appear as `unmanaged` in `status` and `list`, and removing them is the user's job. `--adopt` (section 8) is the way to take one over.
 - Not known from the repo: the schema of `apm.yml` and how APM marks its own installs. I have not seen either. The plan must start the import task by reading Roj's real `apm.yml` and writing the mapping from that, and must not guess fields.
@@ -221,7 +223,7 @@ Semantics: names only, no versions. A dependency is satisfied when a skill with 
 | `update [names] [--apply] [--resolve f=ours\|theirs] [--take-upstream] [--keep-mine] [--accept-recommended]` | Section 5: dry run by default; conflicts get a classification and a recommendation. A skill whose ref or folder is gone upstream, or whose upstream folder fails validation, is skipped; the rest is planned or applied, then the exit code is non-zero. A manifest skill that is not locked is noted (run `sync`) and also makes the exit code non-zero. |
 | `remove <name>` | Back up the installed folders, remove them, drop the manifest and lock entries. Blocks if the folder has local edits unless `--force`. |
 | `sync [--frozen]` | Make installed folders match the lock; resolve manifest entries missing from the lock and write them. `--frozen` fails instead of changing the lock. Never overwrites a `modified` or `unmanaged` folder (reports it). A skill whose upstream folder fails validation, or whose ref or folder is gone upstream before it is locked, is skipped, with its lock entry and folders left as they were; the rest is installed, then the exit code is non-zero. Fetch, git and write errors still stop sync. |
-| `import apm.yml` | Section 9. |
+| `import apm.yml` | Section 9 (removed 2026-10-17, issue #13). |
 
 Global rules: `outdated` means the tree SHA of `path` at the tracked ref differs from the locked tree. Network failures degrade to a warning in `status`. Output: styled tables and spinners on a TTY, plain text and `--json` when piped; `--json` carries a `schema_version` so the plan can fix its shape in the requirements.
 
@@ -258,5 +260,5 @@ Package layout, library choices (via the ADRs above), exact JSON output shapes, 
 | Copilot paths for VS Code / JetBrains per OS | Section 6: `.github/skills` and `~/.copilot/skills`, same shape on every OS. VS Code/CLI documented; JetBrains undocumented, V1. |
 | Monorepo subfolder, history per subfolder or per repo? | Per repo, with change detection per subfolder: the lock pins one repo commit plus the subfolder's tree SHA; a skill is outdated only if its own tree changed (sections 1, 4, 5). |
 | Where do pristine copies and cache live? | Section 2 and 5: pristine in `<data>`, git mirrors in `<cache>`. |
-| APM leftovers on import | Section 9: never deleted, reported `unmanaged`. |
+| APM leftovers on import | Section 9: never deleted, reported `unmanaged` (import removed 2026-10-17, issue #13; the rule still holds via section 8). |
 | Name clashes | Section 8: error (remove, then add the new source), no aliases; project shadows global. |
