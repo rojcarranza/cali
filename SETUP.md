@@ -61,7 +61,18 @@ Project scope writes into the current repo's `.claude/skills` and `.github/skill
 
 ## Install
 
-Build for the machine you install on, then put the binary in a directory on your PATH.
+From a clone of the repo, on macOS, Linux, WSL or Windows Git Bash:
+
+```sh
+make install                # or, where make is missing (Git Bash): sh scripts/install.sh
+```
+
+The script detects the OS and CPU, builds `cali` for it, copies it to `~/.local/bin` (`~/bin` on Git Bash), and runs `cali --version`. It needs `go` and `git` on PATH. If the directory is not on PATH it adds it to `~/.zshrc` or `~/.bashrc`; when that file is a symlink (a dotfiles repo) it prints the line to add instead of editing it. On WSL it installs for the Linux side only, so run it again from Git Bash for Windows.
+
+- Somewhere else: `BINDIR=/some/dir make install`
+- Remove: `make uninstall` (deletes the binary only; skills and Cali's dirs stay)
+
+The manual steps below do the same by hand.
 
 ### macOS
 

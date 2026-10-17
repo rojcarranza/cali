@@ -2,6 +2,14 @@
 
 Cali is one Go binary that installs, pins, updates and syncs agent skills from any git source. It records where every skill came from in `cali.lock` and merges upstream changes into local edits instead of overwriting them. It never calls an LLM.
 
+## Install
+
+```sh
+make install    # macOS, Linux, WSL; on Git Bash without make: sh scripts/install.sh
+```
+
+See [SETUP.md](SETUP.md) for what it does and for manual installs.
+
 ## Build
 
 ```sh

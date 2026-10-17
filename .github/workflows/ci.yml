@@ -23,3 +23,8 @@ jobs:
           # v2.13.2 cannot read Go 1.27.2 export data (version 5); v2.15.0 can.
           version: v2.15.0
       - run: go test -v ./...
+      - name: install script
+        shell: bash
+        run: |
+          BINDIR="$RUNNER_TEMP/cali-bin" sh scripts/install.sh
+          BINDIR="$RUNNER_TEMP/cali-bin" sh scripts/install.sh --uninstall
