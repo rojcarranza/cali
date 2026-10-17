@@ -184,6 +184,16 @@ func TestStatusBaseLost(t *testing.T) {
 	}
 }
 
+func TestStatusUnlocked(t *testing.T) {
+	in, _, _ := fixture(t)
+	in.Lock.Skills = nil
+	rows, _ := compute(t, in)
+	want(t, states(t, rows, "x", "claude"), Unlocked)
+	if rows[0].Detail != "not in cali.lock yet; run cali sync" {
+		t.Fatalf("detail = %q", rows[0].Detail)
+	}
+}
+
 func TestStatusShadowedNeedsGlobalFolder(t *testing.T) {
 	in, _, _ := fixture(t)
 	in.Global = manifest.Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]manifest.Skill{

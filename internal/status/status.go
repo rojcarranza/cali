@@ -35,6 +35,7 @@ const (
 	Outdated  State = "outdated"
 	Missing   State = "missing"
 	BaseLost  State = "base-lost"
+	Unlocked  State = "unlocked"
 	Unmanaged State = "unmanaged"
 	Shadowed  State = "shadowed"
 )
@@ -123,7 +124,7 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 			case !present:
 				r.States = append(r.States, Missing)
 			case !locked:
-				r.States, r.Detail = append(r.States, BaseLost), "run cali sync"
+				r.States, r.Detail = append(r.States, Unlocked), "not in cali.lock yet; run cali sync"
 			default:
 				pristine, ok, err := store.Get(in.DataDir, e.Tree)
 				if err != nil {
