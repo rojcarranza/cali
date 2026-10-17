@@ -366,6 +366,39 @@ func TestPlanKeepsGoingWhenOneFolderIsGoneUpstream(t *testing.T) {
 	}
 }
 
+func TestPlanSkipsSkillWithInvalidUpstreamFolder(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	write(t, f.repo, "skills/y/SKILL.md", skillMD("y", ""))
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "add y")
+	if _, err := install.Add(context.Background(), f.d, install.AddRequest{
+		Spec: "file://" + filepath.ToSlash(f.repo) + "//skills/y", Targets: []string{"claude"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	f.upstream(t, map[string]string{"SKILL.md": "---\nname: [x]\ndescription: d\n---\n"})
+	write(t, f.repo, "skills/y/more.md", "more\n")
+	git(t, f.repo, "add", ".")
+	git(t, f.repo, "commit", "-q", "-m", "change y")
+
+	p := f.plan(t)
+	if len(p.Skills) != 2 || p.Skills[0].Name != "x" || p.Skills[0].Problem == "" ||
+		p.Skills[1].Name != "y" || p.Skills[1].Problem != "" || p.Skills[1].Noop {
+		t.Fatalf("proposal = %+v", p)
+	}
+	var out bytes.Buffer
+	f.d.Stdout = &out
+	if err := Apply(context.Background(), f.d, p, nil); !errors.Is(err, install.ErrSkipped) {
+		t.Fatalf("err = %v, want ErrSkipped", err)
+	}
+	if _, err := os.Stat(filepath.Join(filepath.Dir(f.local), "y", "more.md")); err != nil {
+		t.Fatalf("y was not updated: %v", err)
+	}
+	if !strings.Contains(out.String(), "kept x: skipped: ") {
+		t.Fatalf("apply out = %q", out.String())
+	}
+}
+
 func TestPlanFailsOnInvalidRef(t *testing.T) {
 	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
 	cy, opts := filepath.Join(f.d.Cwd, "cali.yaml"), source.Options{AllowFile: true}

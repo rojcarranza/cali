@@ -472,3 +472,23 @@ func TestUpdateSkipExitsNonZero(t *testing.T) {
 		t.Fatalf("apply: code=%d out=%q err=%q", code, out, errs)
 	}
 }
+
+func TestUpdateNotLockedExitsNonZero(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	cy := filepath.Join(project, "cali.yaml")
+	b, err := os.ReadFile(cy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(cy, append(b, "  y:\n    source: "+repoURL+"//skills/y\n"...), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range [][]string{{"update"}, {"update", "--json"}, {"update", "--apply"}} {
+		if code, out, errs := run(args...); code != 1 || !strings.Contains(errs, "y: not locked, run cali sync\n") {
+			t.Fatalf("%v: code=%d out=%q err=%q", args, code, out, errs)
+		}
+	}
+}

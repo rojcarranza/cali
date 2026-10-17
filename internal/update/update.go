@@ -38,14 +38,16 @@ type Options struct {
 // Proposal is the planned update of every selected skill, and the options
 // Apply resolves conflicts with.
 type Proposal struct {
-	Skills []SkillPlan
-	Opts   Options
-	flags  string // scope flags (-g, --manifest) for the printed resolve commands
+	Skills   []SkillPlan
+	Opts     Options
+	flags    string // scope flags (-g, --manifest) for the printed resolve commands
+	unlocked bool   // a selected manifest skill is not locked; Plan noted it
 }
 
 // SkillPlan is one skill: Noop when upstream did not change its folder,
 // BaseLost when the pristine copy of the locked tree is gone, Problem when
-// its ref or folder is not found upstream (the skill is skipped).
+// its ref or folder is not found upstream or its folder fails validation (the
+// skill is skipped).
 type SkillPlan struct {
 	Name                                   string
 	Problem                                string
@@ -143,6 +145,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		e, ok := l.Skills[n]
 		if !ok {
 			_, _ = fmt.Fprintf(note, "%s: not locked, run cali sync\n", n)
+			p.unlocked = true
 			continue
 		}
 		if !source.SameURL(e.Source, spec.URL, opts) || e.Path != strings.Trim(spec.Path, "/") {
@@ -192,6 +195,10 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			return Proposal{}, fmt.Errorf("pristine copy of %s: %w", n, err)
 		}
 		theirs, err := install.ExportTree(repo, sp.ToTree, n)
+		if errors.Is(err, skillfs.ErrInvalid) { // as in sync: skip this skill, not the whole update
+			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
+			continue
+		}
 		if err != nil {
 			return Proposal{}, err
 		}
@@ -314,9 +321,10 @@ func (p Proposal) Conflicts() int {
 	return n
 }
 
-// Skipped reports whether a skill was skipped because its ref or folder is gone upstream.
+// Skipped reports whether a skill was skipped: its ref or folder is gone
+// upstream, its folder fails validation, or it is not locked.
 func (p Proposal) Skipped() bool {
-	return slices.ContainsFunc(p.Skills, func(s SkillPlan) bool { return s.Problem != "" })
+	return p.unlocked || slices.ContainsFunc(p.Skills, func(s SkillPlan) bool { return s.Problem != "" })
 }
 
 // baseLostHint is what dry run and apply say for a lost base: sync can often rebuild it.

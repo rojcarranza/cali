@@ -43,7 +43,7 @@ var beforeLockWrite func()
 // Apply writes the update planned in p (design §5 steps 4 to 6). Every
 // conflict must be resolved, by p.Opts or by prompt (nil: never asks), before
 // anything is written; otherwise nothing is written and the error lists the
-// open conflicts. A skill skipped because it is gone upstream is reported and,
+// open conflicts. A skill skipped (gone upstream, invalid upstream, not locked) is reported and,
 // after the rest is written, makes Apply return install.ErrSkipped. Folders with local edits are backed up first, each folder
 // is swapped in by rename and restored on any failure, and the lock is
 // written last.
