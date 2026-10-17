@@ -23,6 +23,12 @@ func agentSkills(t *testing.T) (clone, manifestPath string) {
 	if clone == "" {
 		t.Skip("CALI_AGENT_SKILLS is not set")
 	}
+	// Resolve the gh token while HOME is still real: gh finds no login in the scratch HOME.
+	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GH_TOKEN") == "" {
+		if tok, err := ghToken(); err == nil {
+			t.Setenv("GITHUB_TOKEN", tok)
+		}
+	}
 	base := t.TempDir()
 	t.Setenv("HOME", filepath.Join(base, "home"))
 	t.Setenv("USERPROFILE", filepath.Join(base, "home"))
@@ -139,7 +145,7 @@ func TestAgentSkillsNewSkill(t *testing.T) {
 		}
 		s := strings.ReplaceAll(string(b), old, url)
 		if p == mp {
-			s = strings.Replace(s, "skills:\n", "skills:\n  roj-new-skill:\n    source: "+url+"//skills/roj-new-skill\n", 1)
+			s = strings.Replace(s, "\nskills:\n", "\nskills:\n  roj-new-skill:\n    source: "+url+"//skills/roj-new-skill\n", 1)
 		}
 		if err := os.WriteFile(p, []byte(s), 0o644); err != nil {
 			t.Fatal(err)
