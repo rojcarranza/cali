@@ -19,6 +19,7 @@ import (
 	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/lock"
 	"github.com/rojcarranza/cali/internal/manifest"
+	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/skillfs"
 	"github.com/rojcarranza/cali/internal/source"
 	"github.com/rojcarranza/cali/internal/store"
@@ -227,7 +228,8 @@ func UnmanagedRows(m manifest.Manifest, scope targets.Scope, root, home string) 
 }
 
 // readFolder reads an installed skill folder; present is false when it does
-// not exist, and odd says why a present path is not a folder Cali manages.
+// not exist, and odd says why a present path is not a folder Cali manages or
+// cannot be read.
 func readFolder(dir string) (t skillfs.Tree, present bool, odd string, err error) {
 	fi, err := os.Lstat(dir)
 	if errors.Is(err, os.ErrNotExist) {
@@ -244,7 +246,8 @@ func readFolder(dir string) (t skillfs.Tree, present bool, odd string, err error
 	}
 	t, err = skillfs.ReadDir(dir)
 	if err != nil {
-		return nil, false, "", fmt.Errorf("%s: %w", dir, err)
+		// One unreadable folder (say a symlink inside it) must not hide every other row.
+		return nil, true, render.Sanitize(err.Error()), nil
 	}
 	return t, true, "", nil
 }

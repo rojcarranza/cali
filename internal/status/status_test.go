@@ -312,3 +312,22 @@ func TestStatusOddManagedFolderIsARow(t *testing.T) {
 		})
 	}
 }
+
+func TestStatusUnreadableManagedFolderIsARow(t *testing.T) {
+	in, _, _ := fixture(t)
+	in.Manifest.Skills["y"] = manifest.Skill{Source: "https://github.com/o/r//skills/y"}
+	if err := os.Symlink(t.TempDir(), filepath.Join(in.Root, ".claude", "skills", "x", "notes")); err != nil {
+		t.Skip("symlinks unavailable:", err)
+	}
+	rows, _, err := Compute(context.Background(), in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want(t, states(t, rows, "x", "claude"), Modified)
+	want(t, states(t, rows, "y", "claude"), Missing)
+	for _, r := range rows {
+		if r.Skill == "x" && r.Detail != "skill contains a symlink: notes" {
+			t.Fatalf("detail = %q", r.Detail)
+		}
+	}
+}
