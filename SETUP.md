@@ -8,14 +8,14 @@ How to work on Cali locally, and how to install the `cali` binary. For the comma
 |---|---|---|
 | Go | 1.27 or later (`go.mod`) | Build and test |
 | git | any recent version on PATH | Cali runs the system `git` for every fetch and merge (ADR 0001) |
-| golangci-lint | v2.13.2, built with Go 1.27 | Lint, same version as CI |
+| golangci-lint | v2.15.0 | Lint, same version as CI |
 | gh | optional | Supplies a GitHub token when `GITHUB_TOKEN` and `GH_TOKEN` are unset |
 
-Install the linter from source so it is built with your Go version (a release binary built with an older Go fails with `export data version 5 is greater than maximum supported version 4`):
-
 ```sh
-go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.2
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 ```
+
+golangci-lint v2.13.2 fails under Go 1.27.2 with `export data version 5 is greater than maximum supported version 4`.
 
 ## Work on the project
 

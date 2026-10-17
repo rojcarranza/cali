@@ -20,7 +20,6 @@ jobs:
       - run: go vet ./...
       - uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.13.2
-          # The release binary is built with an older Go and cannot read Go 1.27 export data.
-          install-mode: goinstall
+          # v2.13.2 cannot read Go 1.27.2 export data (version 5); v2.15.0 can.
+          version: v2.15.0
       - run: go test -v ./...
