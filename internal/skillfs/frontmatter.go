@@ -8,11 +8,12 @@ import (
 )
 
 // Frontmatter is the part of a SKILL.md YAML header that Cali reads. Other
-// keys are ignored.
+// keys are ignored. Metadata holds the string values of metadata only:
+// skills keep lists and maps there too, and Cali reads just cali-requires.
 type Frontmatter struct {
-	Name        string            `yaml:"name"`
-	Description string            `yaml:"description"`
-	Metadata    map[string]string `yaml:"metadata"`
+	Name        string
+	Description string
+	Metadata    map[string]string
 }
 
 // ParseFrontmatter reads the YAML block delimited by "---" lines at the very
@@ -42,6 +43,11 @@ func ParseFrontmatter(data []byte) (Frontmatter, error) {
 	if len(bytes.TrimSpace(block)) == 0 {
 		return fm, nil
 	}
+	var raw struct {
+		Name        string               `yaml:"name"`
+		Description string               `yaml:"description"`
+		Metadata    map[string]yaml.Node `yaml:"metadata"`
+	}
 	var node yaml.Node
 	if err := yaml.Unmarshal(block, &node); err != nil {
 		return Frontmatter{}, errors.New("SKILL.md frontmatter is not valid YAML")
@@ -50,8 +56,19 @@ func ParseFrontmatter(data []byte) (Frontmatter, error) {
 		return Frontmatter{}, errors.New("SKILL.md frontmatter is not a YAML mapping")
 	}
 	// yaml type errors quote the offending value, so they are replaced.
-	if err := node.Decode(&fm); err != nil {
-		return Frontmatter{}, errors.New("SKILL.md frontmatter has a field of the wrong type (name, description and metadata values must be strings)")
+	if err := node.Decode(&raw); err != nil {
+		return Frontmatter{}, errors.New("SKILL.md frontmatter has a field of the wrong type (name and description must be strings, metadata a mapping)")
+	}
+	fm.Name, fm.Description = raw.Name, raw.Description
+	for k, v := range raw.Metadata {
+		if v.Kind == yaml.ScalarNode && v.Tag != "!!null" {
+			if fm.Metadata == nil {
+				fm.Metadata = map[string]string{}
+			}
+			fm.Metadata[k] = v.Value
+		} else if k == "cali-requires" && v.Tag != "!!null" {
+			return Frontmatter{}, errors.New("SKILL.md metadata.cali-requires must be a string of comma-separated skill names")
+		}
 	}
 	return fm, nil
 }
