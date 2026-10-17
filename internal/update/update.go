@@ -145,7 +145,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			_, _ = fmt.Fprintf(note, "%s: not locked, run cali sync\n", n)
 			continue
 		}
-		if e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") {
+		if !source.SameURL(e.Source, spec.URL, opts) || e.Path != strings.Trim(spec.Path, "/") {
 			return Proposal{}, fmt.Errorf("%s: source or path changed in cali.yaml; run cali remove %s and cali add again", n, n)
 		}
 		for _, tg := range m.TargetsFor(n) { // also for up-to-date skills: the leftover may be from any run

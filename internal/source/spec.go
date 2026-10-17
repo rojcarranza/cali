@@ -109,6 +109,14 @@ func ParseWith(s string, o Options) (Spec, error) {
 	return spec, nil
 }
 
+// SameURL reports whether lockURL, a source URL from cali.lock, names the
+// canonical url. It canonicalises lockURL first, so an entry written before
+// a canonical-form change (github.com owner/repo case) still matches.
+func SameURL(lockURL, url string, o Options) bool {
+	s, err := ParseWith(lockURL, o)
+	return err == nil && s.URL == url
+}
+
 // reject is the only way ParseWith builds an error. It takes a fixed reason and
 // never the input, because the input may carry credentials.
 func reject(reason string) error {

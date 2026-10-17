@@ -206,3 +206,15 @@ func TestKeyFileURLIsShortHash(t *testing.T) {
 		t.Fatalf("Key() must be stable and distinct per path")
 	}
 }
+
+func TestSameURLFoldsOldLockEntries(t *testing.T) {
+	if !SameURL("https://github.com/Owner/Repo", "https://github.com/owner/repo", Options{}) {
+		t.Error("upper-case github.com lock entry does not match")
+	}
+	if SameURL("https://github.com/o/other", "https://github.com/o/r", Options{}) {
+		t.Error("different repo matches")
+	}
+	if !SameURL("file:///tmp/r", "file:///tmp/r", Options{AllowFile: true}) {
+		t.Error("file URL does not match itself")
+	}
+}
