@@ -22,14 +22,16 @@ import (
 
 // Action is one thing Sync did or reports.
 type Action struct {
-	Kind   string // installed, adopted, kept or base-lost
+	Kind   string // installed, adopted, kept, base-lost or ref changed
 	Name   string
-	Target string // empty for base-lost
-	Detail string // for kept: modified or unmanaged
+	Target string // empty for base-lost and ref changed
+	Detail string // for kept: modified or unmanaged; for ref changed: the hint
 }
 
 func (a Action) String() string {
 	switch {
+	case a.Target == "" && a.Detail != "":
+		return a.Kind + " " + a.Name + ": " + a.Detail
 	case a.Target == "":
 		return a.Kind + " " + a.Name
 	case a.Detail != "":
@@ -77,9 +79,10 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		return Report{}, fmt.Errorf("%s not found but %s has skills; restore the manifest first", sc.manifest, sc.lockPath)
 	}
 
-	// A lock entry counts only if it matches the manifest's source, path and
-	// ref; otherwise a committed lock could point sync at another origin.
-	var names, missing, stale []string
+	// A lock entry counts only if it matches the manifest's source and path;
+	// otherwise a committed lock could point sync at another origin. A ref
+	// change alone is left to update, which keeps the merge base.
+	var names, missing, stale, refChanged []string
 	specs := map[string]source.Spec{}
 	refs := map[string]string{}
 	for n, s := range m.Skills {
@@ -94,8 +97,11 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		}
 		specs[n], refs[n] = spec, ref
 		e, ok := l.Skills[n]
-		if !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/") || e.Ref != ref {
+		switch {
+		case !ok || e.Source != spec.URL || e.Path != strings.Trim(spec.Path, "/"):
 			missing = append(missing, n)
+		case e.Ref != ref:
+			refChanged = append(refChanged, n)
 		}
 	}
 	for n := range l.Skills {
@@ -106,10 +112,14 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	slices.Sort(names)
 	slices.Sort(missing)
 	slices.Sort(stale)
-	if frozen && (len(missing) > 0 || len(stale) > 0) {
+	slices.Sort(refChanged)
+	if frozen && (len(missing) > 0 || len(stale) > 0 || len(refChanged) > 0) {
 		var why []string
 		if len(missing) > 0 {
-			why = append(why, "not locked, or locked with another source, path or ref: "+strings.Join(missing, ", "))
+			why = append(why, "not locked, or locked with another source or path: "+strings.Join(missing, ", "))
+		}
+		if len(refChanged) > 0 {
+			why = append(why, "ref changed in the manifest, run cali update: "+strings.Join(refChanged, ", "))
 		}
 		if len(stale) > 0 {
 			why = append(why, "no longer in the manifest: "+strings.Join(stale, ", "))
@@ -139,6 +149,11 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	trees := map[string]skillfs.Tree{} // pristine tree per skill that can be checked
 	for _, n := range names {
 		spec := specs[n]
+		if slices.Contains(refChanged, n) {
+			// Lock entry, pristine copy and folders stay as they are.
+			rep.Actions = append(rep.Actions, Action{Kind: "ref changed", Name: n, Detail: "run cali update"})
+			continue
+		}
 		if slices.Contains(missing, n) {
 			repo, err := fetch(spec)
 			if err != nil {
@@ -199,7 +214,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	for _, n := range names {
 		t, ok := trees[n]
 		if !ok {
-			continue // base-lost
+			continue // base-lost or ref changed
 		}
 		fresh := slices.Contains(missing, n)
 		tgs := m.TargetsFor(n)

@@ -372,3 +372,42 @@ func TestSyncRefusesLockWithoutManifest(t *testing.T) {
 		t.Fatalf("lock changed:\n%s", got)
 	}
 }
+
+func TestSyncKeepsLockWhenOnlyRefChanged(t *testing.T) {
+	r := monorepo(t)
+	git(t, r, "tag", "v1")
+	write(t, r, "skills/x/SKILL.md", skillMD("x")+"newer\n")
+	git(t, r, "commit", "-q", "-am", "two")
+	git(t, r, "tag", "v2")
+
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x@v1", Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	mPath, lockPath := filepath.Join(e.project, "cali.yaml"), filepath.Join(e.project, "cali.lock")
+	folder := filepath.Join(e.project, ".claude", "skills", "x")
+	m := readManifest(t, mPath)
+	s := m.Skills["x"]
+	s.Ref = "v2"
+	m.Skills["x"] = s
+	writeManifest(t, mPath, m)
+	lockBefore, folderBefore := readFile(t, lockPath), readTree(t, folder)
+
+	if _, err := Sync(context.Background(), e.deps, true); err == nil || !strings.Contains(err.Error(), "x") || !strings.Contains(err.Error(), "cali update") {
+		t.Fatalf("frozen err = %v, want error naming x and cali update", err)
+	}
+	var out bytes.Buffer
+	e.deps.Stdout = &out
+	if _, err := Sync(context.Background(), e.deps, false); err != nil {
+		t.Fatal(err)
+	}
+	if out.String() != "ref changed x: run cali update\n" {
+		t.Fatalf("out = %q", out.String())
+	}
+	if readFile(t, lockPath) != lockBefore {
+		t.Fatal("sync changed the lock entry")
+	}
+	if !skillfs.Equal(readTree(t, folder), folderBefore) {
+		t.Fatal("sync touched the folder")
+	}
+}
