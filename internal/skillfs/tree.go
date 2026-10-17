@@ -109,6 +109,23 @@ func IsText(b []byte) bool {
 	return bytes.IndexByte(b, 0) < 0
 }
 
+// Index maps each path of t to its file.
+func Index(t Tree) map[string]*File {
+	m := make(map[string]*File, len(t))
+	for i := range t {
+		m[t[i].Path] = &t[i]
+	}
+	return m
+}
+
+// FileEqualPtr is FileEqual where nil means absent: two absent files are equal.
+func FileEqualPtr(a, b *File) bool {
+	if a == nil || b == nil {
+		return a == b
+	}
+	return FileEqual(*a, *b)
+}
+
 // FileEqual compares two files: Exec bits (except on windows), then text
 // content after CRLF to LF, or binary content byte for byte.
 func FileEqual(a, b File) bool {

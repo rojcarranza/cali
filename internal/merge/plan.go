@@ -53,21 +53,6 @@ type Hunk struct {
 	Theirs    []string
 }
 
-func index(t skillfs.Tree) map[string]*skillfs.File {
-	m := make(map[string]*skillfs.File, len(t))
-	for i := range t {
-		m[t[i].Path] = &t[i]
-	}
-	return m
-}
-
-func eq(a, b *skillfs.File) bool {
-	if a == nil || b == nil {
-		return a == b
-	}
-	return skillfs.FileEqual(*a, *b)
-}
-
 func take(p string, a Action, f *skillfs.File) FilePlan {
 	if f == nil {
 		return FilePlan{Path: p, Action: a, Delete: true}
@@ -85,7 +70,7 @@ func data(f *skillfs.File) []byte {
 // Plan returns one FilePlan per path in the union of the three trees, sorted
 // by path, following the update table of the design (§5).
 func Plan(base, ours, theirs skillfs.Tree) ([]FilePlan, error) {
-	bm, om, tm := index(base), index(ours), index(theirs)
+	bm, om, tm := skillfs.Index(base), skillfs.Index(ours), skillfs.Index(theirs)
 	set := map[string]bool{}
 	for _, m := range []map[string]*skillfs.File{bm, om, tm} {
 		for p := range m {
@@ -108,10 +93,10 @@ func Plan(base, ours, theirs skillfs.Tree) ([]FilePlan, error) {
 	for _, p := range paths {
 		b, o, t := bm[p], om[p], tm[p]
 		switch {
-		case eq(o, b):
+		case skillfs.FileEqualPtr(o, b):
 			out = append(out, take(p, TakeUpstream, t))
 			continue
-		case eq(t, b), eq(o, t):
+		case skillfs.FileEqualPtr(t, b), skillfs.FileEqualPtr(o, t):
 			out = append(out, take(p, KeepLocal, o))
 			continue
 		}

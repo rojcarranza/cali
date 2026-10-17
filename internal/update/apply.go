@@ -267,14 +267,14 @@ func checkFlags(p Proposal) error {
 // the skill must not advance (a conflict kept without an explicit choice, or
 // skipped at the prompt); unres lists conflicts nothing decided.
 func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job, skip string, unres []string, err error) {
-	tm := index(s.theirs)
+	tm := skillfs.Index(s.theirs)
 	for _, tp := range s.Targets {
 		j := job{skill: s.Name, target: tp.Target, dir: tp.Dir, exists: !tp.Missing, ours: tp.ours, base: s.base, next: s.theirs}
 		if tp.Missing {
 			jobs = append(jobs, j)
 			continue
 		}
-		om := index(tp.ours)
+		om := skillfs.Index(tp.ours)
 		open := len(unres)
 		next := skillfs.Tree{}
 		put := func(f *skillfs.File) {

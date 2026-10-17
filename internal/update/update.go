@@ -240,21 +240,6 @@ func warnLeftovers(w io.Writer, dir string) {
 	}
 }
 
-func index(t skillfs.Tree) map[string]*skillfs.File {
-	m := make(map[string]*skillfs.File, len(t))
-	for i := range t {
-		m[t[i].Path] = &t[i]
-	}
-	return m
-}
-
-func eq(a, b *skillfs.File) bool {
-	if a == nil || b == nil {
-		return a == b
-	}
-	return skillfs.FileEqual(*a, *b)
-}
-
 func text(sides ...[]byte) bool {
 	for _, b := range sides {
 		if !skillfs.IsText(b) {
@@ -271,10 +256,10 @@ func decide(base, ours, theirs skillfs.Tree) ([]FileDecision, error) {
 	if err != nil {
 		return nil, err
 	}
-	bm, om, tm := index(base), index(ours), index(theirs)
+	bm, om, tm := skillfs.Index(base), skillfs.Index(ours), skillfs.Index(theirs)
 	out := make([]FileDecision, 0, len(fps))
 	for _, fp := range fps {
-		fd := FileDecision{FilePlan: fp, same: eq(bm[fp.Path], om[fp.Path]) && eq(om[fp.Path], tm[fp.Path])}
+		fd := FileDecision{FilePlan: fp, same: skillfs.FileEqualPtr(bm[fp.Path], om[fp.Path]) && skillfs.FileEqualPtr(om[fp.Path], tm[fp.Path])}
 		if fp.Action == merge.Conflicted {
 			c := *fp.Conflict
 			if res, ok := merge.PreResolve(c.Base, c.Ours, c.Theirs); ok {
