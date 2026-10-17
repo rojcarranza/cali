@@ -355,8 +355,8 @@ func TestPlanKeepsGoingWhenOneFolderIsGoneUpstream(t *testing.T) {
 	}
 	out.Reset()
 	f.d.Stdout = &out
-	if err := Apply(context.Background(), f.d, p, nil); err != nil {
-		t.Fatal(err)
+	if err := Apply(context.Background(), f.d, p, nil); !errors.Is(err, install.ErrSkipped) {
+		t.Fatalf("err = %v, want ErrSkipped", err)
 	}
 	if _, err := os.Stat(filepath.Join(filepath.Dir(f.local), "y", "more.md")); err != nil {
 		t.Fatalf("y was not updated: %v", err)

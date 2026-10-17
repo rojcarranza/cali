@@ -3,6 +3,7 @@ package install
 import (
 	"bytes"
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -409,5 +410,106 @@ func TestSyncKeepsLockWhenOnlyRefChanged(t *testing.T) {
 	}
 	if !skillfs.Equal(readTree(t, folder), folderBefore) {
 		t.Fatal("sync touched the folder")
+	}
+}
+
+func TestSyncSkipsSkillWithBadUpstreamContent(t *testing.T) {
+	cases := map[string]func(t *testing.T, r string){
+		"frontmatter": func(t *testing.T, r string) {
+			write(t, r, "skills/x/SKILL.md", "---\nname: [x]\ndescription: d\n---\n")
+		},
+		"symlink": func(t *testing.T, r string) {
+			if err := os.Symlink("SKILL.md", filepath.Join(r, "skills", "x", "link.md")); err != nil {
+				t.Skip("no symlinks here:", err)
+			}
+		},
+	}
+	for name, spoil := range cases {
+		t.Run(name, func(t *testing.T) {
+			r := monorepo(t)
+			spoil(t, r)
+			git(t, r, "add", ".")
+			git(t, r, "commit", "-q", "-m", "spoil x")
+			e := newEnv(t)
+			writeManifest(t, filepath.Join(e.project, "cali.yaml"), manifest.Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]manifest.Skill{
+				"x": {Source: fileURL(r) + "//skills/x"},
+				"y": {Source: fileURL(r) + "//skills/y"},
+			}})
+			var out bytes.Buffer
+			e.deps.Stdout = &out
+			rep, err := Sync(context.Background(), e.deps, false)
+			if !errors.Is(err, ErrSkipped) {
+				t.Fatalf("err = %v, want ErrSkipped", err)
+			}
+			if !hasAction(rep, "installed", "y", "claude", "") || !strings.Contains(out.String(), "x: skipped: ") {
+				t.Fatalf("report = %+v, out = %q", rep, out.String())
+			}
+			if exists(filepath.Join(e.project, ".claude", "skills", "x")) {
+				t.Fatal("x was installed")
+			}
+			l, err := lock.Read(filepath.Join(e.project, "cali.lock"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, ok := l.Skills["x"]; ok || l.Skills["y"].Tree == "" {
+				t.Fatalf("lock = %+v", l)
+			}
+		})
+	}
+}
+
+func TestSyncSkipLeavesLockAndFoldersOfThatSkill(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	addX(t, e, r)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/y", Targets: []string{"claude"}}); err != nil {
+		t.Fatal(err)
+	}
+	// Point x's lock entry at an upstream commit whose folder no longer validates.
+	write(t, r, "skills/x/SKILL.md", "---\nname: x\ndescription: d\nmetadata:\n  cali-requires: [y]\n---\n")
+	git(t, r, "commit", "-q", "-am", "spoil x")
+	lockPath := filepath.Join(e.project, "cali.lock")
+	editLock(t, lockPath, func(en *lock.Entry) {
+		en.Commit, en.Tree = git(t, r, "rev-parse", "HEAD"), git(t, r, "rev-parse", "HEAD:skills/x")
+	})
+	lockBefore := readFile(t, lockPath)
+	xDir := filepath.Join(e.project, ".claude", "skills", "x")
+	write(t, xDir, "local.md", "mine\n")
+	xBefore := readTree(t, xDir)
+	for _, d := range []string{e.deps.Dirs.Data, filepath.Join(e.project, ".claude", "skills", "y")} {
+		if err := os.RemoveAll(d); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, frozen := range []bool{true, false} {
+		rep, err := Sync(context.Background(), e.deps, frozen)
+		if !errors.Is(err, ErrSkipped) {
+			t.Fatalf("frozen=%v: err = %v, want ErrSkipped", frozen, err)
+		}
+		if !hasAction(rep, "skipped", "x", "", rep.Actions[0].Detail) || rep.Actions[0].String() != "x: skipped: "+rep.Actions[0].Detail {
+			t.Fatalf("frozen=%v: report = %+v", frozen, rep)
+		}
+		if readFile(t, lockPath) != lockBefore || !skillfs.Equal(readTree(t, xDir), xBefore) {
+			t.Fatalf("frozen=%v: x's lock entry or folder changed", frozen)
+		}
+		if !exists(filepath.Join(e.project, ".claude", "skills", "y", "SKILL.md")) {
+			t.Fatalf("frozen=%v: y not installed", frozen)
+		}
+	}
+}
+
+func TestSyncFetchFailureStaysFatal(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	writeManifest(t, filepath.Join(e.project, "cali.yaml"), manifest.Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]manifest.Skill{
+		"x": {Source: fileURL(filepath.Join(t.TempDir(), "gone")) + "//skills/x"},
+		"y": {Source: fileURL(r) + "//skills/y"},
+	}})
+	_, err := Sync(context.Background(), e.deps, false)
+	if err == nil || errors.Is(err, ErrSkipped) {
+		t.Fatalf("err = %v, want a fatal fetch error", err)
+	}
+	if exists(filepath.Join(e.project, ".claude", "skills", "y")) {
+		t.Fatal("y installed although sync failed")
 	}
 }

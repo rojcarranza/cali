@@ -2,6 +2,7 @@ package gitx
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -188,7 +189,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 	r := openFetched(t, dir)
 	c, _ := r.Resolve("")
 	_, err := exportAt(r, c, "skills/b")
-	if err == nil || !strings.Contains(err.Error(), "link") {
+	if err == nil || !strings.Contains(err.Error(), "link") || !errors.Is(err, skillfs.ErrInvalid) {
 		t.Fatalf("symlink err = %v", err)
 	}
 
@@ -200,7 +201,7 @@ func TestExportRejectsSymlinkAndSubmodule(t *testing.T) {
 	}
 	c, _ = r.Resolve("")
 	_, err = exportAt(r, c, "skills/b")
-	if err == nil || !strings.Contains(err.Error(), "sub") {
+	if err == nil || !strings.Contains(err.Error(), "sub") || !errors.Is(err, skillfs.ErrInvalid) {
 		t.Fatalf("submodule err = %v", err)
 	}
 }
@@ -256,15 +257,15 @@ func TestExportEnforcesLimitsBeforeReading(t *testing.T) {
 	t.Cleanup(func() { limits = old })
 
 	limits.files = 1
-	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "files") || !errors.Is(err, skillfs.ErrInvalid) {
 		t.Fatalf("file count err = %v", err)
 	}
 	limits.files, limits.file = old.files, 5
-	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "limit is 5") || !errors.Is(err, skillfs.ErrInvalid) {
 		t.Fatalf("file size err = %v", err)
 	}
 	limits.file, limits.tree = old.file, 10
-	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") {
+	if _, err := exportAt(r, c, "skills/a"); err == nil || !strings.Contains(err.Error(), "larger than") || !errors.Is(err, skillfs.ErrInvalid) {
 		t.Fatalf("tree size err = %v", err)
 	}
 }

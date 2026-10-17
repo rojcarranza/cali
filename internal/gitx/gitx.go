@@ -336,30 +336,30 @@ func (r *Repo) Export(tree string) (skillfs.Tree, error) {
 		mode, sha, p := fields[0], fields[2], string(name)
 		switch mode {
 		case "120000":
-			return nil, fmt.Errorf("%q: symlinks are not allowed in a skill", p)
+			return nil, skillfs.Invalid(fmt.Errorf("%q: symlinks are not allowed in a skill", p))
 		case "160000":
-			return nil, fmt.Errorf("%q: submodules are not allowed in a skill", p)
+			return nil, skillfs.Invalid(fmt.Errorf("%q: submodules are not allowed in a skill", p))
 		case "100644", "100755":
 		default:
-			return nil, fmt.Errorf("%q: unsupported file mode %s", p, mode)
+			return nil, skillfs.Invalid(fmt.Errorf("%q: unsupported file mode %s", p, mode))
 		}
 		size, err := strconv.ParseInt(fields[3], 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("%q: bad size in tree listing", p)
 		}
 		if len(entries)+1 > limits.files {
-			return nil, fmt.Errorf("skill has more than %d files", limits.files)
+			return nil, skillfs.Invalid(fmt.Errorf("skill has more than %d files", limits.files))
 		}
 		if size > limits.file {
-			return nil, fmt.Errorf("%q: file is %d bytes, limit is %d", p, size, limits.file)
+			return nil, skillfs.Invalid(fmt.Errorf("%q: file is %d bytes, limit is %d", p, size, limits.file))
 		}
 		if total += size; total > limits.tree {
-			return nil, fmt.Errorf("skill is larger than %d bytes", limits.tree)
+			return nil, skillfs.Invalid(fmt.Errorf("skill is larger than %d bytes", limits.tree))
 		}
 		entries = append(entries, entry{p, sha, size, mode == "100755"})
 	}
 	if len(entries) == 0 {
-		return nil, fmt.Errorf("no files in tree %s", tree)
+		return nil, skillfs.Invalid(fmt.Errorf("no files in tree %s", tree))
 	}
 	t, err := r.readBlobs(ctx, entries)
 	if err != nil {
@@ -367,7 +367,7 @@ func (r *Repo) Export(tree string) (skillfs.Tree, error) {
 	}
 	// git ls-tree emits entries in byte order, which is the sorted Path order.
 	if err := skillfs.Validate(t); err != nil {
-		return nil, err
+		return nil, skillfs.Invalid(err)
 	}
 	return t, nil
 }
@@ -390,7 +390,7 @@ func (r *Repo) fetchMissing(ctx context.Context, tree string) error {
 	}
 	// Every missing object is a distinct blob, so n is at most the file count.
 	if n > limits.files {
-		return fmt.Errorf("skill has more than %d files", limits.files)
+		return skillfs.Invalid(fmt.Errorf("skill has more than %d files", limits.files))
 	}
 	if n == 0 {
 		return nil

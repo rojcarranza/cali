@@ -9,6 +9,17 @@ import (
 	"strings"
 )
 
+// ErrInvalid is matched (errors.Is) by errors about a skill folder's own
+// content: its files, sizes or SKILL.md. I/O and git failures never match it.
+var ErrInvalid = errors.New("invalid skill content")
+
+type invalidErr struct{ error }
+
+func (e invalidErr) Unwrap() []error { return []error{e.error, ErrInvalid} }
+
+// Invalid marks err as ErrInvalid and keeps its message.
+func Invalid(err error) error { return invalidErr{err} }
+
 var reservedNames = map[string]bool{
 	"CON": true, "PRN": true, "AUX": true, "NUL": true,
 	"COM1": true, "COM2": true, "COM3": true, "COM4": true, "COM5": true,

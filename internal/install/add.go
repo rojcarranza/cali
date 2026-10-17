@@ -450,10 +450,10 @@ func exportTree(repo *gitx.Repo, tree, name string) (skillfs.Tree, error) {
 	}
 	fm, err := skillfs.ParseFrontmatter(md)
 	if err != nil {
-		return nil, fmt.Errorf("skill %q: %w", name, err)
+		return nil, skillfs.Invalid(fmt.Errorf("skill %q: %w", name, err))
 	}
 	if fm.Name != name {
-		return nil, fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name)
+		return nil, skillfs.Invalid(fmt.Errorf("skill folder %q has name %q in SKILL.md; they must match (Copilot skips a skill whose name differs from its folder)", name, fm.Name))
 	}
 	return t, nil
 }

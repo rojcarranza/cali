@@ -98,7 +98,7 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 			} else {
 				err = p.WriteText(out)
 			}
-			if err == nil && p.Conflicts() > 0 {
+			if err == nil && (p.Conflicts() > 0 || p.Skipped()) {
 				return errFindings
 			}
 			return err
