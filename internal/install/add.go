@@ -511,24 +511,50 @@ func existing(final string, upstream skillfs.Tree, adoptFlag bool) (bool, error)
 	return false, fmt.Errorf("%s exists, is not managed by Cali and differs from upstream; pass --adopt to take it over as is", final)
 }
 
+// Stage writes t to a fresh .cali-staging-* dir in parent and returns it. On
+// error nothing is left behind.
+func Stage(parent string, t skillfs.Tree) (string, error) {
+	staging, err := os.MkdirTemp(parent, ".cali-staging-*")
+	if err != nil {
+		return "", err
+	}
+	// MkdirTemp creates 0700; the installed folder must be readable like any other.
+	if err := os.Chmod(staging, 0o755); err != nil {
+		_ = os.RemoveAll(staging)
+		return "", err
+	}
+	if err := t.WriteTo(staging); err != nil {
+		_ = os.RemoveAll(staging)
+		return "", fmt.Errorf("write %s: %w", staging, err)
+	}
+	return staging, nil
+}
+
+// MoveAside renames dir to a fresh, unused .cali-old-* path beside it and
+// returns that path.
+func MoveAside(dir string, rename func(string, string) error) (string, error) {
+	old, err := os.MkdirTemp(filepath.Dir(dir), ".cali-old-*")
+	if err == nil {
+		err = os.Remove(old) // reserve a unique name, then free it for the rename
+	}
+	if err == nil {
+		err = rename(dir, old)
+	}
+	if err != nil {
+		return "", fmt.Errorf("move %s aside: %w", dir, err)
+	}
+	return old, nil
+}
+
 // place writes t to a fresh staging dir next to final and renames it to
 // final. Only that staging dir is ever removed.
 func place(final string, t skillfs.Tree, rename func(string, string) error) error {
 	if err := os.MkdirAll(filepath.Dir(final), 0o755); err != nil {
 		return err
 	}
-	staging, err := os.MkdirTemp(filepath.Dir(final), ".cali-staging-*")
+	staging, err := Stage(filepath.Dir(final), t)
 	if err != nil {
 		return err
-	}
-	// MkdirTemp creates 0700; the installed folder must be readable like any other.
-	if err := os.Chmod(staging, 0o755); err != nil {
-		_ = os.RemoveAll(staging)
-		return err
-	}
-	if err := t.WriteTo(staging); err != nil {
-		_ = os.RemoveAll(staging)
-		return fmt.Errorf("write %s: %w", staging, err)
 	}
 	// Re-check right before the swap: something may have created final since planning.
 	if _, err := os.Lstat(final); !errors.Is(err, os.ErrNotExist) {

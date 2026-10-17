@@ -366,30 +366,15 @@ func swap(j job, rename func(string, string) error, root string) (swapped, error
 			return sw, err
 		}
 	}
-	staging, err := os.MkdirTemp(parent, ".cali-staging-*")
+	staging, err := install.Stage(parent, j.next)
 	if err != nil {
 		return sw, err
 	}
-	// MkdirTemp creates 0700; the installed folder must be readable like any other.
-	if err := os.Chmod(staging, 0o755); err != nil {
-		_ = os.RemoveAll(staging)
-		return sw, err
-	}
-	if err := j.next.WriteTo(staging); err != nil {
-		_ = os.RemoveAll(staging)
-		return sw, fmt.Errorf("write %s: %w", staging, err)
-	}
 	if j.exists {
-		old, err := os.MkdirTemp(parent, ".cali-old-*")
-		if err == nil {
-			err = os.Remove(old) // reserve a unique name, then free it for the rename
-		}
-		if err == nil {
-			err = rename(j.dir, old)
-		}
+		old, err := install.MoveAside(j.dir, rename)
 		if err != nil {
 			_ = os.RemoveAll(staging)
-			return sw, fmt.Errorf("move %s aside: %w", j.dir, err)
+			return sw, err
 		}
 		// An edit saved after the backup would be deleted with old: put it back and stop.
 		if cur, err := skillfs.ReadDir(old); err != nil || !skillfs.SameBytes(cur, j.ours) {
