@@ -23,6 +23,10 @@ func agentSkills(t *testing.T) (clone, manifestPath string) {
 	if clone == "" {
 		t.Skip("CALI_AGENT_SKILLS is not set")
 	}
+	clone, err := filepath.Abs(clone) // before t.Chdir below
+	if err != nil {
+		t.Fatal(err)
+	}
 	// Resolve the gh token while HOME is still real: gh finds no login in the scratch HOME.
 	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GH_TOKEN") == "" {
 		if tok, err := ghToken(); err == nil {
