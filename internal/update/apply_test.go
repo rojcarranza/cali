@@ -649,3 +649,51 @@ func TestPlanRefusesPathChange(t *testing.T) {
 		t.Fatalf("err = %v, want %q", err, want)
 	}
 }
+
+func TestEntryRemovedDuringApplyRestores(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "")})
+	f.upstream(t, map[string]string{"more.md": "more\n"})
+	loc, err := install.Locate(f.d, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeLockWrite = func() {
+		l := f.lock(t)
+		delete(l.Skills, f.name)
+		if err := lock.Write(loc.LockPath, l); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Cleanup(func() { beforeLockWrite = nil })
+	_, err = f.apply(t, Options{}, nil)
+	if err == nil || err.Error() != "x was removed from cali.lock during the update; nothing written" {
+		t.Fatalf("err = %v", err)
+	}
+	if _, ok := f.lock(t).Skills["x"]; ok {
+		t.Fatal("lock entry for x was written back")
+	}
+	if _, err := os.Lstat(filepath.Join(f.local, "more.md")); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("folder not restored: more.md %v", err)
+	}
+}
+
+// A conflicted file whose name Sanitize changes gets no --resolve command: it could never match.
+func TestControlCharConflictHasNoResolveCommand(t *testing.T) {
+	name := "n\u200bote.md" // zero-width space: Sanitize drops it, every OS can hold it
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", ""), name: lines("line", 1, 12)})
+	write(t, f.local, name, "line 1 local\n"+lines("line", 2, 12))
+	f.upstream(t, map[string]string{name: lines("new", 1, 12)})
+	const hint = "file name has control characters; resolve it with --take-upstream or --keep-mine"
+
+	var out bytes.Buffer
+	if err := f.plan(t).WriteText(&out, false); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out.String(), "    "+hint+"\n") || strings.Contains(out.String(), "--resolve") {
+		t.Errorf("dry run:\n%s", out.String())
+	}
+	_, err := f.apply(t, Options{}, nil)
+	if err == nil || !strings.Contains(err.Error(), hint) || strings.Contains(err.Error(), "--resolve") {
+		t.Errorf("apply err = %v", err)
+	}
+}

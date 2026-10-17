@@ -37,6 +37,9 @@ type swapped struct {
 // beforeCleanup, when set by a test, runs before a moved-aside folder is removed.
 var beforeCleanup func(old string)
 
+// beforeLockWrite, when set by a test, runs after the swaps and before the lock is re-read.
+var beforeLockWrite func()
+
 // Apply writes the update planned in p (design §5 steps 4 to 6). Every
 // conflict must be resolved, by p.Opts or by prompt (nil: never asks), before
 // anything is written; otherwise nothing is written and the error lists the
@@ -190,12 +193,18 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 		done = append(done, sw)
 	}
 
+	if beforeLockWrite != nil {
+		beforeLockWrite()
+	}
 	l, err := lock.Read(loc.LockPath)
 	if err != nil {
 		return restore(err)
 	}
 	for _, s := range append(advanced, refOnly...) {
-		e := l.Skills[s.Name]
+		e, ok := l.Skills[s.Name]
+		if !ok {
+			return restore(fmt.Errorf("%s was removed from cali.lock during the update; nothing written", s.Name))
+		}
 		e.Ref, e.Commit, e.Tree = s.ref, s.ToCommit, s.ToTree
 		l.Skills[s.Name] = e
 	}
@@ -301,8 +310,8 @@ func resolveSkill(s SkillPlan, o Options, prompt Prompter, g string) (jobs []job
 			path := render.Sanitize(f.Path)
 			switch choice {
 			case "":
-				unres = append(unres, fmt.Sprintf("  %s %s %s: RECOMMEND %s [%s] (%s)\n    cali update %s%s --apply --resolve %s",
-					s.Name, tp.Target, path, f.Rec.Choice, f.Rec.Class, f.Rec.Reason, s.Name, g, shellArg(path+"="+f.Rec.Choice)))
+				unres = append(unres, fmt.Sprintf("  %s %s %s: RECOMMEND %s [%s] (%s)\n    %s",
+					s.Name, tp.Target, path, f.Rec.Choice, f.Rec.Class, f.Rec.Reason, resolveHint(s.Name, g, f.Path, f.Rec.Choice)))
 			case "skip":
 				return nil, "skipped", nil, nil
 			case "theirs":

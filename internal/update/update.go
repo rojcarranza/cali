@@ -378,7 +378,7 @@ func (p Proposal) WriteText(w io.Writer, global bool) error {
 					}
 				}
 				fmt.Fprintf(&b, "    RECOMMEND %s [%s] (%s)\n", f.Rec.Choice, f.Rec.Class, f.Rec.Reason)
-				fmt.Fprintf(&b, "    cali update %s%s --apply --resolve %s\n", s.Name, g, shellArg(path+"="+f.Rec.Choice))
+				fmt.Fprintf(&b, "    %s\n", resolveHint(s.Name, g, f.Path, f.Rec.Choice))
 			}
 		}
 	}
@@ -454,4 +454,13 @@ func (p Proposal) WriteJSON(w io.Writer) error {
 	return render.WriteJSON(w, struct {
 		Skills []jsonSkill `json:"skills"`
 	}{skills})
+}
+
+// resolveHint is the command that resolves one conflict. A path Sanitize
+// changes cannot be typed back to match --resolve, so it gets the whole-skill flags instead.
+func resolveHint(skill, g, path, choice string) string {
+	if render.Sanitize(path) != path {
+		return "file name has control characters; resolve it with --take-upstream or --keep-mine"
+	}
+	return fmt.Sprintf("cali update %s%s --apply --resolve %s", skill, g, shellArg(path+"="+choice))
 }
