@@ -109,7 +109,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 			mf = filepath.Join(cwd, mf)
 		}
 		mf = filepath.Clean(mf)
-		if !global && filepath.Dir(mf) == filepath.Clean(d.Dirs.Home) {
+		if !global && sameDir(filepath.Dir(mf), d.Dirs.Home) {
 			return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", mf)
 		}
 		sc := scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
@@ -118,8 +118,8 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		}
 		return sc, nil
 	}
-	root := findRoot(cwd, filepath.Clean(d.Dirs.Home))
-	if root == filepath.Clean(d.Dirs.Home) {
+	root := findRoot(cwd, d.Dirs.Home)
+	if sameDir(root, d.Dirs.Home) {
 		return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", filepath.Join(root, "cali.yaml"))
 	}
 	return scope{
@@ -130,12 +130,26 @@ func resolveScope(d Deps, global bool) (scope, error) {
 	}, nil
 }
 
+// sameDir compares two paths after symlink resolution, so HOME and the cwd
+// agree when they spell one folder differently; a path that cannot be
+// resolved (not created yet) falls back to its cleaned form.
+func sameDir(a, b string) bool {
+	return resolve(a) == resolve(b)
+}
+
+func resolve(p string) string {
+	if r, err := filepath.EvalSymlinks(p); err == nil {
+		return r
+	}
+	return filepath.Clean(p)
+}
+
 // findRoot walks up from cwd: the first dir holding cali.yaml or .git is the
 // root. The walk stops before home and never checks home itself (a dotfiles
 // ~/.git or a ~/cali.yaml must not make home, whose .claude/skills is the
 // global dir, the project); with no match the root is cwd.
 func findRoot(cwd, home string) string {
-	for dir := cwd; dir != home; {
+	for dir := cwd; !sameDir(dir, home); {
 		for _, marker := range []string{"cali.yaml", ".git"} {
 			if _, err := os.Lstat(filepath.Join(dir, marker)); err == nil {
 				return dir

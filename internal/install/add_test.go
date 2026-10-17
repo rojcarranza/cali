@@ -514,6 +514,37 @@ func TestProjectRootNeverHome(t *testing.T) {
 	}
 }
 
+func TestProjectRootNeverHomeThroughSymlink(t *testing.T) {
+	e := newEnv(t)
+	real := t.TempDir()
+	link := filepath.Join(t.TempDir(), "home")
+	if err := os.Symlink(real, link); err != nil {
+		t.Skip("symlinks unavailable:", err)
+	}
+	if err := os.Mkdir(filepath.Join(real, ".git"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	e.deps.Dirs.Home = link
+	cwd := filepath.Join(real, "notes")
+	if err := os.MkdirAll(cwd, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	e.deps.Cwd = cwd
+	sc, err := resolveScope(e.deps, false)
+	if err != nil || sc.root != cwd {
+		t.Fatalf("root = %s, %v; want cwd %s", sc.root, err, cwd)
+	}
+	e.deps.Cwd = real
+	if sc, err := resolveScope(e.deps, false); err == nil {
+		t.Fatalf("cwd = home via the other spelling: root = %s, want refusal", sc.root)
+	}
+	e.deps.Cwd = cwd
+	e.deps.Manifest = filepath.Join(real, "cali.yaml")
+	if sc, err := resolveScope(e.deps, false); err == nil {
+		t.Fatalf("--manifest in home via the other spelling: root = %s, want refusal", sc.root)
+	}
+}
+
 func TestAddRefusesSymlinkInProjectTree(t *testing.T) {
 	r := monorepo(t)
 	e := newEnv(t)
