@@ -26,6 +26,7 @@ System `git` must be on PATH (ADR 0001). GitHub tokens come from `GITHUB_TOKEN` 
 - `cali sync`: install every skill in `cali.lock` and lock manifest skills not locked yet (`--frozen` fails instead of changing `cali.lock`).
 - `cali import <apm.yml>`: add the skills of an `apm.yml` to `cali.yaml` (`--local-source <spec>`).
 - `-g`, `--global` (all commands): use the global scope instead of the project.
+- `--manifest <path>` (all commands): use this manifest file; `cali.lock` sits next to it. In project scope its folder is the project root; with `-g` skills still install into `~/.claude/skills` and `~/.copilot/skills`.
 
 ## Where things live
 
@@ -36,7 +37,7 @@ Targets (ADR 0005):
 | Project | `<project>/.claude/skills/<name>` | `<project>/.github/skills/<name>` |
 | Global | `~/.claude/skills/<name>` | `~/.copilot/skills/<name>` |
 
-Project scope keeps `<project>/cali.yaml` and `<project>/cali.lock`; global scope keeps `<config>/cali.yaml` and `<config>/cali.lock`.
+Project scope keeps `<project>/cali.yaml` and `<project>/cali.lock`; global scope keeps `<config>/cali.yaml` and `<config>/cali.lock`. `--manifest <path>` moves both to the given file and its folder.
 
 | Dir | macOS / Linux / WSL | Windows |
 |---|---|---|

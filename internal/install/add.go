@@ -43,6 +43,9 @@ type Deps struct {
 	Cwd string
 	// Global selects the global scope for Sync and Remove.
 	Global bool
+	// Manifest is --manifest: the manifest file, relative to Cwd; the lock sits
+	// next to it and, in project scope, its dir is the project root. Empty means the default.
+	Manifest string
 }
 
 // AddRequest is one `cali add` invocation.
@@ -78,8 +81,10 @@ type scope struct {
 // resolveScope finds the manifest and lock paths. Project scope is rooted at
 // the nearest ancestor of the cwd holding cali.yaml, else the nearest one
 // holding .git, else the cwd. Global scope lives in the config dir.
+// d.Manifest overrides both: the lock sits next to it and, in project scope,
+// its dir is the root; global targets stay under home.
 func resolveScope(d Deps, global bool) (scope, error) {
-	if global {
+	if d.Manifest == "" && global {
 		return scope{
 			scope:    targets.Global,
 			manifest: filepath.Join(d.Dirs.Config, "cali.yaml"),
@@ -97,6 +102,18 @@ func resolveScope(d Deps, global bool) (scope, error) {
 	cwd, err := filepath.Abs(cwd)
 	if err != nil {
 		return scope{}, err
+	}
+	if d.Manifest != "" {
+		mf := d.Manifest
+		if !filepath.IsAbs(mf) {
+			mf = filepath.Join(cwd, mf)
+		}
+		mf = filepath.Clean(mf)
+		sc := scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
+		if global {
+			sc.scope, sc.root = targets.Global, ""
+		}
+		return sc, nil
 	}
 	root := findRoot(cwd, filepath.Clean(d.Dirs.Home))
 	return scope{

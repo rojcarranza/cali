@@ -25,6 +25,9 @@ var version = "dev"
 // allowFileScheme admits file:// sources. Only tests set it.
 var allowFileScheme = false
 
+// manifestPath is the persistent --manifest flag; newRoot resets it to "" for each run.
+var manifestPath string
+
 // Execute runs cali with args (without the program name) and returns the exit code.
 func Execute(args []string, out, errw io.Writer) int {
 	root := newRoot(out)
@@ -51,6 +54,7 @@ func newRoot(out io.Writer) *cobra.Command {
 	}
 	root.SetVersionTemplate("cali {{.Version}}\n")
 	root.PersistentFlags().BoolVarP(&global, "global", "g", false, "use the global scope (your home folder) instead of the project")
+	root.PersistentFlags().StringVar(&manifestPath, "manifest", "", "use this manifest file; the lock sits next to it (in project scope its folder is the project root)")
 
 	root.AddCommand(&cobra.Command{
 		Use:   "init",
@@ -111,6 +115,7 @@ func deps(out io.Writer) (install.Deps, error) {
 		GhToken:         sync.OnceValues(ghToken), // at most one gh run per command
 		AllowFileScheme: allowFileScheme,
 		Cwd:             cwd,
+		Manifest:        manifestPath,
 	}, nil
 }
 

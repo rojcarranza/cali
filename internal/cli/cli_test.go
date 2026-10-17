@@ -295,3 +295,67 @@ func TestGhTokenRunsOncePerCommand(t *testing.T) {
 		t.Fatalf("gh auth token ran %d times, want 1", runs)
 	}
 }
+
+func TestManifestFlagGlobal(t *testing.T) {
+	repoURL, project := setup(t)
+	dot := filepath.Join(filepath.Dir(project), "dotfiles")
+	mf := filepath.Join(dot, "cali.yaml")
+	if code, out, errs := run("add", "-g", "--manifest", mf, repoURL, "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	for _, p := range []string{mf, filepath.Join(dot, "cali.lock"), filepath.Join(os.Getenv("HOME"), ".claude", "skills", "x", "SKILL.md")} {
+		if _, err := os.Stat(p); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(os.Getenv("CALI_CONFIG_DIR"), "cali.yaml")); err == nil {
+		t.Fatal("the config dir manifest was written")
+	}
+	code, out, errs := run("list", "-g", "--manifest", mf)
+	if code != 0 || !strings.Contains(out, "x ") || !strings.Contains(out, repoURL) {
+		t.Fatalf("list: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("remove", "-g", "--manifest", mf, "x"); code != 0 {
+		t.Fatalf("remove: code=%d out=%q err=%q", code, out, errs)
+	}
+	if b, err := os.ReadFile(filepath.Join(dot, "cali.lock")); err != nil || strings.Contains(string(b), `"x"`) {
+		t.Fatalf("lock after remove: %q %v", b, err)
+	}
+}
+
+func TestManifestFlagProject(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", "--manifest", filepath.Join("other", "cali.yaml"), repoURL, "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	other := filepath.Join(project, "other")
+	for _, p := range []string{"cali.yaml", "cali.lock", filepath.Join(".claude", "skills", "x", "SKILL.md")} {
+		if _, err := os.Stat(filepath.Join(other, p)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, p := range []string{"cali.yaml", ".claude"} {
+		if _, err := os.Stat(filepath.Join(project, p)); err == nil {
+			t.Fatalf("%s written in the cwd project", p)
+		}
+	}
+}
+
+func TestManifestFlagProjectSymlinkRefused(t *testing.T) {
+	repoURL, project := setup(t)
+	other := filepath.Join(project, "other")
+	if err := os.Mkdir(other, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	real := filepath.Join(filepath.Dir(project), "real.yaml")
+	if err := os.WriteFile(real, []byte("version: 1\ntargets: [claude]\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(real, filepath.Join(other, "cali.yaml")); err != nil {
+		t.Skip("symlinks unavailable:", err)
+	}
+	code, _, errs := run("add", "--manifest", filepath.Join("other", "cali.yaml"), repoURL)
+	if code != 1 || !strings.Contains(errs, "is a symlink") {
+		t.Fatalf("code=%d err=%q", code, errs)
+	}
+}
