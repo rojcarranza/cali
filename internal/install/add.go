@@ -119,6 +119,9 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		return sc, nil
 	}
 	root := findRoot(cwd, filepath.Clean(d.Dirs.Home))
+	if root == filepath.Clean(d.Dirs.Home) {
+		return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", filepath.Join(root, "cali.yaml"))
+	}
 	return scope{
 		scope:    targets.Project,
 		root:     root,

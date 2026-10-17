@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"sort"
 	"strings"
 
@@ -12,6 +11,7 @@ import (
 
 	"github.com/rojcarranza/cali/internal/find"
 	"github.com/rojcarranza/cali/internal/gitx"
+	"github.com/rojcarranza/cali/internal/install"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
 )
@@ -26,11 +26,11 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			if strings.TrimSpace(args[0]) == "" {
 				return errors.New("find: the query is empty")
 			}
-			s, err := load(out, *global)
+			d, err := deps(out)
 			if err != nil {
 				return err
 			}
-			d, err := deps(out)
+			s, err := loadFrom(d, *global)
 			if err != nil {
 				return err
 			}
@@ -57,16 +57,13 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 					_, _ = fmt.Fprintf(warn, "warning: %s: no local mirror (run without --offline)\n", sp.URL)
 					continue
 				}
-				r, err := gitx.Open(d.Dirs.Cache, sp)
-				if err == nil {
-					r.SetOffline(offline)
-				}
-				if err == nil && !offline {
-					host := ""
-					if u, perr := url.Parse(sp.URL); perr == nil {
-						host = u.Hostname()
+				var r *gitx.Repo
+				if offline {
+					if r, err = gitx.Open(d.Dirs.Cache, sp); err == nil {
+						r.SetOffline(true)
 					}
-					err = r.Fetch(cmd.Context(), gitx.AuthEnv(host, d.Getenv, d.GhToken))
+				} else {
+					r, err = install.OpenFetch(cmd.Context(), d, sp)
 				}
 				if err == nil {
 					var h []find.Hit

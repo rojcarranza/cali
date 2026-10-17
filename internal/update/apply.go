@@ -59,10 +59,7 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 	if err := checkFlags(p); err != nil {
 		return err
 	}
-	g := ""
-	if d.Global {
-		g = " -g"
-	}
+	g := p.flags
 
 	var jobs []job
 	var advanced, refOnly []SkillPlan

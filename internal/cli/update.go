@@ -96,7 +96,7 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 			if asJSON {
 				err = p.WriteJSON(out)
 			} else {
-				err = p.WriteText(out, *global)
+				err = p.WriteText(out)
 			}
 			if err == nil && p.Conflicts() > 0 {
 				return errFindings

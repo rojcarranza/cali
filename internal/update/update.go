@@ -40,6 +40,7 @@ type Options struct {
 type Proposal struct {
 	Skills []SkillPlan
 	Opts   Options
+	flags  string // scope flags (-g, --manifest) for the printed resolve commands
 }
 
 // SkillPlan is one skill: Noop when upstream did not change its folder,
@@ -123,6 +124,12 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	repos := map[string]*gitx.Repo{}
 	warned := map[string]bool{} // skills dirs already checked for leftovers
 	p := Proposal{Opts: o}
+	if d.Global {
+		p.flags = " -g"
+	}
+	if d.Manifest != "" {
+		p.flags += " --manifest " + shellArg(loc.Manifest)
+	}
 	for _, n := range names {
 		s := m.Skills[n]
 		spec, err := source.ParseWith(s.Source, opts)
@@ -331,13 +338,10 @@ func shellArg(s string) string {
 
 // WriteText prints the dry run: per skill a header, per changed file its
 // action, and for each conflict the hunks, the recommendation and the
-// command that applies it. global adds -g to that command.
-func (p Proposal) WriteText(w io.Writer, global bool) error {
+// command that applies it, with the scope flags Plan was run with.
+func (p Proposal) WriteText(w io.Writer) error {
 	var b strings.Builder
-	g := ""
-	if global {
-		g = " -g"
-	}
+	g := p.flags
 	n := 0
 	for _, s := range p.Skills {
 		switch {

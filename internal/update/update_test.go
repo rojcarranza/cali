@@ -209,7 +209,7 @@ func TestDryRunWritesNothing(t *testing.T) {
 	before := f.snapshot(t)
 	p := f.plan(t)
 	var out bytes.Buffer
-	if err := p.WriteText(&out, false); err != nil {
+	if err := p.WriteText(&out); err != nil {
 		t.Fatal(err)
 	}
 	if err := p.WriteJSON(&out); err != nil {
@@ -231,7 +231,7 @@ func TestNoSubtreeChangeIsNoop(t *testing.T) {
 		t.Fatalf("proposal = %+v", p)
 	}
 	var out bytes.Buffer
-	if err := p.WriteText(&out, false); err != nil {
+	if err := p.WriteText(&out); err != nil {
 		t.Fatal(err)
 	}
 	if got, want := out.String(), "x: up to date\n0 skill(s) to update, 0 conflict(s)\n"; got != want {
@@ -252,7 +252,7 @@ func TestNonTTYConflictPrintsCommandAndChangesNothing(t *testing.T) {
 		t.Fatalf("SKILL.md = %+v rec=%+v", d, d.Rec)
 	}
 	var out bytes.Buffer
-	if err := p.WriteText(&out, false); err != nil {
+	if err := p.WriteText(&out); err != nil {
 		t.Fatal(err)
 	}
 	s := out.String()
@@ -316,7 +316,7 @@ func TestPlanBaseLost(t *testing.T) {
 		t.Fatalf("proposal = %+v", p)
 	}
 	var out bytes.Buffer
-	if err := p.WriteText(&out, false); err != nil {
+	if err := p.WriteText(&out); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.HasPrefix(out.String(), "x: base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream\n") {
@@ -460,5 +460,20 @@ func TestPlanRefusesLockWithoutManifest(t *testing.T) {
 	}
 	if _, err := Plan(context.Background(), f.d, Options{}); err == nil || !strings.Contains(err.Error(), manifestPath) {
 		t.Fatalf("err = %v, want an error naming %s", err, manifestPath)
+	}
+}
+
+// The printed resolve command keeps --manifest, or it would act on another manifest.
+func TestResolveHintKeepsManifestFlag(t *testing.T) {
+	f := codeReview(t)
+	f.d.Manifest = "cali.yaml"
+	p := f.plan(t)
+	var out bytes.Buffer
+	if err := p.WriteText(&out); err != nil {
+		t.Fatal(err)
+	}
+	want := "cali update code-review --manifest " + shellArg(filepath.Join(f.d.Cwd, "cali.yaml")) + " --apply --resolve SKILL.md=theirs\n"
+	if !strings.Contains(out.String(), want) {
+		t.Fatalf("output lacks %q:\n%s", want, out.String())
 	}
 }

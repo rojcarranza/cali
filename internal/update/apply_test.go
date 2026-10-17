@@ -686,7 +686,7 @@ func TestControlCharConflictHasNoResolveCommand(t *testing.T) {
 	const hint = "file name has control characters; resolve it with --take-upstream or --keep-mine"
 
 	var out bytes.Buffer
-	if err := f.plan(t).WriteText(&out, false); err != nil {
+	if err := f.plan(t).WriteText(&out); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(out.String(), "    "+hint+"\n") || strings.Contains(out.String(), "--resolve") {

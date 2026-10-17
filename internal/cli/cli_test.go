@@ -403,3 +403,24 @@ func TestManifestFlagInHomeRefusedInProject(t *testing.T) {
 		t.Fatalf("home not empty: %v %v", ents, err)
 	}
 }
+
+// Without --manifest, running in the home folder must not make home the project root either.
+func TestHomeCwdRefusedInProject(t *testing.T) {
+	repoURL, _ := setup(t)
+	home := os.Getenv("HOME")
+	if err := os.MkdirAll(home, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(home)
+	want := filepath.Join(home, "cali.yaml") + ": a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g"
+	for _, args := range [][]string{{"add", repoURL}, {"init"}} {
+		code, _, errs := run(args...)
+		if code != 1 || errs != "cali: "+want+"\n" {
+			t.Fatalf("%v: code=%d err=%q", args, code, errs)
+		}
+	}
+	ents, err := os.ReadDir(home)
+	if err != nil || len(ents) != 0 {
+		t.Fatalf("home not empty: %v %v", ents, err)
+	}
+}

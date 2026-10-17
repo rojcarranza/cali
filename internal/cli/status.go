@@ -22,11 +22,11 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 		Short: "Show local edits, newer upstream versions and missing skills",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			s, err := load(out, *global)
+			d, err := deps(out)
 			if err != nil {
 				return err
 			}
-			d, err := deps(out)
+			s, err := loadFrom(d, *global)
 			if err != nil {
 				return err
 			}
