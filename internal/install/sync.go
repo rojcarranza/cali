@@ -45,7 +45,8 @@ func (a Action) String() string {
 }
 
 // ErrSkipped is returned, after everything else was done, when a skill was
-// skipped because its upstream folder cannot be installed.
+// skipped because its upstream folder cannot be installed (or, from update,
+// because it is not locked).
 var ErrSkipped = errors.New("one or more skills were skipped")
 
 // Report is what Sync did.
@@ -56,8 +57,9 @@ type Report struct{ Actions []Action }
 // entries no longer in the manifest are dropped. With frozen, either case is
 // an error and nothing is written. Sync never deletes or overwrites a folder:
 // a folder that differs is reported and left alone. A skill whose upstream folder
-// fails validation is reported as skipped, with its lock entry and folders
-// left as they were; the rest is done and Sync then returns ErrSkipped.
+// fails validation, or whose ref or folder is gone upstream before it is locked,
+// is reported as skipped, with its lock entry and folders left as they were;
+// the rest is done and Sync then returns ErrSkipped.
 func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	opts := source.Options{AllowFile: d.AllowFileScheme}
 	out := d.Stdout
@@ -175,12 +177,16 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			}
 			ref := refs[n]
 			commit, err := repo.Resolve(ref)
+			if errors.Is(err, gitx.ErrNotFound) {
+				skip(n, err)
+				continue
+			}
 			if err != nil {
 				return Report{}, fmt.Errorf("skill %s: %w", n, err)
 			}
 			p := strings.Trim(spec.Path, "/")
 			tree, t, err := exportSkill(repo, commit, p, n)
-			if errors.Is(err, skillfs.ErrInvalid) {
+			if errors.Is(err, skillfs.ErrInvalid) || errors.Is(err, gitx.ErrNotFound) {
 				skip(n, err)
 				continue
 			}
