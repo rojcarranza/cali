@@ -513,3 +513,40 @@ func TestSyncFetchFailureStaysFatal(t *testing.T) {
 		t.Fatal("y installed although sync failed")
 	}
 }
+
+func TestSyncSkipsUnlockedSkillGoneUpstream(t *testing.T) {
+	cases := map[string]manifest.Skill{
+		"ref":    {Ref: "gone"},
+		"folder": {},
+	}
+	for name, x := range cases {
+		t.Run(name, func(t *testing.T) {
+			r := monorepo(t)
+			e := newEnv(t)
+			x.Source = fileURL(r) + "//skills/x"
+			if name == "folder" {
+				x.Source = fileURL(r) + "//skills/gone"
+			}
+			writeManifest(t, filepath.Join(e.project, "cali.yaml"), manifest.Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]manifest.Skill{
+				"x": x,
+				"y": {Source: fileURL(r) + "//skills/y"},
+			}})
+			var out bytes.Buffer
+			e.deps.Stdout = &out
+			rep, err := Sync(context.Background(), e.deps, false)
+			if !errors.Is(err, ErrSkipped) {
+				t.Fatalf("err = %v, want ErrSkipped", err)
+			}
+			if !hasAction(rep, "installed", "y", "claude", "") || !strings.Contains(out.String(), "x: skipped: ") || !strings.Contains(out.String(), "not found upstream") {
+				t.Fatalf("report = %+v, out = %q", rep, out.String())
+			}
+			l, err := lock.Read(filepath.Join(e.project, "cali.lock"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, ok := l.Skills["x"]; ok || l.Skills["y"].Tree == "" {
+				t.Fatalf("lock = %+v", l)
+			}
+		})
+	}
+}
