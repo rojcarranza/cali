@@ -184,8 +184,28 @@ func TestStatusBaseLost(t *testing.T) {
 	}
 }
 
+func TestStatusShadowedNeedsGlobalFolder(t *testing.T) {
+	in, _, _ := fixture(t)
+	in.Global = manifest.Manifest{Version: 1, Targets: []string{"claude"}, Skills: map[string]manifest.Skill{
+		"x": {Source: "https://github.com/o/r//skills/x"},
+	}}
+	rows, _ := compute(t, in)
+	if len(rows) != 1 {
+		t.Fatalf("rows = %+v, want no shadowed row without the global folder", rows)
+	}
+}
+
 func TestStatusShadowed(t *testing.T) {
 	in, _, _ := fixture(t)
+	for _, tg := range []string{"claude", "copilot"} {
+		base, err := targets.Dir(tg, targets.Global, "", in.Home)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := skillTree("x").WriteTo(filepath.Join(base, "x")); err != nil {
+			t.Fatal(err)
+		}
+	}
 	in.Global = manifest.Manifest{Version: 1, Targets: []string{"claude", "copilot"}, Skills: map[string]manifest.Skill{
 		"x": {Source: "https://github.com/o/r//skills/x"},
 		"y": {Source: "https://github.com/o/r//skills/y"},

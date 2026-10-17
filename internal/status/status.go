@@ -166,7 +166,8 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 				if fi, err := os.Stat(filepath.Join(base, name)); err == nil && fi.IsDir() && !slices.Contains(installed[tg], name) {
 					installed[tg] = append(installed[tg], name)
 				}
-				if _, ok := in.Manifest.Skills[name]; ok && slices.Contains(in.Manifest.TargetsFor(name), tg) {
+				_, lerr := os.Lstat(filepath.Join(base, name))
+				if _, ok := in.Manifest.Skills[name]; ok && lerr == nil && slices.Contains(in.Manifest.TargetsFor(name), tg) {
 					rows = append(rows, Row{Skill: name, Target: tg, States: []State{Shadowed}, Detail: "global"})
 				}
 			}
