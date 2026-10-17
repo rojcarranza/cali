@@ -465,6 +465,9 @@ func TestUpdateSkipExitsNonZero(t *testing.T) {
 	if code, out, errs := run("update"); code != 1 || errs != "" || !strings.HasPrefix(out, "x: skipped: ") {
 		t.Fatalf("dry run: code=%d out=%q err=%q", code, out, errs)
 	}
+	if code, out, errs := run("update", "--json"); code != 1 || errs != "" || !json.Valid([]byte(out)) || !strings.Contains(out, `"problem"`) {
+		t.Fatalf("json: code=%d out=%q err=%q", code, out, errs)
+	}
 	if code, out, errs := run("update", "--apply"); code != 1 || errs != "" || !strings.HasPrefix(out, "kept x: skipped: ") {
 		t.Fatalf("apply: code=%d out=%q err=%q", code, out, errs)
 	}
