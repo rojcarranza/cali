@@ -188,6 +188,40 @@ func TestRemoveAbortsWhenFolderChangesDuringBackup(t *testing.T) {
 	}
 }
 
+func TestRemoveLeavesEveryTargetWhenOneChangesDuringBackup(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude", "copilot"}}); err != nil {
+		t.Fatal(err)
+	}
+	claude := filepath.Join(e.project, ".claude", "skills", "x")
+	copilot := filepath.Join(e.project, ".github", "skills", "x")
+	afterBackup = func(dir string) {
+		if dir == copilot {
+			write(t, dir, "SKILL.md", "late edit\n")
+		}
+	}
+	t.Cleanup(func() { afterBackup = nil })
+
+	if err := Remove(context.Background(), e.deps, "x", false); err == nil || !strings.Contains(err.Error(), copilot) {
+		t.Fatalf("err = %v, want abort naming %s", err, copilot)
+	}
+	if _, err := os.Stat(filepath.Join(claude, "SKILL.md")); err != nil {
+		t.Fatalf("claude folder removed although the remove stopped: %v", err)
+	}
+	if got := readFile(t, filepath.Join(copilot, "SKILL.md")); got != "late edit\n" {
+		t.Fatalf("copilot SKILL.md = %q", got)
+	}
+	for _, dir := range []string{filepath.Dir(claude), filepath.Dir(copilot)} {
+		ents, _ := os.ReadDir(dir)
+		for _, en := range ents {
+			if strings.HasPrefix(en.Name(), ".cali-") {
+				t.Errorf("leftover %s in %s", en.Name(), dir)
+			}
+		}
+	}
+}
+
 func TestRemoveAbortsOnLineEndingOnlyChangeDuringBackup(t *testing.T) {
 	r := monorepo(t)
 	e := newEnv(t)
