@@ -134,7 +134,10 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 	}
 	for i, old := range aside {
 		if err := os.RemoveAll(old); err != nil {
-			return fmt.Errorf("remove %s (moved to %s): %w", found[i].final, old, err)
+			cause := fmt.Errorf("remove %s (moved to %s): %w", found[i].final, old, err)
+			// Put the folders not yet removed back, so they are not stranded at .cali-old-*.
+			aside, found = aside[i+1:], found[i+1:]
+			return restore(cause)
 		}
 		_, _ = fmt.Fprintf(out, "removed %s (%s)\n", name, found[i].target)
 	}
