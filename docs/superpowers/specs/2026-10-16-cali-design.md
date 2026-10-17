@@ -195,7 +195,7 @@ Semantics: names only, no versions. A dependency is satisfied when a skill with 
 
 ## 8. Name clashes
 
-- Within a scope and target, an install name is unique (the manifest is a map). `add`/`sync` of a second source with an existing name fails: `name "x" already installed from <source>; remove it first or pass --replace`. `--replace` swaps the source and treats it as a fresh install (the old one goes to backups).
+- Within a scope and target, an install name is unique (the manifest is a map). `add`/`sync` of a second source with an existing name fails: `name "x" already installed from <source>; remove it first`. To switch a skill's source, run `cali remove x` (it backs the folders up first; `--force` when they have local edits) and then `cali add <new spec>`.
 - No alias option: the folder name has to equal the frontmatter `name`, and rewriting `SKILL.md` would make every install look edited.
 - Project vs global with the same name: allowed. `status` marks the global one `shadowed` (informational), since the project skill takes precedence in Claude Code.
 - A folder that already exists in the target and is not in the manifest (including APM leftovers) is `unmanaged`: `add`/`sync` never overwrite it. `--adopt` takes it over: if it is identical to upstream it just becomes managed; if it differs, it becomes managed and shows as `modified` against the pinned version.
@@ -257,4 +257,4 @@ Package layout, library choices (via the ADRs above), exact JSON output shapes, 
 | Monorepo subfolder, history per subfolder or per repo? | Per repo, with change detection per subfolder: the lock pins one repo commit plus the subfolder's tree SHA; a skill is outdated only if its own tree changed (sections 1, 4, 5). |
 | Where do pristine copies and cache live? | Section 2 and 5: pristine in `<data>`, git mirrors in `<cache>`. |
 | APM leftovers on import | Section 9: never deleted, reported `unmanaged`. |
-| Name clashes | Section 8: error, `--replace`, no aliases; project shadows global. |
+| Name clashes | Section 8: error (remove, then add the new source), no aliases; project shadows global. |
