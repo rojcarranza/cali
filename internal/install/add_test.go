@@ -492,6 +492,27 @@ func TestProjectRootStopsAtHome(t *testing.T) {
 	}
 }
 
+func TestProjectRootNeverHome(t *testing.T) {
+	e := newEnv(t)
+	home := e.deps.Dirs.Home
+	// A dotfiles repo (~/.git) and a ~/cali.yaml must not make HOME a project.
+	if err := os.Mkdir(filepath.Join(home, ".git"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(home, "cali.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cwd := filepath.Join(home, "work", "scratch")
+	if err := os.MkdirAll(cwd, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	e.deps.Cwd = cwd
+	sc, err := resolveScope(e.deps, false)
+	if err != nil || sc.root != cwd {
+		t.Fatalf("root = %s, %v; want cwd %s", sc.root, err, cwd)
+	}
+}
+
 func TestAddRefusesSymlinkInProjectTree(t *testing.T) {
 	r := monorepo(t)
 	e := newEnv(t)

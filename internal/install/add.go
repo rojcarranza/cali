@@ -108,21 +108,23 @@ func resolveScope(d Deps, global bool) (scope, error) {
 }
 
 // findRoot walks up from cwd: the first dir holding cali.yaml or .git is the
-// root. The walk never goes above home (a stray cali.yaml there must not
-// capture every project below); with no match the root is cwd.
+// root. The walk stops before home and never checks home itself (a dotfiles
+// ~/.git or a ~/cali.yaml must not make home, whose .claude/skills is the
+// global dir, the project); with no match the root is cwd.
 func findRoot(cwd, home string) string {
-	for dir := cwd; ; {
+	for dir := cwd; dir != home; {
 		for _, marker := range []string{"cali.yaml", ".git"} {
 			if _, err := os.Lstat(filepath.Join(dir, marker)); err == nil {
 				return dir
 			}
 		}
 		parent := filepath.Dir(dir)
-		if dir == home || parent == dir {
-			return cwd
+		if parent == dir {
+			break
 		}
 		dir = parent
 	}
+	return cwd
 }
 
 // noSymlinks refuses a symlink at any existing path component below root
