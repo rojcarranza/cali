@@ -40,6 +40,10 @@ func load(out io.Writer, global bool) (state, error) {
 	if err != nil {
 		return state{}, err
 	}
+	return loadFrom(d, global)
+}
+
+func loadFrom(d install.Deps, global bool) (state, error) {
 	loc, err := install.Locate(d, global)
 	if err != nil {
 		return state{}, err

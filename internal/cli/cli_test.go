@@ -359,3 +359,47 @@ func TestManifestFlagProjectSymlinkRefused(t *testing.T) {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 }
+
+// The global manifest that status compares against ignores --manifest.
+func TestManifestFlagProjectStatusIgnoresOverrideForGlobal(t *testing.T) {
+	_, project := setup(t)
+	home := os.Getenv("HOME")
+	files := map[string]string{
+		filepath.Join(project, "other", "cali.yaml"):                          "version: 1\ntargets: [claude]\nskills:\n  x:\n    source: github:o/r//skills/x\n    requires: [z]\n  z:\n    source: github:o/r//skills/z\n",
+		filepath.Join(project, "other", ".claude", "skills", "x", "SKILL.md"): "---\nname: x\ndescription: X.\n---\n",
+		// z exists only in the global dir and the real global manifest does not list it.
+		filepath.Join(home, ".claude", "skills", "z", "SKILL.md"): "---\nname: z\ndescription: Z.\n---\n",
+	}
+	for p, c := range files {
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(c), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	code, out, errs := run("status", "--offline", "--manifest", filepath.Join("other", "cali.yaml"))
+	if code != 0 || strings.Contains(out, "shadowed") || !strings.Contains(out, "WARN x requires z (missing)") {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+}
+
+func TestManifestFlagInHomeRefusedInProject(t *testing.T) {
+	repoURL, _ := setup(t)
+	home := os.Getenv("HOME")
+	if err := os.MkdirAll(home, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	mf := filepath.Join(home, "cali.yaml")
+	want := mf + ": a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g"
+	for _, args := range [][]string{{"add", "--manifest", mf, repoURL}, {"init", "--manifest", mf}} {
+		code, _, errs := run(args...)
+		if code != 1 || errs != "cali: "+want+"\n" {
+			t.Fatalf("%v: code=%d err=%q", args, code, errs)
+		}
+	}
+	ents, err := os.ReadDir(home)
+	if err != nil || len(ents) != 0 {
+		t.Fatalf("home not empty: %v %v", ents, err)
+	}
+}

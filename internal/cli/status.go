@@ -38,7 +38,9 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 				Warn:          cmd.ErrOrStderr(),
 			}
 			if !*global {
-				g, err := load(out, true)
+				gd := d
+				gd.Manifest = "" // --manifest names the project manifest, not the global one
+				g, err := loadFrom(gd, true)
 				if err != nil {
 					return err
 				}

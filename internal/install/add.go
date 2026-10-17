@@ -109,6 +109,9 @@ func resolveScope(d Deps, global bool) (scope, error) {
 			mf = filepath.Join(cwd, mf)
 		}
 		mf = filepath.Clean(mf)
+		if !global && filepath.Dir(mf) == filepath.Clean(d.Dirs.Home) {
+			return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", mf)
+		}
 		sc := scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
 		if global {
 			sc.scope, sc.root = targets.Global, ""
