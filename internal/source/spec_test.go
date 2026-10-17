@@ -183,3 +183,14 @@ func TestKey(t *testing.T) {
 		}
 	}
 }
+
+func TestKeyFileURLIsShortHash(t *testing.T) {
+	long := Spec{URL: "file://C:/very/long/" + strings.Repeat("deeply/nested/", 20) + "skills-repo"}
+	k := long.Key()
+	if len(k) != 21 || !strings.HasPrefix(k, "file/") || strings.Contains(k, ":") {
+		t.Fatalf("Key() = %q, want file/ + 16 hex chars", k)
+	}
+	if k != long.Key() || k == (Spec{URL: "file:///tmp/other"}).Key() {
+		t.Fatalf("Key() must be stable and distinct per path")
+	}
+}

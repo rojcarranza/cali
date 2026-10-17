@@ -3,6 +3,8 @@
 package source
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"strconv"
 	"strings"
@@ -183,10 +185,12 @@ func (s Spec) String() string {
 }
 
 // Key returns <host>/<owner>/<repo> (no .git suffix), used to name mirror dirs.
-// For file:// URLs it is "file/" plus the path.
+// For file:// URLs it is "file/" plus the first 16 hex chars of the SHA-256
+// of the path: short and free of ":" so Windows paths stay under MAX_PATH.
 func (s Spec) Key() string {
 	if rest, ok := strings.CutPrefix(s.URL, "file://"); ok {
-		return "file/" + strings.Trim(rest, "/")
+		sum := sha256.Sum256([]byte(rest))
+		return "file/" + hex.EncodeToString(sum[:])[:16]
 	}
 	rest := strings.TrimPrefix(s.URL, "https://")
 	return strings.TrimSuffix(rest, ".git")
