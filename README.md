@@ -10,7 +10,6 @@ Every `add` takes a spec, `<repo>//<folder>@<ref>`:
 
 ```
 github:rojcarranza/agent-skills//skills/roj-code-review-pr@main
-└──────── repo ───────────────┘  └──── skill folder ────┘ └ ref ┘
 ```
 
 - `<repo>` is `github:<owner>/<repo>` or a full `https://` URL.
@@ -55,7 +54,7 @@ cali update -g            # dry run: shows what would change
 cali update -g --apply    # writes it
 ```
 
-If you edited a skill locally, Cali merges upstream into your edit. When both changed the same lines it stops and reports a conflict. Keep your version (`--keep-mine`), take upstream (`--take-upstream`), or decide per file: `--resolve SKILL.md=ours|theirs|merge`.
+If you edited a skill locally, Cali merges upstream into your edit. When both changed the same lines it stops and reports a conflict. Keep your version (`--keep-mine`), take upstream (`--take-upstream`), or decide per file for one named skill: `cali update -g roj-grill-plan --apply --resolve SKILL.md=ours|theirs|merge`.
 
 **5. Remove one:**
 
@@ -128,7 +127,7 @@ Pass `--manifest` on every command. Without it, `cali status -g` reads the defau
 
 On every command: `-g` uses your home folder instead of the project, and `--manifest <path>` uses that `cali.yaml`, with `cali.lock` next to it.
 
-`update` and `sync` skip a skill whose ref or folder is gone upstream, or whose upstream folder is invalid. They report it, finish the rest, and exit 1.
+`update` and `sync` skip a skill whose ref or folder is gone upstream, or whose upstream folder is invalid. They report it, finish the rest, and exit 1. `update` also exits 1 when `cali.yaml` names a skill that is not in `cali.lock` yet, and tells you to `run cali sync`.
 
 ## Where things live
 

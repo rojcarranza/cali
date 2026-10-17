@@ -27,7 +27,7 @@ cali --version            # cali dev
 gh auth login
 ```
 
-Cali sends the token only to `github.com`, through git's environment, never on the command line. Without it, a private repo fails with `fatal: could not read Username for 'https://github.com': terminal prompts disabled`.
+Cali sends the token only to `github.com`, through git's environment, never on the command line. With no token and no git credential helper that knows github.com, a private repo fails with `fatal: could not read Username for 'https://github.com': terminal prompts disabled`.
 
 ### First run
 
@@ -73,18 +73,18 @@ v2.13.2 fails under Go 1.27.2 with `export data version 5 is greater than maximu
 
 ### Try a build without touching your real skills
 
-Point every Cali folder, and `HOME`, at a scratch folder. Then even `-g` writes there. Export the token first, because `gh` reads its login from the real `HOME`:
+Point every Cali folder, and `HOME`, at a scratch folder. Then even `-g` writes there. The parentheses run it in a subshell, so your own shell keeps its real `HOME`. The token is read first, because `gh` finds its login under the real `HOME`:
 
 ```sh
-export GITHUB_TOKEN="$(gh auth token)"
-export HOME="$PWD/tmp/home" CALI_CONFIG_DIR="$PWD/tmp/config" CALI_DATA_DIR="$PWD/tmp/data" CALI_CACHE_DIR="$PWD/tmp/cache"
-mkdir -p "$HOME"
-./bin/cali add -g github:rojcarranza/agent-skills --skill roj-grill-plan
-./bin/cali status -g
-ls tmp/home/.claude/skills
+(
+  export GITHUB_TOKEN="$(gh auth token)"
+  export HOME="$PWD/tmp/home" CALI_CONFIG_DIR="$PWD/tmp/config" CALI_DATA_DIR="$PWD/tmp/data" CALI_CACHE_DIR="$PWD/tmp/cache"
+  mkdir -p "$HOME"
+  ./bin/cali add -g github:rojcarranza/agent-skills --skill roj-grill-plan
+  ./bin/cali status -g
+  ls tmp/home/.claude/skills
+)
 ```
-
-Run it in a subshell, or open a new terminal afterwards, to get your real `HOME` back.
 
 ### Where to read first
 
