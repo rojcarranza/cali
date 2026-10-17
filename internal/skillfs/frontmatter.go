@@ -67,7 +67,7 @@ func ParseFrontmatter(data []byte) (Frontmatter, error) {
 		if v.Tag == "!!null" || (v.Kind == yaml.AliasNode && v.Alias.Tag == "!!null") {
 			continue
 		}
-		if err := v.Decode(&str); err != nil || v.Kind == yaml.MappingNode || v.Kind == yaml.SequenceNode {
+		if err := v.Decode(&str); err != nil {
 			if k == "cali-requires" {
 				return Frontmatter{}, errors.New("SKILL.md metadata.cali-requires must be a string of comma-separated skill names")
 			}
