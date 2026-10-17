@@ -84,6 +84,17 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 			return nil, err
 		}
 	}
+	// Read the config once and write only what is missing or different, so an
+	// existing mirror costs one git call and a half-configured one is repaired.
+	out, err := r.git(ctx, nil, "config", "--local", "-z", "--list")
+	if err != nil {
+		return nil, err
+	}
+	have := map[string]string{}
+	for _, rec := range strings.Split(string(out), "\x00") {
+		k, v, _ := strings.Cut(rec, "\n")
+		have[k] = v
+	}
 	for _, kv := range [][2]string{
 		{"core.repositoryformatversion", "1"},
 		{"extensions.partialclone", "origin"},
@@ -91,6 +102,9 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 		{"remote.origin.promisor", "true"},
 		{"remote.origin.partialclonefilter", "blob:none"},
 	} {
+		if v, ok := have[kv[0]]; ok && v == kv[1] {
+			continue
+		}
 		if _, err := r.git(ctx, nil, "config", kv[0], kv[1]); err != nil {
 			return nil, err
 		}

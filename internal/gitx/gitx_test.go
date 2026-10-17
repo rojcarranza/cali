@@ -414,3 +414,36 @@ func exportAt(r *Repo, commit, path string) (skillfs.Tree, error) {
 	}
 	return r.Export(tree)
 }
+
+func TestOpenWritesConfigOnlyWhenNeeded(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("a read-only directory does not stop writes on windows")
+	}
+	cache, spec := t.TempDir(), fixtureSpec(t, fixture(t))
+	r, err := Open(cache, spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A configured mirror needs no write: Open must succeed with the dir read-only.
+	if err := os.Chmod(r.Dir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Open(cache, spec); err != nil {
+		t.Fatalf("second Open wrote config: %v", err)
+	}
+	if err := os.Chmod(r.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	// A missing or changed value is written back.
+	git(t, r.Dir, "config", "--unset", "remote.origin.promisor")
+	git(t, r.Dir, "config", "remote.origin.url", "https://example.invalid/x")
+	if _, err := Open(cache, spec); err != nil {
+		t.Fatal(err)
+	}
+	if got := git(t, r.Dir, "config", "remote.origin.promisor"); got != "true" {
+		t.Errorf("promisor = %q", got)
+	}
+	if got := git(t, r.Dir, "config", "remote.origin.url"); got != spec.URL {
+		t.Errorf("url = %q, want %q", got, spec.URL)
+	}
+}
