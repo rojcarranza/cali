@@ -297,8 +297,10 @@ type entry struct {
 // Export reads the folder whose tree SHA is tree (from TreeSHA) into a Tree
 // straight from git blobs, so no checkout filter can alter the bytes. Symlinks and submodules
 // are errors naming the path. File count and sizes are checked against the
-// skillfs limits from the tree listing before any blob is read, and the
-// result is validated by skillfs.Validate.
+// skillfs limits from the tree listing before any blob is read into memory,
+// and the result is validated by skillfs.Validate. Blobs the blob-less
+// mirror lacks are downloaded first in one fetch (ls-tree -l needs them for
+// the sizes); only the file count is checked before that download.
 //
 // Fetch must have run on this Repo first: the mirror is blob-less, and the
 // auth environment given to Fetch is what lets git download blobs lazily.
@@ -307,6 +309,11 @@ func (r *Repo) Export(tree string) (skillfs.Tree, error) {
 		return nil, fmt.Errorf("invalid tree %q", tree)
 	}
 	ctx := context.Background()
+	if !r.offline {
+		if err := r.fetchMissing(ctx, tree); err != nil {
+			return nil, err
+		}
+	}
 	out, err := r.git(ctx, r.env, "ls-tree", "-r", "-z", "-l", tree)
 	if err != nil {
 		return nil, err
@@ -359,6 +366,40 @@ func (r *Repo) Export(tree string) (skillfs.Tree, error) {
 		return nil, err
 	}
 	return t, nil
+}
+
+// fetchMissing downloads every blob of tree the blob-less mirror lacks in one
+// fetch (the command git itself runs for a lazy fetch), instead of the one
+// lazy fetch per blob that ls-tree -l would trigger.
+func (r *Repo) fetchMissing(ctx context.Context, tree string) error {
+	out, err := r.git(ctx, r.env, "rev-list", "--objects", "--missing=print", tree)
+	if err != nil {
+		return err
+	}
+	var want strings.Builder
+	n := 0
+	for _, line := range strings.Split(string(out), "\n") {
+		if oid, ok := strings.CutPrefix(line, "?"); ok {
+			want.WriteString(oid + "\n")
+			n++
+		}
+	}
+	// Every missing object is a distinct blob, so n is at most the file count.
+	if n > limits.files {
+		return fmt.Errorf("skill has more than %d files", limits.files)
+	}
+	if n == 0 {
+		return nil
+	}
+	cmd := r.command(ctx, r.env, "--git-dir", r.Dir, "-c", "fetch.negotiationAlgorithm=noop",
+		"fetch", "-q", "--no-tags", "--no-write-fetch-head", "--recurse-submodules=no", "--filter=blob:none", "--stdin", "origin")
+	cmd.Stdin = strings.NewReader(want.String())
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("git fetch of missing blobs: %w: %s", err, sanitize(stderr.String(), r.env))
+	}
+	return nil
 }
 
 // readBlobs reads every entry through one git cat-file --batch process. Each

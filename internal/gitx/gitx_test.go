@@ -218,9 +218,19 @@ func TestFilteredFetchIsBlobless(t *testing.T) {
 		t.Fatalf("fetch was not blob-less, no missing objects:\n%s", out)
 	}
 	c, _ := r.Resolve("")
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
 	tr, err := exportAt(r, c, "skills/a")
 	if err != nil || len(tr) != 2 {
 		t.Fatalf("Export over lazy fetch = %v, %v", tr, err)
+	}
+	// Both missing blobs come down in one fetch, not one fetch per blob.
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := strings.Count(string(log), "built-in: git fetch"); n != 1 {
+		t.Errorf("Export ran %d fetches, want 1:\n%s", n, log)
 	}
 	if string(tr[0].Data) != "---\nname: a\n---\r\nline\r\n" {
 		t.Fatalf("bytes = %q", tr[0].Data)
