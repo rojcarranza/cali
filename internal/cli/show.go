@@ -63,7 +63,8 @@ func newShowCmd(out io.Writer, global *bool) *cobra.Command {
 					"commit": e.Commit, "tree": e.Tree, "targets": tgts, "requires": req,
 				})
 			}
-			w := func(k, v string) { _, _ = io.WriteString(out, k+": "+v+"\n") }
+			// Values come from a possibly cloned manifest and a repo's SKILL.md: strip control characters.
+			w := func(k, v string) { _, _ = io.WriteString(out, k+": "+render.Sanitize(v)+"\n") }
 			w("name", name)
 			w("source", sk.Source)
 			w("ref", sk.Ref)

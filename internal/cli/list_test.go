@@ -140,6 +140,19 @@ func TestShow(t *testing.T) {
 	}
 }
 
+func TestShowStripsControlCharacters(t *testing.T) {
+	_, project := setup(t)
+	writeFixture(t, project)
+	md := filepath.Join(project, ".claude", "skills", "b", "SKILL.md")
+	if err := os.WriteFile(md, []byte("---\nname: b\ndescription: B.\nmetadata:\n  cali-requires: \"x\\e[31m\"\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := run("show", "b")
+	if code != 0 || strings.Contains(out, "\x1b") || !strings.Contains(out, "requires: a,x[31m") {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+}
+
 func TestListNoManifest(t *testing.T) {
 	setup(t)
 	for _, args := range [][]string{{"list"}, {"list", "-g"}} {

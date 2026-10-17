@@ -79,7 +79,7 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 				seen := map[string]bool{}
 				for _, w := range warns {
 					// One line per skill and dependency, even when several targets lack it.
-					line := "WARN " + w.Skill + " requires " + w.Missing + " (missing)\n"
+					line := "WARN " + w.Skill + " requires " + render.Sanitize(w.Missing) + " (missing)\n" // Missing comes from SKILL.md metadata
 					if !seen[line] {
 						seen[line] = true
 						_, err = io.WriteString(out, line)
