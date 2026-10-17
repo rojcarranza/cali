@@ -108,6 +108,8 @@ func TestCanonicalURL(t *testing.T) {
 		"github:o/r.git",
 		"https://github.com/o/r.git",
 		"https://GitHub.com/o/r",
+		"github:O/R",
+		"https://github.com/O/R.git",
 	} {
 		s, err := Parse(in)
 		if err != nil {
@@ -119,6 +121,16 @@ func TestCanonicalURL(t *testing.T) {
 		if s.Key() != "github.com/o/r" {
 			t.Errorf("Parse(%q).Key() = %q", in, s.Key())
 		}
+	}
+}
+
+func TestOtherHostsKeepOwnerRepoCase(t *testing.T) {
+	s, err := Parse("https://git.example.com/O/R")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.URL != "https://git.example.com/O/R" {
+		t.Errorf("URL = %q", s.URL)
 	}
 }
 
