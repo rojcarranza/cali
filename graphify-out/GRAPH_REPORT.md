@@ -1,16 +1,16 @@
-# Graph Report - cali  (2026-10-18)
+# Graph Report - agent-skills-same-repo-sources-d6fc21  (2026-10-18)
 
 ## Corpus Check
-- 83 files · ~71,812 words
+- 83 files · ~71,709 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 823 nodes · 2859 edges · 24 communities (20 shown, 4 thin omitted)
-- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 524 edges (avg confidence: 0.85)
+- 822 nodes · 2857 edges · 25 communities (21 shown, 4 thin omitted)
+- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 525 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c129ca2f`
+- Built from commit: `5dcc99aa`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,10 +24,11 @@
 - classify_test.go
 - testing.T
 - Cali Brief
-- manifest.go
+- ParseWith
 - Validate
 - Cali design
-- add.go
+- plan_test.go
+- ParseFrontmatter
 - ADR 0006: Copilot target paths
 - ADR 0003: CLI framework
 - ADR 0004: Terminal styling, spinner and prompts
@@ -71,47 +72,47 @@
 - **Read-only review subagents** — _claude_agents_architecture_guardian_architecture_guardian, _claude_agents_security_reviewer_security_reviewer, _claude_agents_test_auditor_test_auditor [EXTRACTED 1.00]
 - **Safe update: pristine base + git merge-file + conflict flags** — docs_adr_0005_on_disk_layout_pristine_store, docs_adr_0001_system_git_git_merge_file, readme_update_conflict_resolution, docs_brief_safe_updates [INFERRED 0.85]
 
-## Communities (24 total, 4 thin omitted)
+## Communities (25 total, 4 thin omitted)
 
 ### Community 0 - "Repo"
 Cohesion: 0.06
-Nodes (55): Hit, entry, context.Context, os/exec.Cmd, Search(), repo(), repoFilter(), skill() (+47 more)
+Nodes (68): entry, context.Context, os/exec.Cmd, AddRequest, Installed, plan, Result, scope (+60 more)
 
 ### Community 1 - "Add"
 Cohesion: 0.11
-Nodes (85): Action, env, Report, Add(), Init(), exists(), fileURL(), git() (+77 more)
+Nodes (87): Action, env, Report, Add(), checkScopeFiles(), LockCommit(), place(), exists() (+79 more)
 
 ### Community 2 - "setup"
 Cohesion: 0.12
-Nodes (61): Locate(), ReadWith(), backupDir(), conflictAndClean(), exact(), failSecondStaging(), Options, fx (+53 more)
+Nodes (59): Locate(), ReadWith(), backupDir(), conflictAndClean(), exact(), failSecondStaging(), Options, fx (+51 more)
 
 ### Community 3 - "Milestone 1: Walking skeleton (target 2026-10-30)"
 Cohesion: 0.08
 Nodes (25): Cali MVP Implementation Plan, Global Constraints, Milestone 1: Walking skeleton (target 2026-10-30), Milestone 2: Daily commands (target 2026-11-13), Milestone 3: Safe update and APM import (target 2026-11-27), Review Focus, Self-review notes, Task 10: `status` (+17 more)
 
 ### Community 4 - "fixture"
-Cohesion: 0.11
-Nodes (47): bytes.Buffer, Check(), Warning, V, Requires(), sortedKeys(), TestCheckMissingReportedPerTarget(), TestCheckSatisfiedByGlobal() (+39 more)
+Cohesion: 0.10
+Nodes (48): bytes.Buffer, Check(), Warning, V, Requires(), sortedKeys(), TestCheckMissingReportedPerTarget(), TestCheckSatisfiedByGlobal() (+40 more)
 
 ### Community 5 - "io.Writer"
 Cohesion: 0.09
 Nodes (37): huhPrompter, state, main(), TestMainExitsZeroOnVersion(), github.com/spf13/cobra.Command, io.Writer, deps(), Execute() (+29 more)
 
 ### Community 6 - "classify_test.go"
-Cohesion: 0.06
-Nodes (81): allDisjoint(), binary(), Classify(), edits(), frontmatter(), Class, Recommendation, inFrontmatter() (+73 more)
+Cohesion: 0.11
+Nodes (42): allDisjoint(), binary(), Classify(), edits(), frontmatter(), Class, Recommendation, inFrontmatter() (+34 more)
 
 ### Community 7 - "testing.T"
-Cohesion: 0.08
-Nodes (69): testing.T, agentSkills(), copyFile(), installedAsDeclared(), TestAgentSkillsFrozenSync(), TestAgentSkillsLockIsCurrent(), TestAgentSkillsNewSkill(), gitRun() (+61 more)
+Cohesion: 0.07
+Nodes (81): testing.T, agentSkills(), installedAsDeclared(), TestAgentSkillsFrozenSync(), TestAgentSkillsLockIsCurrent(), TestAgentSkillsNewSkill(), gitRun(), run() (+73 more)
 
 ### Community 8 - "Cali Brief"
 Cohesion: 0.08
 Nodes (34): architecture-guardian agent, security-reviewer agent, test-auditor agent, CI workflow (vet, lint, test, install script on 3 OSes), golangci-lint v2 config (standard linters), Cali project rules (TDD, ADRs, PR workflow), 3-way merge via git merge-file --diff3, ADR 0001: Shell out to system git (+26 more)
 
-### Community 9 - "manifest.go"
-Cohesion: 0.16
-Nodes (30): copyComments(), ensureMapping(), Manifest, Skill, markFlow(), Read(), removeKey(), render() (+22 more)
+### Community 9 - "ParseWith"
+Cohesion: 0.12
+Nodes (39): copyComments(), ensureMapping(), Manifest, Skill, markFlow(), Read(), removeKey(), render() (+31 more)
 
 ### Community 10 - "Validate"
 Cohesion: 0.24
@@ -121,9 +122,13 @@ Nodes (11): os.FileMode, ensureDirs(), Tree, Tree, quote(), safePath(), Validate
 Cohesion: 0.10
 Nodes (21): 10. Commands (behavior contracts), 11. Anti-goals, deferred, and ADRs, 12. Left to the builder, 13. How the brief's questions were closed, 1. Model, 2. Files and where they live, 3. `cali.yaml` (manifest, hand-editable), 4. `cali.lock` (generated, deterministic) (+13 more)
 
-### Community 13 - "add.go"
-Cohesion: 0.10
-Nodes (33): AddRequest, Installed, plan, Result, scope, checkScopeFiles(), findRoot(), host() (+25 more)
+### Community 12 - "plan_test.go"
+Cohesion: 0.21
+Nodes (22): TestClassifyDeleteVsModifyFromPlan(), byPath(), f(), markerLines(), plan(), TestPlanAddAddConflict(), TestPlanBinaryBothChangedConflict(), TestPlanDeleteVsModifyConflict() (+14 more)
+
+### Community 13 - "ParseFrontmatter"
+Cohesion: 0.19
+Nodes (17): Hit, Search(), repo(), repoFilter(), skill(), TestSearchDepthLimit(), TestSearchMatchesDescription(), TestSearchNoRegistry() (+9 more)
 
 ### Community 14 - "ADR 0006: Copilot target paths"
 Cohesion: 0.33
@@ -147,7 +152,7 @@ Nodes (12): Dirs, join(), pick(), Resolve(), resolveWindows(), check(), envOf(),
 
 ### Community 20 - "Tree"
 Cohesion: 0.05
-Nodes (83): Save(), fixedNow(), TestSaveAppendsSuffixOnCollision(), TestSaveCreatesMissingDataDir(), TestSaveDirsArePrivate(), TestSaveRejectsBadName(), TestSaveUserTreeBreakingUpstreamRules(), TestSaveWithoutPatchWritesNoPatchFile() (+75 more)
+Nodes (80): Save(), fixedNow(), TestSaveAppendsSuffixOnCollision(), TestSaveCreatesMissingDataDir(), TestSaveDirsArePrivate(), TestSaveRejectsBadName(), TestSaveUserTreeBreakingUpstreamRules(), TestSaveWithoutPatchWritesNoPatchFile() (+72 more)
 
 ### Community 23 - "install.sh"
 Cohesion: 0.83
@@ -161,11 +166,11 @@ Nodes (3): die(), say(), install.sh script
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Repo` connect `Repo` to `add.go`, `io.Writer`?**
+- **Why does `Repo` connect `Repo` to `Add`, `fixture`, `ParseFrontmatter`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `Sync()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `add.go`, `Tree`?**
+- **Why does `Sync()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `ParseWith`, `Tree`?**
   _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `Add()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `add.go`, `Tree`?**
+- **Why does `Add()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `ParseWith`, `Tree`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Are the 31 inferred relationships involving `Add()` (e.g. with `TestAddAdoptsIdenticalFolder()` and `TestAddDefaultTargetsWritesBoth()`) actually correct?**
   _`Add()` has 31 INFERRED edges - model-reasoned connections that need verification._
