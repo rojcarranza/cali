@@ -492,3 +492,36 @@ func TestUpdateNotLockedExitsNonZero(t *testing.T) {
 		}
 	}
 }
+
+// A skills repo that lists its own skills (.//path) in its committed
+// manifest, installed globally as agent-skills' install.py does.
+func TestSameRepoManifestGlobal(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	mf := filepath.Join(repo, "cali.yaml")
+	cali := func(wantCode int, want string, args ...string) {
+		t.Helper()
+		code, out, errs := run(append(args, "-g", "--manifest", mf)...)
+		if code != wantCode || !strings.Contains(out+errs, want) {
+			t.Fatalf("%v: code=%d out=%q err=%q", args, code, out, errs)
+		}
+	}
+	cali(0, "installed x", "add", ".//skills/x", "--target", "claude")
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "manifest and lock")
+	cali(0, "ok", "status", "--exit-code")
+
+	// The skill changes in a commit that leaves the lock behind.
+	if err := os.WriteFile(filepath.Join(repo, "skills", "x", "more.md"), []byte("more\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "more")
+	cali(1, "outdated", "status", "--exit-code")
+	cali(1, "behind the repo, run cali update: x", "sync", "--frozen")
+	cali(0, "updated x - -> ", "update", "--apply")
+	cali(0, "", "sync", "--frozen")
+	if _, err := os.Stat(filepath.Join(os.Getenv("HOME"), ".claude", "skills", "x", "more.md")); err != nil {
+		t.Fatal(err)
+	}
+}
