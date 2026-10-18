@@ -57,6 +57,7 @@ type SkillPlan struct {
 	Targets                                []TargetPlan
 	base, theirs                           skillfs.Tree
 	ref, fromRef                           string       // effective manifest ref (written to the lock) and the locked one
+	lockCommit                             string       // ToCommit as the lock records it
 	lost                                   []TargetPlan // BaseLost only: the folders --take-upstream replaces
 }
 
@@ -178,7 +179,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
 			continue
 		}
-		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref}
+		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref, lockCommit: repo.LockCommit(commit)}
 		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil && !errors.Is(err, gitx.ErrNotFound) {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		} else if err != nil {

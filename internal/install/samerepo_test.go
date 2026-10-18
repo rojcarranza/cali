@@ -140,3 +140,21 @@ func TestAddSameRepo(t *testing.T) {
 		t.Fatalf("lock entry = %+v", e)
 	}
 }
+
+func TestAddSameRepoAllSkipsInstalledCopies(t *testing.T) {
+	isolate(t)
+	e := newEnv(t)
+	git(t, e.project, "init", "-q", "-b", "main")
+	// A project that commits its installed skills: the copy under .claude is not a source.
+	write(t, e.project, "skills/w/SKILL.md", skillMD("w"))
+	write(t, e.project, ".claude/skills/w/SKILL.md", skillMD("w"))
+	git(t, e.project, "add", ".")
+	git(t, e.project, "commit", "-q", "-m", "one")
+	res, err := Add(context.Background(), e.deps, AddRequest{Spec: ".", All: true, Targets: []string{"claude"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Skills) != 1 || res.Skills[0].Path != "skills/w" {
+		t.Fatalf("skills = %+v", res.Skills)
+	}
+}

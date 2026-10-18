@@ -333,7 +333,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	res := Result{Manifest: sc.manifest, Created: created}
 	for _, pl := range plans {
 		m.Skills[pl.name] = manifest.Skill{Source: pl.source, Ref: spec.Ref, Targets: pl.skillTargets}
-		l.Skills[pl.name] = lock.Entry{Source: spec.URL, Path: pl.path, Ref: spec.Ref, Commit: LockCommit(spec.URL, commit), Tree: pl.tree}
+		l.Skills[pl.name] = lock.Entry{Source: spec.URL, Path: pl.path, Ref: spec.Ref, Commit: repo.LockCommit(commit), Tree: pl.tree}
 		res.Skills = append(res.Skills, Installed{
 			Name: pl.name, Path: pl.path, Commit: commit, Tree: pl.tree,
 			Dirs: pl.write, Adopted: pl.adopt,
@@ -590,6 +590,10 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 	if err != nil {
 		return nil, err
 	}
+	if repo.Local() {
+		// Hidden folders hold installed copies (.claude/skills, .github/skills), not sources.
+		found = slices.DeleteFunc(found, func(p string) bool { return strings.HasPrefix(p, ".") })
+	}
 	if len(found) == 0 {
 		return nil, fmt.Errorf("no SKILL.md found in %s (searched %d levels deep)", spec.URL, maxScanDepth)
 	}
@@ -653,17 +657,6 @@ func manifestSource(raw string, spec source.Spec, p string) string {
 		s += "//" + p
 	}
 	return s
-}
-
-// LockCommit is the commit a lock entry records for a skill read at commit
-// from url: none for a same-repo source, because the commit that will hold
-// the lock does not exist yet and a squash merge drops the branch's commits.
-// The tree alone identifies the skill.
-func LockCommit(url, commit string) string {
-	if url == source.Here {
-		return ""
-	}
-	return commit
 }
 
 func host(rawURL string) string {
