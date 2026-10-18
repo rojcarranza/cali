@@ -222,3 +222,33 @@ func TestSameURLFoldsOldLockEntries(t *testing.T) {
 		t.Error("file URL with @ does not match itself")
 	}
 }
+
+func TestParseSameRepo(t *testing.T) {
+	cases := map[string]Spec{
+		".//skills/x": {URL: Here, Path: "skills/x"},
+		".":           {URL: Here},
+	}
+	for in, want := range cases {
+		got, err := Parse(in)
+		if err != nil {
+			t.Errorf("Parse(%q) error: %v", in, err)
+			continue
+		}
+		if got != want {
+			t.Errorf("Parse(%q) = %+v, want %+v", in, got, want)
+		}
+		if got.String() != in {
+			t.Errorf("String() = %q, want %q", got.String(), in)
+		}
+	}
+	for in, msg := range map[string]string{
+		".//skills/x@main": "no ref",
+		".//../x":          "..",
+		".///x":            "leading",
+		"./skills/x":       "unsupported",
+	} {
+		if _, err := Parse(in); err == nil || !strings.Contains(err.Error(), msg) {
+			t.Errorf("Parse(%q) error = %v, want one naming %q", in, err, msg)
+		}
+	}
+}
