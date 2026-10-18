@@ -591,8 +591,11 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 		return nil, err
 	}
 	if repo.Local() {
-		// Hidden folders hold installed copies (.claude/skills, .github/skills), not sources.
-		found = slices.DeleteFunc(found, func(p string) bool { return strings.HasPrefix(p, ".") })
+		// Installed copies a project commits (<root>/.claude/skills, .github/skills) are not sources.
+		found = slices.DeleteFunc(found, func(p string) bool {
+			p = "/" + p + "/"
+			return strings.Contains(p, "/.claude/skills/") || strings.Contains(p, "/.github/skills/")
+		})
 	}
 	if len(found) == 0 {
 		return nil, fmt.Errorf("no SKILL.md found in %s (searched %d levels deep)", spec.URL, maxScanDepth)

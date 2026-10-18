@@ -148,13 +148,15 @@ func TestAddSameRepoAllSkipsInstalledCopies(t *testing.T) {
 	// A project that commits its installed skills: the copy under .claude is not a source.
 	write(t, e.project, "skills/w/SKILL.md", skillMD("w"))
 	write(t, e.project, ".claude/skills/w/SKILL.md", skillMD("w"))
+	write(t, e.project, "app/.github/skills/w/SKILL.md", skillMD("w")) // a sub-project's copy
+	write(t, e.project, ".agents/skills/v/SKILL.md", skillMD("v"))      // a hidden folder can hold sources
 	git(t, e.project, "add", ".")
 	git(t, e.project, "commit", "-q", "-m", "one")
 	res, err := Add(context.Background(), e.deps, AddRequest{Spec: ".", All: true, Targets: []string{"claude"}})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(res.Skills) != 1 || res.Skills[0].Path != "skills/w" {
+	if len(res.Skills) != 2 || res.Skills[0].Path != ".agents/skills/v" || res.Skills[1].Path != "skills/w" {
 		t.Fatalf("skills = %+v", res.Skills)
 	}
 }
