@@ -1,1 +1,26 @@
-{"0": "Git Repo Access", "1": "Install Add Flow", "2": "Lockfile and Update Tests", "3": "MVP Plan and Design Spec", "4": "Dependency Checks and Status", "5": "CLI Commands", "6": "Conflict Classification", "7": "End-to-End CLI Tests", "8": "ADRs Agents and Project Docs", "9": "Manifest YAML Editing", "10": "Skill Tree Diffing", "11": "Merge Plan Tests", "12": "Source Spec Parsing", "13": "Skill Search and Frontmatter", "14": "Tree Index and Line Diffs", "15": "Update Proposal Output", "16": "Safe Path Validation", "17": "Update Apply and Staging", "18": "Three-Way Merge Planner", "19": "Directory Resolution", "20": "Backups", "21": "Pristine Store", "22": "Cross-OS Golden Test", "23": "Install Script", "24": "Protected-File Hook", "25": "Go Post-Edit Hook", "26": "Stop Tests Hook", "27": "Go Module"}
+{
+  "0": "add.go",
+  "1": "Add",
+  "2": "testing.T",
+  "3": "Milestone 1: Walking skeleton (target 2026-10-30)",
+  "4": "fixture",
+  "5": "Apply",
+  "6": "Tree",
+  "7": "run",
+  "8": "Cali Brief",
+  "9": "manifest.go",
+  "10": "Equal",
+  "11": "Cali design",
+  "12": "ParseWith",
+  "13": "Write",
+  "14": "ADR 0006: Copilot target paths",
+  "15": "ADR 0003: CLI framework",
+  "16": "ADR 0004: Terminal styling, spinner and prompts",
+  "17": "ADR 0007: Same-repo sources",
+  "19": "Resolve",
+  "23": "install.sh",
+  "24": "block-protected.sh",
+  "25": "post-edit-go.sh",
+  "26": "stop-tests.sh",
+  "27": "github.com/rojcarranza/cali"
+}
