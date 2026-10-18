@@ -112,35 +112,6 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			refChanged = append(refChanged, n)
 		}
 	}
-	for n := range l.Skills {
-		if _, ok := m.Skills[n]; !ok {
-			stale = append(stale, n)
-		}
-	}
-	slices.Sort(names)
-	slices.Sort(missing)
-	slices.Sort(stale)
-	slices.Sort(refChanged)
-	if frozen && (len(missing) > 0 || len(stale) > 0 || len(refChanged) > 0) {
-		var why []string
-		if len(missing) > 0 {
-			why = append(why, "not locked, or locked with another source or path: "+strings.Join(missing, ", "))
-		}
-		if len(refChanged) > 0 {
-			why = append(why, "ref changed in the manifest, run cali update: "+strings.Join(refChanged, ", "))
-		}
-		if len(stale) > 0 {
-			why = append(why, "no longer in the manifest: "+strings.Join(stale, ", "))
-		}
-		return Report{}, fmt.Errorf("%s needs changes (%s); run sync without --frozen", sc.lockPath, strings.Join(why, "; "))
-	}
-
-	newL := lock.Lock{Version: l.Version, Skills: map[string]lock.Entry{}}
-	for n, e := range l.Skills {
-		if _, ok := m.Skills[n]; ok && !slices.Contains(missing, n) {
-			newL.Skills[n] = e
-		}
-	}
 	repos := map[string]*gitx.Repo{}
 	fetch := func(spec source.Spec) (*gitx.Repo, error) {
 		if r, ok := repos[spec.URL]; ok {
@@ -151,6 +122,58 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			repos[spec.URL] = r
 		}
 		return r, err
+	}
+	// A same-repo lock entry falls behind when the skill changes in a commit
+	// that does not also move the lock; it is reported, and update moves it.
+	var behind []string
+	for n, spec := range specs {
+		if spec.URL != source.Here || slices.Contains(missing, n) || slices.Contains(refChanged, n) {
+			continue
+		}
+		repo, err := fetch(spec)
+		if err != nil {
+			return Report{}, err
+		}
+		commit, err := repo.Resolve("")
+		if err != nil {
+			return Report{}, fmt.Errorf("skill %s: %w", n, err)
+		}
+		if tree, err := repo.TreeSHA(commit, l.Skills[n].Path); err != nil || tree != l.Skills[n].Tree {
+			behind = append(behind, n) // a folder gone from HEAD is behind too
+		}
+	}
+	for n := range l.Skills {
+		if _, ok := m.Skills[n]; !ok {
+			stale = append(stale, n)
+		}
+	}
+	slices.Sort(names)
+	slices.Sort(behind)
+	slices.Sort(missing)
+	slices.Sort(stale)
+	slices.Sort(refChanged)
+	if frozen && (len(missing) > 0 || len(stale) > 0 || len(refChanged) > 0 || len(behind) > 0) {
+		var why []string
+		if len(missing) > 0 {
+			why = append(why, "not locked, or locked with another source or path: "+strings.Join(missing, ", "))
+		}
+		if len(refChanged) > 0 {
+			why = append(why, "ref changed in the manifest, run cali update: "+strings.Join(refChanged, ", "))
+		}
+		if len(stale) > 0 {
+			why = append(why, "no longer in the manifest: "+strings.Join(stale, ", "))
+		}
+		if len(behind) > 0 {
+			why = append(why, "locked tree is behind the repo, run cali update: "+strings.Join(behind, ", "))
+		}
+		return Report{}, fmt.Errorf("%s needs changes (%s); run sync without --frozen", sc.lockPath, strings.Join(why, "; "))
+	}
+
+	newL := lock.Lock{Version: l.Version, Skills: map[string]lock.Entry{}}
+	for n, e := range l.Skills {
+		if _, ok := m.Skills[n]; ok && !slices.Contains(missing, n) {
+			newL.Skills[n] = e
+		}
 	}
 
 	var rep Report
@@ -196,9 +219,12 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			if err := store.Put(d.Dirs.Data, tree, t); err != nil {
 				return Report{}, fmt.Errorf("store pristine copy of %s: %w", n, err)
 			}
-			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: commit, Tree: tree}
+			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: LockCommit(spec.URL, commit), Tree: tree}
 			trees[n] = t
 			continue
+		}
+		if slices.Contains(behind, n) {
+			rep.Actions = append(rep.Actions, Action{Kind: "outdated", Name: n, Detail: "run cali update"})
 		}
 		e := l.Skills[n]
 		t, ok, err := store.Get(d.Dirs.Data, e.Tree)
@@ -210,16 +236,25 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			if err != nil {
 				return Report{}, err
 			}
-			if !repo.HasCommit(e.Commit) {
-				rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
-				continue
-			}
-			tree, err := repo.TreeSHA(e.Commit, e.Path)
-			if err != nil {
-				return Report{}, err
-			}
-			if tree != e.Tree {
-				return Report{}, fmt.Errorf("skill %s: tree at commit %s is %s, but the lock says %s", n, e.Commit, tree, e.Tree)
+			tree := e.Tree
+			if spec.URL == source.Here {
+				// No commit to check against: the tree is read by its SHA,
+				// which names its content.
+				if !repo.HasTree(tree) {
+					rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
+					continue
+				}
+			} else {
+				if !repo.HasCommit(e.Commit) {
+					rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
+					continue
+				}
+				if tree, err = repo.TreeSHA(e.Commit, e.Path); err != nil {
+					return Report{}, err
+				}
+				if tree != e.Tree {
+					return Report{}, fmt.Errorf("skill %s: tree at commit %s is %s, but the lock says %s", n, e.Commit, tree, e.Tree)
+				}
 			}
 			et, err := exportTree(repo, tree, n) // only after the check: no blobs fetched for a mismatched tree
 			if errors.Is(err, skillfs.ErrInvalid) {
