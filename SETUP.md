@@ -73,6 +73,15 @@ v2.13.2 fails under Go 1.27.2 with `export data version 5 is greater than maximu
 
 `bin/` is build output. Keep it out of git with `.git/info/exclude`, not `.gitignore`.
 
+`graphify-out/` holds a committed knowledge graph of the code (see the graphify section of `CLAUDE.md`). To query or refresh it, install graphify:
+
+```sh
+uv tool install graphifyy   # or: pipx install graphifyy
+graphify update .           # re-extract changed code, no API key needed
+```
+
+Commit only `graph.json`, `graph.html`, `GRAPH_REPORT.md`, `manifest.json` and `.graphify_labels.json`. The other files in `graphify-out/` hold paths for one machine.
+
 ### Try a build without touching your real skills
 
 Point every Cali folder, and `HOME`, at a scratch folder. Then even `-g` writes there. The parentheses run it in a subshell, so your own shell keeps its real `HOME`. The token is read first, because `gh` finds its login under the real `HOME`:
