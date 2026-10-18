@@ -186,9 +186,9 @@
     "semantic_hash": "9c91ad145b6aea6a394cd11a64f06105"
   },
   "internal/install/add.go": {
-    "mtime": 1792331969.9575455,
-    "seen": 1792331998.621003,
-    "ast_hash": "87d7f59c72b30f97353b0db5ec99a821",
+    "mtime": 1792336231.9848382,
+    "seen": 1792336261.3268962,
+    "ast_hash": "c0117406b09d990f20f08e562ff877a1",
     "semantic_hash": ""
   },
   "internal/install/add_test.go": {
@@ -498,9 +498,9 @@
     "semantic_hash": ""
   },
   "internal/install/samerepo_test.go": {
-    "mtime": 1792331953.6744258,
-    "seen": 1792331998.621006,
-    "ast_hash": "7849a1c62413c52c48af244297320b10",
+    "mtime": 1792336231.98516,
+    "seen": 1792336261.3269,
+    "ast_hash": "d2dedc8ebb69d3629c27bc40b46b269c",
     "semantic_hash": ""
   },
   "docs/adr/0007-same-repo-sources.md": {
