@@ -260,6 +260,18 @@ func (r *Repo) HasCommit(commit string) bool {
 	return err == nil
 }
 
+// Local reports whether r is a repository opened in place by OpenLocal.
+func (r *Repo) Local() bool { return r.head != "" }
+
+// HasLocked reports whether a lock entry's content can still be read: its
+// tree for a local repository (which locks no commit), else its commit.
+func (r *Repo) HasLocked(commit, tree string) bool {
+	if r.Local() {
+		return r.HasTree(tree)
+	}
+	return r.HasCommit(commit)
+}
+
 // HasTree reports whether tree exists in the repository as a tree object.
 func (r *Repo) HasTree(tree string) bool {
 	if !hex40.MatchString(tree) {

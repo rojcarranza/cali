@@ -225,7 +225,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			if err := store.Put(d.Dirs.Data, tree, t); err != nil {
 				return Report{}, fmt.Errorf("store pristine copy of %s: %w", n, err)
 			}
-			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: LockCommit(spec.URL, commit), Tree: tree}
+			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: LockCommit(repo, commit), Tree: tree}
 			trees[n] = t
 			continue
 		}
@@ -242,19 +242,12 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			if err != nil {
 				return Report{}, err
 			}
+			if !repo.HasLocked(e.Commit, e.Tree) {
+				rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
+				continue
+			}
 			tree := e.Tree
-			if spec.URL == source.Here {
-				// No commit to check against: the tree is read by its SHA,
-				// which names its content.
-				if !repo.HasTree(tree) {
-					rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
-					continue
-				}
-			} else {
-				if !repo.HasCommit(e.Commit) {
-					rep.Actions = append(rep.Actions, Action{Kind: "base-lost", Name: n})
-					continue
-				}
+			if !repo.Local() { // a local entry has no commit: its tree SHA names its content
 				if tree, err = repo.TreeSHA(e.Commit, e.Path); err != nil {
 					return Report{}, err
 				}
