@@ -124,6 +124,9 @@ func TestAgentSkillsNewSkill(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := strings.Replace(string(b), "\nskills:\n", "\nskills:\n  roj-new-skill:\n    source: .//skills/roj-new-skill\n", 1)
+	if s == string(b) {
+		t.Fatal("cali.yaml has no \"\\nskills:\\n\" line to add the skill under")
+	}
 	if err := os.WriteFile(mp, []byte(s), 0o644); err != nil {
 		t.Fatal(err)
 	}
