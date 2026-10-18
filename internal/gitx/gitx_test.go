@@ -492,3 +492,33 @@ func TestFetchFallsBackOnlyWhenTheFilterIsRejected(t *testing.T) {
 		t.Errorf("fell back to a full fetch:\n%s", log)
 	}
 }
+
+func TestOpenLocalReadsCheckedOutHead(t *testing.T) {
+	dir := fixture(t)
+	// A linked worktree on another branch: its HEAD, not main's, is the one read.
+	wt := filepath.Join(t.TempDir(), "wt")
+	git(t, dir, "worktree", "add", "-q", "-b", "feature", wt)
+	write(t, wt, "skills/c/SKILL.md", "c\n", 0o644)
+	git(t, wt, "add", ".")
+	git(t, wt, "commit", "-q", "-m", "two")
+
+	r, err := OpenLocal(filepath.Join(wt, "skills"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit, err := r.Resolve("")
+	if err != nil || commit != git(t, wt, "rev-parse", "HEAD") {
+		t.Fatalf("Resolve(\"\") = %q, %v; want the worktree HEAD", commit, err)
+	}
+	tree, err := r.TreeSHA(commit, "skills/c")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.Export(tree); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := OpenLocal(t.TempDir()); err == nil || !strings.Contains(err.Error(), "not inside a git repository") {
+		t.Fatalf("OpenLocal outside a repo: err = %v", err)
+	}
+}

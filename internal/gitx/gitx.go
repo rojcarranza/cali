@@ -46,6 +46,7 @@ type Repo struct {
 	env   []string // extra env of the last Fetch, reused for lazy blob fetches
 	// offline forbids lazy blob fetches (GIT_NO_LAZY_FETCH=1).
 	offline bool
+	head    string // what an empty ref resolves to; empty means refs/cali/head
 }
 
 // SetOffline makes every later git call on r refuse to fetch missing objects.
@@ -113,6 +114,19 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 			return nil, err
 		}
 	}
+	return r, nil
+}
+
+// OpenLocal returns the repository that holds dir, as checked out: an empty
+// ref resolves to its HEAD. It never fetches and allows no transport, so
+// every read stays inside that repository.
+func OpenLocal(dir string) (*Repo, error) {
+	r := &Repo{url: dir, offline: true, head: "HEAD"}
+	out, err := r.run(context.Background(), nil, "-C", dir, "rev-parse", "--absolute-git-dir")
+	if err != nil {
+		return nil, fmt.Errorf("%s is not inside a git repository, which a same-repo source (.//path) needs", dir)
+	}
+	r.Dir = strings.TrimSpace(string(out))
 	return r, nil
 }
 
@@ -239,11 +253,23 @@ func (r *Repo) HasCommit(commit string) bool {
 	return err == nil
 }
 
+// HasTree reports whether tree exists in the repository as a tree object.
+func (r *Repo) HasTree(tree string) bool {
+	if !hex40.MatchString(tree) {
+		return false
+	}
+	typ, err := r.git(context.Background(), r.env, "cat-file", "-t", tree)
+	return err == nil && strings.TrimSpace(string(typ)) == "tree"
+}
+
 // Resolve turns ref into a full commit SHA. An empty ref is the remote
 // default branch. A full 40-hex commit is returned as is if present;
 // otherwise ref is looked up as a branch, then a tag. Revision expressions
 // (main~1, v1^, a..b, @{u}) are rejected.
 func (r *Repo) Resolve(ref string) (string, error) {
+	if ref == "" && r.head != "" {
+		return r.revParse(r.head, r.head)
+	}
 	if ref == "" {
 		return r.revParse("refs/cali/head", "default branch")
 	}
