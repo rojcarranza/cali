@@ -525,3 +525,22 @@ func TestSameRepoManifestGlobal(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// Without --manifest, status -g finds a same-repo source through the global
+// config dir, not through the cwd's project.
+func TestSameRepoGlobalConfigStatus(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	t.Setenv("CALI_CONFIG_DIR", repo)
+	if code, out, errs := run("add", "-g", ".//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if err := os.WriteFile(filepath.Join(repo, "skills", "x", "more.md"), []byte("more\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "more")
+	if code, out, errs := run("status", "-g", "--exit-code"); code != 1 || !strings.Contains(out, "outdated") || errs != "" {
+		t.Fatalf("status: code=%d out=%q err=%q", code, out, errs)
+	}
+}

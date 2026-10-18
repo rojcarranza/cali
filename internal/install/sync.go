@@ -126,6 +126,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	// A same-repo lock entry falls behind when the skill changes in a commit
 	// that does not also move the lock; it is reported, and update moves it.
 	var behind []string
+	head := "" // HEAD of the manifest's repository, resolved once
 	for n, spec := range specs {
 		if spec.URL != source.Here || slices.Contains(missing, n) || slices.Contains(refChanged, n) {
 			continue
@@ -134,12 +135,17 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		if err != nil {
 			return Report{}, err
 		}
-		commit, err := repo.Resolve("")
-		if err != nil {
+		if head == "" {
+			if head, err = repo.Resolve(""); err != nil {
+				return Report{}, fmt.Errorf("skill %s: %w", n, err)
+			}
+		}
+		tree, err := repo.TreeSHA(head, l.Skills[n].Path)
+		if err != nil && !errors.Is(err, gitx.ErrNotFound) {
 			return Report{}, fmt.Errorf("skill %s: %w", n, err)
 		}
-		if tree, err := repo.TreeSHA(commit, l.Skills[n].Path); err != nil || tree != l.Skills[n].Tree {
-			behind = append(behind, n) // a folder gone from HEAD is behind too
+		if tree != l.Skills[n].Tree { // a folder gone from HEAD is behind too
+			behind = append(behind, n)
 		}
 	}
 	for n := range l.Skills {

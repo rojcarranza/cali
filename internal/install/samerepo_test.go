@@ -120,7 +120,7 @@ func TestSyncSameRepoNeedsGitRepo(t *testing.T) {
 		Version: 1, Targets: []string{"claude"},
 		Skills: map[string]manifest.Skill{"x": {Source: ".//skills/x"}},
 	})
-	if _, err := Sync(context.Background(), e.deps, false); err == nil || !strings.Contains(err.Error(), "not inside a git repository") {
+	if _, err := Sync(context.Background(), e.deps, false); err == nil || !strings.Contains(err.Error(), "inside a git repository") {
 		t.Fatalf("err = %v", err)
 	}
 }

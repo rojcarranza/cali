@@ -283,6 +283,7 @@ func TestEnvironStripsInheritedConfig(t *testing.T) {
 	base := []string{
 		"PATH=/bin", "GIT_CONFIG_COUNT=2", "GIT_CONFIG_KEY_0=a", "GIT_CONFIG_VALUE_0=b",
 		"GIT_CONFIG_KEY_1=c", "GIT_CONFIG_VALUE_1=d", "GIT_ALLOW_PROTOCOL=ext",
+		"GIT_DIR=/other/.git", "GIT_WORK_TREE=/other", "GIT_INDEX_FILE=/other/.git/index",
 	}
 	got := environ(base, "https", AuthEnv("github.com", func(string) string { return "t" }, nil))
 	m := envMap(got)
@@ -297,7 +298,8 @@ func TestEnvironStripsInheritedConfig(t *testing.T) {
 		t.Fatalf("inherited value survived: %v", got)
 	}
 	for _, e := range got {
-		if e == "GIT_CONFIG_COUNT=2" || e == "GIT_ALLOW_PROTOCOL=ext" {
+		if e == "GIT_CONFIG_COUNT=2" || e == "GIT_ALLOW_PROTOCOL=ext" || strings.HasPrefix(e, "GIT_DIR=") ||
+			strings.HasPrefix(e, "GIT_WORK_TREE=") || strings.HasPrefix(e, "GIT_INDEX_FILE=") {
 			t.Fatalf("inherited entry survived: %v", got)
 		}
 	}
@@ -518,7 +520,13 @@ func TestOpenLocalReadsCheckedOutHead(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := OpenLocal(t.TempDir()); err == nil || !strings.Contains(err.Error(), "not inside a git repository") {
+	// An inherited GIT_DIR (as in a git hook of another repo) is ignored.
+	t.Setenv("GIT_DIR", filepath.Join(dir, ".git"))
+	if r, err := OpenLocal(wt); err != nil || r.Dir == filepath.Join(dir, ".git") {
+		t.Fatalf("OpenLocal under GIT_DIR: dir=%v err=%v", r, err)
+	}
+	t.Setenv("GIT_DIR", "")
+	if _, err := OpenLocal(t.TempDir()); err == nil || !strings.Contains(err.Error(), "inside a git repository") || !strings.Contains(err.Error(), "not a git repository") {
 		t.Fatalf("OpenLocal outside a repo: err = %v", err)
 	}
 }

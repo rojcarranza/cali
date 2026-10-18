@@ -124,20 +124,27 @@ func OpenLocal(dir string) (*Repo, error) {
 	r := &Repo{url: dir, offline: true, head: "HEAD"}
 	out, err := r.run(context.Background(), nil, "-C", dir, "rev-parse", "--absolute-git-dir")
 	if err != nil {
-		return nil, fmt.Errorf("%s is not inside a git repository, which a same-repo source (.//path) needs", dir)
+		return nil, fmt.Errorf("%s: a same-repo source (.//path) needs the manifest inside a git repository: %w", dir, err)
 	}
 	r.Dir = strings.TrimSpace(string(out))
 	return r, nil
 }
 
+// repoLocation are the variables a git hook or `git rebase --exec` exports
+// that would point git at another repository than the one Cali names.
+var repoLocation = map[string]bool{
+	"GIT_DIR": true, "GIT_WORK_TREE": true, "GIT_COMMON_DIR": true, "GIT_INDEX_FILE": true,
+	"GIT_OBJECT_DIRECTORY": true, "GIT_ALTERNATE_OBJECT_DIRECTORIES": true,
+}
+
 // environ builds the child environment: base without any inherited
-// GIT_CONFIG_COUNT/KEY_n/VALUE_n or GIT_ALLOW_PROTOCOL, then prompts off,
+// GIT_CONFIG_COUNT/KEY_n/VALUE_n, GIT_ALLOW_PROTOCOL or repoLocation, then prompts off,
 // the protocol allow-list and the extra entries.
 func environ(base []string, proto string, extra []string) []string {
 	out := make([]string, 0, len(base)+len(extra)+2)
 	for _, e := range base {
 		k, _, _ := strings.Cut(e, "=")
-		if k == "GIT_CONFIG_COUNT" || k == "GIT_ALLOW_PROTOCOL" ||
+		if k == "GIT_CONFIG_COUNT" || k == "GIT_ALLOW_PROTOCOL" || repoLocation[k] ||
 			strings.HasPrefix(k, "GIT_CONFIG_KEY_") || strings.HasPrefix(k, "GIT_CONFIG_VALUE_") {
 			continue
 		}
