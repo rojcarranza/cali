@@ -29,6 +29,7 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			d.Global = *global // the fetcher finds a same-repo source through the scope
 			s, err := loadFrom(d, *global)
 			if err != nil {
 				return err

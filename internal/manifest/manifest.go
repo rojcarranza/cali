@@ -117,8 +117,12 @@ func (m Manifest) validate(o source.Options) error {
 		if s.Source == "" {
 			return fmt.Errorf("skill %s: source is required", n)
 		}
-		if _, err := source.ParseWith(s.Source, o); err != nil {
+		spec, err := source.ParseWith(s.Source, o)
+		if err != nil {
 			return fmt.Errorf("skill %s: source: %w", n, err)
+		}
+		if spec.URL == source.Here && s.Ref != "" {
+			return fmt.Errorf("skill %s: a same-repo source takes no ref; it uses the commit checked out", n)
 		}
 		if err := validTargets(s.Targets); err != nil {
 			return fmt.Errorf("skill %s: targets: %w", n, err)

@@ -242,3 +242,10 @@ func TestWriteWithAllowsFileScheme(t *testing.T) {
 		t.Fatalf("got %+v", got)
 	}
 }
+
+func TestReadRejectsRefOnSameRepoSource(t *testing.T) {
+	p := writeFile(t, "version: 1\nskills:\n  x:\n    source: .//skills/x\n    ref: main\n")
+	if _, err := Read(p); err == nil || !strings.Contains(err.Error(), "no ref") {
+		t.Fatalf("err = %v, want one saying a same-repo source takes no ref", err)
+	}
+}

@@ -697,3 +697,32 @@ func TestControlCharConflictHasNoResolveCommand(t *testing.T) {
 		t.Errorf("apply err = %v", err)
 	}
 }
+
+func TestApplySameRepoMovesTreeAndKeepsNoCommit(t *testing.T) {
+	f := setup(t, "x", map[string]string{"SKILL.md": skillMD("x", "v1\n")})
+	// The project is the skills repo itself, listing its own skill.
+	g := f
+	g.d.Cwd = f.repo
+	res, err := install.Add(context.Background(), g.d, install.AddRequest{Spec: ".//skills/x", Targets: []string{"claude"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	g.local = res.Skills[0].Dirs[0]
+	before := g.lock(t).Skills["x"]
+	g.upstream(t, map[string]string{"SKILL.md": skillMD("x", "v2\n")})
+
+	out, err := g.apply(t, Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := read(t, filepath.Join(g.local, "SKILL.md")); got != skillMD("x", "v2\n") {
+		t.Fatalf("installed SKILL.md = %q", got)
+	}
+	after := g.lock(t).Skills["x"]
+	if after.Commit != "" || after.Tree == before.Tree {
+		t.Fatalf("lock entry %+v -> %+v; want a new tree and no commit", before, after)
+	}
+	if !strings.Contains(out, "updated x - -> ") {
+		t.Fatalf("out = %q", out)
+	}
+}

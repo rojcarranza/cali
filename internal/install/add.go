@@ -250,6 +250,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 		}
 	}
 
+	d.Global = req.Global // openFetch finds a same-repo source through the scope
 	sc, err := resolveScope(d, req.Global)
 	if err != nil {
 		return Result{}, err
@@ -332,7 +333,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	res := Result{Manifest: sc.manifest, Created: created}
 	for _, pl := range plans {
 		m.Skills[pl.name] = manifest.Skill{Source: pl.source, Ref: spec.Ref, Targets: pl.skillTargets}
-		l.Skills[pl.name] = lock.Entry{Source: spec.URL, Path: pl.path, Ref: spec.Ref, Commit: commit, Tree: pl.tree}
+		l.Skills[pl.name] = lock.Entry{Source: spec.URL, Path: pl.path, Ref: spec.Ref, Commit: LockCommit(spec.URL, commit), Tree: pl.tree}
 		res.Skills = append(res.Skills, Installed{
 			Name: pl.name, Path: pl.path, Commit: commit, Tree: pl.tree,
 			Dirs: pl.write, Adopted: pl.adopt,
@@ -471,8 +472,16 @@ func checkScopeFiles(sc scope) error {
 	return nil
 }
 
-// openFetch opens the cache mirror for spec and fetches it.
+// openFetch opens the cache mirror for spec and fetches it. A same-repo
+// source opens the repository that holds the scope's manifest instead.
 func openFetch(ctx context.Context, d Deps, spec source.Spec) (*gitx.Repo, error) {
+	if spec.URL == source.Here {
+		sc, err := resolveScope(d, d.Global)
+		if err != nil {
+			return nil, err
+		}
+		return gitx.OpenLocal(filepath.Dir(sc.manifest))
+	}
 	repo, err := gitx.Open(d.Dirs.Cache, spec)
 	if err != nil {
 		return nil, err
@@ -644,6 +653,17 @@ func manifestSource(raw string, spec source.Spec, p string) string {
 		s += "//" + p
 	}
 	return s
+}
+
+// LockCommit is the commit a lock entry records for a skill read at commit
+// from url: none for a same-repo source, because the commit that will hold
+// the lock does not exist yet and a squash merge drops the branch's commits.
+// The tree alone identifies the skill.
+func LockCommit(url, commit string) string {
+	if url == source.Here {
+		return ""
+	}
+	return commit
 }
 
 func host(rawURL string) string {

@@ -283,6 +283,7 @@ func TestEnvironStripsInheritedConfig(t *testing.T) {
 	base := []string{
 		"PATH=/bin", "GIT_CONFIG_COUNT=2", "GIT_CONFIG_KEY_0=a", "GIT_CONFIG_VALUE_0=b",
 		"GIT_CONFIG_KEY_1=c", "GIT_CONFIG_VALUE_1=d", "GIT_ALLOW_PROTOCOL=ext",
+		"GIT_DIR=/other/.git", "GIT_WORK_TREE=/other", "GIT_INDEX_FILE=/other/.git/index",
 	}
 	got := environ(base, "https", AuthEnv("github.com", func(string) string { return "t" }, nil))
 	m := envMap(got)
@@ -297,7 +298,8 @@ func TestEnvironStripsInheritedConfig(t *testing.T) {
 		t.Fatalf("inherited value survived: %v", got)
 	}
 	for _, e := range got {
-		if e == "GIT_CONFIG_COUNT=2" || e == "GIT_ALLOW_PROTOCOL=ext" {
+		if e == "GIT_CONFIG_COUNT=2" || e == "GIT_ALLOW_PROTOCOL=ext" || strings.HasPrefix(e, "GIT_DIR=") ||
+			strings.HasPrefix(e, "GIT_WORK_TREE=") || strings.HasPrefix(e, "GIT_INDEX_FILE=") {
 			t.Fatalf("inherited entry survived: %v", got)
 		}
 	}
@@ -490,5 +492,41 @@ func TestFetchFallsBackOnlyWhenTheFilterIsRejected(t *testing.T) {
 	}
 	if strings.Contains(string(log), "--no-filter") {
 		t.Errorf("fell back to a full fetch:\n%s", log)
+	}
+}
+
+func TestOpenLocalReadsCheckedOutHead(t *testing.T) {
+	dir := fixture(t)
+	// A linked worktree on another branch: its HEAD, not main's, is the one read.
+	wt := filepath.Join(t.TempDir(), "wt")
+	git(t, dir, "worktree", "add", "-q", "-b", "feature", wt)
+	write(t, wt, "skills/c/SKILL.md", "c\n", 0o644)
+	git(t, wt, "add", ".")
+	git(t, wt, "commit", "-q", "-m", "two")
+
+	r, err := OpenLocal(filepath.Join(wt, "skills"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit, err := r.Resolve("")
+	if err != nil || commit != git(t, wt, "rev-parse", "HEAD") {
+		t.Fatalf("Resolve(\"\") = %q, %v; want the worktree HEAD", commit, err)
+	}
+	tree, err := r.TreeSHA(commit, "skills/c")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r.Export(tree); err != nil {
+		t.Fatal(err)
+	}
+
+	// An inherited GIT_DIR (as in a git hook of another repo) is ignored.
+	t.Setenv("GIT_DIR", filepath.Join(dir, ".git"))
+	if r, err := OpenLocal(wt); err != nil || r.Dir == filepath.Join(dir, ".git") {
+		t.Fatalf("OpenLocal under GIT_DIR: dir=%v err=%v", r, err)
+	}
+	t.Setenv("GIT_DIR", "")
+	if _, err := OpenLocal(t.TempDir()); err == nil || !strings.Contains(err.Error(), "inside a git repository") || !strings.Contains(err.Error(), "not a git repository") {
+		t.Fatalf("OpenLocal outside a repo: err = %v", err)
 	}
 }

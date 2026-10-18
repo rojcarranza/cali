@@ -30,6 +30,7 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			d.Global = *global // OpenFetch finds a same-repo source through the scope
 			s, err := loadFrom(d, *global)
 			if err != nil {
 				return err
@@ -53,12 +54,13 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			warn := cmd.ErrOrStderr()
 			hits := []find.Hit{}
 			for _, sp := range urls {
-				if offline && !gitx.MirrorExists(d.Dirs.Cache, sp) {
+				local := sp.URL == source.Here // read in place, never fetched: no mirror
+				if offline && !local && !gitx.MirrorExists(d.Dirs.Cache, sp) {
 					_, _ = fmt.Fprintf(warn, "warning: %s: no local mirror (run without --offline)\n", sp.URL)
 					continue
 				}
 				var r *gitx.Repo
-				if offline {
+				if offline && !local {
 					if r, err = gitx.Open(d.Dirs.Cache, sp); err == nil {
 						r.SetOffline(true)
 					}

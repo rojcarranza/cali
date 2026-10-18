@@ -16,6 +16,10 @@ type Spec struct {
 	URL, Path, Ref string
 }
 
+// Here is the URL of a same-repo source (".//path"): the git repository that
+// holds the manifest. It is never fetched and has no mirror.
+const Here = "."
+
 // Options tunes Parse. AllowFile accepts file:// URLs (local git fixtures).
 type Options struct{ AllowFile bool }
 
@@ -24,10 +28,13 @@ func Parse(s string) (Spec, error) { return ParseWith(s, Options{}) }
 
 // ParseWith parses a source spec. Accepted forms are
 // github:owner/repo[//path][@ref] and https://host/owner/repo[.git][//path][@ref]
-// (plus file:///abs/path[//path][@ref] when o.AllowFile is set).
+// (plus file:///abs/path[//path][@ref] when o.AllowFile is set), and
+// .[//path] for the repository that holds the manifest, which takes no ref.
 func ParseWith(s string, o Options) (Spec, error) {
 	var scheme, rest string
 	switch {
+	case s == Here || strings.HasPrefix(s, Here+"//"):
+		scheme, rest = "here", s
 	case strings.HasPrefix(s, "github:"):
 		scheme, rest = "github", strings.TrimPrefix(s, "github:")
 	case strings.Contains(s, "://"):
@@ -37,7 +44,7 @@ func ParseWith(s string, o Options) (Spec, error) {
 		return Spec{}, reject("unsupported form, want github:owner/repo or https://host/owner/repo")
 	}
 	switch scheme {
-	case "github", "https":
+	case "github", "https", "here":
 	case "file":
 		if !o.AllowFile {
 			return Spec{}, reject("scheme file is not allowed")
@@ -46,7 +53,7 @@ func ParseWith(s string, o Options) (Spec, error) {
 		return Spec{}, reject("scheme " + safeScheme(scheme) + " is not allowed, use github: or https://")
 	}
 
-	if scheme != "github" {
+	if scheme == "https" || scheme == "file" {
 		authority, _, _ := strings.Cut(rest, "/")
 		if strings.Contains(authority, "@") {
 			return Spec{}, reject("embedded credentials are not allowed")
@@ -76,6 +83,11 @@ func ParseWith(s string, o Options) (Spec, error) {
 
 	spec := Spec{Path: path, Ref: ref}
 	switch scheme {
+	case "here":
+		if ref != "" {
+			return Spec{}, reject("a same-repo source takes no ref; it uses the commit checked out")
+		}
+		spec.URL = Here
 	case "github":
 		owner, repo, err := ownerRepo(strings.Split(head, "/"))
 		if err != nil {

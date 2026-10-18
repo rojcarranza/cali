@@ -46,6 +46,7 @@ type Repo struct {
 	env   []string // extra env of the last Fetch, reused for lazy blob fetches
 	// offline forbids lazy blob fetches (GIT_NO_LAZY_FETCH=1).
 	offline bool
+	head    string // what an empty ref resolves to; empty means refs/cali/head
 }
 
 // SetOffline makes every later git call on r refuse to fetch missing objects.
@@ -116,14 +117,34 @@ func Open(cacheDir string, s source.Spec) (*Repo, error) {
 	return r, nil
 }
 
+// OpenLocal returns the repository that holds dir, as checked out: an empty
+// ref resolves to its HEAD. It never fetches and allows no transport, so
+// every read stays inside that repository.
+func OpenLocal(dir string) (*Repo, error) {
+	r := &Repo{url: dir, offline: true, head: "HEAD"}
+	out, err := r.run(context.Background(), nil, "-C", dir, "rev-parse", "--absolute-git-dir")
+	if err != nil {
+		return nil, fmt.Errorf("%s: a same-repo source (.//path) needs the manifest inside a git repository: %w", dir, err)
+	}
+	r.Dir = strings.TrimSpace(string(out))
+	return r, nil
+}
+
+// repoLocation are the variables a git hook or `git rebase --exec` exports
+// that would point git at another repository than the one Cali names.
+var repoLocation = map[string]bool{
+	"GIT_DIR": true, "GIT_WORK_TREE": true, "GIT_COMMON_DIR": true, "GIT_INDEX_FILE": true,
+	"GIT_OBJECT_DIRECTORY": true, "GIT_ALTERNATE_OBJECT_DIRECTORIES": true,
+}
+
 // environ builds the child environment: base without any inherited
-// GIT_CONFIG_COUNT/KEY_n/VALUE_n or GIT_ALLOW_PROTOCOL, then prompts off,
+// GIT_CONFIG_COUNT/KEY_n/VALUE_n, GIT_ALLOW_PROTOCOL or repoLocation, then prompts off,
 // the protocol allow-list and the extra entries.
 func environ(base []string, proto string, extra []string) []string {
 	out := make([]string, 0, len(base)+len(extra)+2)
 	for _, e := range base {
 		k, _, _ := strings.Cut(e, "=")
-		if k == "GIT_CONFIG_COUNT" || k == "GIT_ALLOW_PROTOCOL" ||
+		if k == "GIT_CONFIG_COUNT" || k == "GIT_ALLOW_PROTOCOL" || repoLocation[k] ||
 			strings.HasPrefix(k, "GIT_CONFIG_KEY_") || strings.HasPrefix(k, "GIT_CONFIG_VALUE_") {
 			continue
 		}
@@ -239,11 +260,23 @@ func (r *Repo) HasCommit(commit string) bool {
 	return err == nil
 }
 
+// HasTree reports whether tree exists in the repository as a tree object.
+func (r *Repo) HasTree(tree string) bool {
+	if !hex40.MatchString(tree) {
+		return false
+	}
+	typ, err := r.git(context.Background(), r.env, "cat-file", "-t", tree)
+	return err == nil && strings.TrimSpace(string(typ)) == "tree"
+}
+
 // Resolve turns ref into a full commit SHA. An empty ref is the remote
 // default branch. A full 40-hex commit is returned as is if present;
 // otherwise ref is looked up as a branch, then a tag. Revision expressions
 // (main~1, v1^, a..b, @{u}) are rejected.
 func (r *Repo) Resolve(ref string) (string, error) {
+	if ref == "" && r.head != "" {
+		return r.revParse(r.head, r.head)
+	}
 	if ref == "" {
 		return r.revParse("refs/cali/head", "default branch")
 	}
