@@ -23,6 +23,8 @@ github:owner/repo//skills/x@v1.2.0      branch, tag or full commit
 https://host/owner/repo.git//path@ref   explicit URL
 ```
 
+Added 2026-10-18 (ADR 0007): `.//path` names the git repository that holds the manifest, read at its checked-out `HEAD` without a fetch; it takes no ref.
+
 The canonical URL lowercases the host, and for `github.com` also the owner and repo, because GitHub ignores their case. Other hosts keep the owner and repo as written.
 
 ## 2. Files and where they live

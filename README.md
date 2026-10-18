@@ -68,6 +68,15 @@ You can also edit `cali.yaml` by hand and run `python3 install.py` (or `cali syn
     targets: [copilot]      # this skill only; default is the top-level targets
 ```
 
+**A skill in this same repo** is written `.//<path>`: the git repository that holds `cali.yaml`, at the commit checked out, never fetched. A new skill, its `cali.yaml` entry and its `cali.lock` entry then go in one commit, and work on any clone:
+
+```sh
+cali add -g --manifest cali.yaml .//skills/roj-new-thing     # commit the skill folder first
+git add cali.yaml cali.lock && git commit -m "feat(skills): add roj-new-thing"
+```
+
+Its lock entry has a `tree` and no `commit` (the commit that will hold the lock does not exist yet). When a later commit changes the skill without moving the lock, `cali sync --frozen` fails with `locked tree is behind the repo, run cali update`; `cali update -g --manifest cali.yaml --apply` moves it.
+
 **5. Remove one.** It is backed up first. Add `--force` if you edited it:
 
 ```sh
