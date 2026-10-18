@@ -179,7 +179,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 			p.Skills = append(p.Skills, SkillPlan{Name: n, Problem: err.Error(), FromCommit: e.Commit, FromTree: e.Tree})
 			continue
 		}
-		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref, lockCommit: repo.LockCommit(commit)}
+		sp := SkillPlan{Name: n, FromCommit: e.Commit, ToCommit: commit, FromTree: e.Tree, ref: ref, fromRef: e.Ref, lockCommit: install.LockCommit(repo, commit)}
 		if sp.ToTree, err = repo.TreeSHA(commit, e.Path); err != nil && !errors.Is(err, gitx.ErrNotFound) {
 			return Proposal{}, fmt.Errorf("skill %s: %w", n, err)
 		} else if err != nil {

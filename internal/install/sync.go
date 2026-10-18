@@ -225,7 +225,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 			if err := store.Put(d.Dirs.Data, tree, t); err != nil {
 				return Report{}, fmt.Errorf("store pristine copy of %s: %w", n, err)
 			}
-			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: repo.LockCommit(commit), Tree: tree}
+			newL.Skills[n] = lock.Entry{Source: spec.URL, Path: p, Ref: ref, Commit: LockCommit(repo, commit), Tree: tree}
 			trees[n] = t
 			continue
 		}

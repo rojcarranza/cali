@@ -263,17 +263,6 @@ func (r *Repo) HasCommit(commit string) bool {
 // Local reports whether r is a repository opened in place by OpenLocal.
 func (r *Repo) Local() bool { return r.head != "" }
 
-// LockCommit is the commit a lock entry records for a skill read at commit:
-// none for a local repository, because the commit that will hold the lock
-// does not exist yet and a squash merge drops the branch's commits. The
-// tree alone identifies the skill.
-func (r *Repo) LockCommit(commit string) string {
-	if r.Local() {
-		return ""
-	}
-	return commit
-}
-
 // HasLocked reports whether a lock entry's content can still be read: its
 // tree for a local repository (which locks no commit), else its commit.
 func (r *Repo) HasLocked(commit, tree string) bool {
