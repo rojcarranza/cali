@@ -17,9 +17,9 @@ import (
 // clone. Needs network and a token that can read it (GITHUB_TOKEN or gh auth):
 //
 //	CALI_AGENT_SKILLS=~/Dev/projects/agent-skills go test -v -run AgentSkills ./internal/cli
-func agentSkills(t *testing.T) (clone, manifestPath string) {
+func agentSkills(t *testing.T) (repo, manifestPath string) {
 	t.Helper()
-	clone = os.Getenv("CALI_AGENT_SKILLS")
+	clone := os.Getenv("CALI_AGENT_SKILLS")
 	if clone == "" {
 		t.Skip("CALI_AGENT_SKILLS is not set")
 	}
@@ -40,26 +40,11 @@ func agentSkills(t *testing.T) (clone, manifestPath string) {
 	t.Setenv("CALI_DATA_DIR", filepath.Join(base, "data"))
 	t.Setenv("CALI_CACHE_DIR", filepath.Join(base, "cache"))
 	t.Chdir(base)
-	// A copy, so a run never rewrites the clone's cali.lock.
-	manifestPath = filepath.Join(base, "m", "cali.yaml")
-	for _, f := range []string{"cali.yaml", "cali.lock"} {
-		copyFile(t, filepath.Join(clone, f), filepath.Join(base, "m", f))
-	}
-	return clone, manifestPath
-}
-
-func copyFile(t *testing.T, from, to string) {
-	t.Helper()
-	b, err := os.ReadFile(from)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(to, b, 0o644); err != nil {
-		t.Fatal(err)
-	}
+	// A clone, so a run never rewrites the clone's cali.lock, and own skills
+	// (.//skills/<name>) are read at its committed HEAD.
+	repo = filepath.Join(base, "m")
+	gitRun(t, base, "clone", "-q", "--no-hardlinks", clone, repo)
+	return repo, filepath.Join(repo, "cali.yaml")
 }
 
 // installedAsDeclared checks every manifest skill is in each of its targets and nowhere else.
@@ -110,8 +95,8 @@ func TestAgentSkillsFrozenSync(t *testing.T) {
 	}
 }
 
-// The committed lock matches upstream: an own skill changed on the default
-// branch without a lock bump is installed at its old content.
+// The committed lock matches HEAD and upstream: an own skill committed
+// without a lock bump fails --frozen, and status reports nothing outdated.
 func TestAgentSkillsLockIsCurrent(t *testing.T) {
 	_, mp := agentSkills(t)
 	if code, out, errs := run("sync", "-g", "--manifest", mp, "--frozen"); code != 0 {
@@ -122,14 +107,11 @@ func TestAgentSkillsLockIsCurrent(t *testing.T) {
 	}
 }
 
-// Adding a skill to agent-skills: a cali.yaml entry without a lock entry fails
-// --frozen (what CI runs), and a plain sync locks and installs it. Own-skill
-// sources point at a local clone with the new skill committed, which stands in
-// for the default branch after the skill's PR merges.
+// Adding a skill to agent-skills in one PR: the skill and its cali.yaml entry
+// without a lock entry fail --frozen (what CI runs), and a plain sync locks
+// and installs it from the clone before anything is merged.
 func TestAgentSkillsNewSkill(t *testing.T) {
-	clone, mp := agentSkills(t)
-	repo := filepath.Join(t.TempDir(), "agent-skills")
-	gitRun(t, filepath.Dir(repo), "clone", "-q", "--no-hardlinks", clone, repo)
+	repo, mp := agentSkills(t)
 	skill := filepath.Join(repo, "skills", "roj-new-skill")
 	if err := os.MkdirAll(skill, 0o755); err != nil {
 		t.Fatal(err)
@@ -137,27 +119,16 @@ func TestAgentSkillsNewSkill(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(skill, "SKILL.md"), []byte("---\nname: roj-new-skill\ndescription: A new skill. Use when testing.\n---\nbody\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	b, err := os.ReadFile(mp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := strings.Replace(string(b), "\nskills:\n", "\nskills:\n  roj-new-skill:\n    source: .//skills/roj-new-skill\n", 1)
+	if err := os.WriteFile(mp, []byte(s), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	gitRun(t, repo, "add", ".")
 	gitRun(t, repo, "commit", "-q", "-m", "add roj-new-skill")
-
-	url := "file://" + filepath.ToSlash(repo)
-	lp := filepath.Join(filepath.Dir(mp), "cali.lock")
-	for p, old := range map[string]string{mp: "github:rojcarranza/agent-skills", lp: "https://github.com/rojcarranza/agent-skills"} {
-		b, err := os.ReadFile(p)
-		if err != nil {
-			t.Fatal(err)
-		}
-		s := strings.ReplaceAll(string(b), old, url)
-		if p == mp {
-			s = strings.Replace(s, "\nskills:\n", "\nskills:\n  roj-new-skill:\n    source: "+url+"//skills/roj-new-skill\n", 1)
-		}
-		if err := os.WriteFile(p, []byte(s), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	old := allowFileScheme
-	allowFileScheme = true
-	t.Cleanup(func() { allowFileScheme = old })
 
 	if code, out, errs := run("sync", "-g", "--manifest", mp, "--frozen"); code != 1 || !strings.Contains(out+errs, "roj-new-skill") {
 		t.Fatalf("sync --frozen with an unlocked skill: code=%d out=%q err=%q", code, out, errs)
@@ -165,12 +136,12 @@ func TestAgentSkillsNewSkill(t *testing.T) {
 	if code, out, errs := run("sync", "-g", "--manifest", mp); code != 0 {
 		t.Fatalf("sync: code=%d out=%q err=%q", code, out, errs)
 	}
-	installedAsDeclared(t, mp, source.Options{AllowFile: true})
-	l, err := lock.Read(lp)
+	installedAsDeclared(t, mp, source.Options{})
+	l, err := lock.Read(filepath.Join(repo, "cali.lock"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e := l.Skills["roj-new-skill"]; e.Path != "skills/roj-new-skill" || len(e.Commit) != 40 || len(e.Tree) != 40 {
+	if e := l.Skills["roj-new-skill"]; e.Source != "." || e.Path != "skills/roj-new-skill" || e.Commit != "" || len(e.Tree) != 40 {
 		t.Errorf("lock entry = %+v", e)
 	}
 	if code, out, errs := run("sync", "-g", "--manifest", mp, "--frozen"); code != 0 {
