@@ -330,7 +330,12 @@ func (p Proposal) Skipped() bool {
 // baseLostHint is what dry run and apply say for a lost base: sync can often rebuild it.
 const baseLostHint = "base lost: run cali sync to rebuild it; if sync reports base-lost, use --take-upstream"
 
-func short(c string) string { return c[:min(7, len(c))] }
+func short(c string) string {
+	if c == "" {
+		return "-" // a same-repo lock entry has no commit
+	}
+	return c[:min(7, len(c))]
+}
 
 // shellArg quotes s for a POSIX shell unless it is plainly safe: paths come
 // from the repo and the printed command is meant to be pasted.

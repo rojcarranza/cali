@@ -206,7 +206,7 @@ func Apply(ctx context.Context, d install.Deps, p Proposal, prompt Prompter) err
 		if !ok {
 			return restore(fmt.Errorf("%s was removed from cali.lock during the update; nothing written", s.Name))
 		}
-		e.Ref, e.Commit, e.Tree = s.ref, s.ToCommit, s.ToTree
+		e.Ref, e.Commit, e.Tree = s.ref, install.LockCommit(e.Source, s.ToCommit), s.ToTree
 		l.Skills[s.Name] = e
 	}
 	if len(advanced) > 0 || len(refOnly) > 0 {
