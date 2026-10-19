@@ -223,3 +223,17 @@ func TestCaliManifestIsTheDefaultGlobalManifest(t *testing.T) {
 		t.Fatalf("relative CALI_MANIFEST: code=%d err=%q", code, errs)
 	}
 }
+
+// The agent-skills case: a skills repo's own cali.yaml, named by CALI_MANIFEST,
+// with a same-repo source.
+func TestCaliManifestSameRepoSource(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	t.Setenv("CALI_MANIFEST", filepath.Join(repo, "cali.yaml"))
+	if code, out, errs := run("add", "-g", ".//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("status", "-g", "--exit-code"); code != 0 || !strings.Contains(out, "ok") {
+		t.Fatalf("status: code=%d out=%q err=%q", code, out, errs)
+	}
+}
