@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/rojcarranza/cali/internal/backup"
 	"github.com/rojcarranza/cali/internal/lock"
@@ -142,6 +143,24 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 		_, _ = fmt.Fprintf(out, "removed %s (%s)\n", name, found[i].target)
 	}
 
+	restoreCmd := []string{"cali", "add"}
+	if d.Global {
+		restoreCmd = append(restoreCmd, "-g")
+	}
+	if d.Manifest != "" {
+		restoreCmd = append(restoreCmd, "--manifest", d.Manifest)
+	}
+	src := m.Skills[name].Source
+	if r := m.Skills[name].Ref; r != "" { // a pin kept in ref: goes back on the spec
+		if sp, err := source.ParseWith(src, opts); err == nil {
+			sp.Ref = r
+			src = sp.String()
+		}
+	}
+	restoreCmd = append(restoreCmd, src)
+	for _, tg := range m.TargetsFor(name) {
+		restoreCmd = append(restoreCmd, "--target", tg)
+	}
 	delete(m.Skills, name)
 	if err := manifest.WriteWith(sc.manifest, m, opts); err != nil {
 		return err
@@ -152,5 +171,6 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 			return err
 		}
 	}
+	_, _ = fmt.Fprintf(out, "to restore: %s (installs upstream; your old copy is in the backup above)\n", strings.Join(restoreCmd, " "))
 	return nil
 }

@@ -180,6 +180,14 @@ func TestRefAfterRepoStillParses(t *testing.T) {
 	}
 }
 
+func TestGithubComWithoutScheme(t *testing.T) {
+	got, err := Parse("github.com/Addy/R//skills/x@v1")
+	want := Spec{URL: "https://github.com/addy/r", Path: "skills/x", Ref: "v1"}
+	if err != nil || got != want {
+		t.Fatalf("Parse = %+v, %v; want %+v", got, err, want)
+	}
+}
+
 func TestKey(t *testing.T) {
 	cases := map[string]string{
 		"github:obra/superpowers//x": "github.com/obra/superpowers",

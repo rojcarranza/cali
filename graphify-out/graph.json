@@ -444,83 +444,6 @@
       "source_location": "L76"
     },
     {
-      "id": "internal_gitx_auth",
-      "label": "auth.go",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "auth.go",
-      "source_file": "internal/gitx/auth.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_gitx_auth_authenv",
-      "label": "AuthEnv()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "authenv()",
-      "source_file": "internal/gitx/auth.go",
-      "source_location": "L12"
-    },
-    {
-      "id": "internal_gitx_auth_test",
-      "label": "auth_test.go",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "auth_test.go",
-      "source_file": "internal/gitx/auth_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_gitx_auth_test_envmap",
-      "label": "envMap()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "envmap()",
-      "source_file": "internal/gitx/auth_test.go",
-      "source_location": "L10"
-    },
-    {
-      "id": "internal_gitx_auth_test_testauthenvonlygithub",
-      "label": "TestAuthEnvOnlyGithub()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testauthenvonlygithub()",
-      "source_file": "internal/gitx/auth_test.go",
-      "source_location": "L19"
-    },
-    {
-      "id": "internal_gitx_auth_test_testauthenvtokenorder",
-      "label": "TestAuthEnvTokenOrder()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testauthenvtokenorder()",
-      "source_file": "internal/gitx/auth_test.go",
-      "source_location": "L55"
-    },
-    {
-      "id": "internal_gitx_auth_test_testscrubremovescredentials",
-      "label": "TestScrubRemovesCredentials()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testscrubremovescredentials()",
-      "source_file": "internal/gitx/auth_test.go",
-      "source_location": "L45"
-    },
-    {
       "id": "internal_gitx_gitx",
       "label": "gitx.go",
       "_origin": "ast",
@@ -576,17 +499,6 @@
       "source_location": "L63"
     },
     {
-      "id": "internal_gitx_gitx_open",
-      "label": "Open()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "open()",
-      "source_file": "internal/gitx/gitx.go",
-      "source_location": "L72"
-    },
-    {
       "id": "internal_gitx_gitx_openlocal",
       "label": "OpenLocal()",
       "_origin": "ast",
@@ -620,237 +532,6 @@
       "source_location": "L207"
     },
     {
-      "id": "internal_gitx_gitx_test",
-      "label": "gitx_test.go",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "gitx_test.go",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_gitx_gitx_test_exportat",
-      "label": "exportAt()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "exportat()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L423"
-    },
-    {
-      "id": "internal_gitx_gitx_test_fixture",
-      "label": "fixture()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "fixture()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L45"
-    },
-    {
-      "id": "internal_gitx_gitx_test_fixturespec",
-      "label": "fixtureSpec()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "fixturespec()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L69"
-    },
-    {
-      "id": "internal_gitx_gitx_test_git",
-      "label": "git()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "git()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L20"
-    },
-    {
-      "id": "internal_gitx_gitx_test_hashstring",
-      "label": "hashString()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "hashstring()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L342"
-    },
-    {
-      "id": "internal_gitx_gitx_test_openfetched",
-      "label": "openFetched()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "openfetched()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L78"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testenvironstripsinheritedconfig",
-      "label": "TestEnvironStripsInheritedConfig()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testenvironstripsinheritedconfig()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L282"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testexportenforceslimitsbeforereading",
-      "label": "TestExportEnforcesLimitsBeforeReading()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testexportenforceslimitsbeforereading()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L252"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testexportequalscommittedbytes",
-      "label": "TestExportEqualsCommittedBytes()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testexportequalscommittedbytes()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L90"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testexportrejectssymlinkandsubmodule",
-      "label": "TestExportRejectsSymlinkAndSubmodule()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testexportrejectssymlinkandsubmodule()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L183"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testfetcherrordoesnotleaktoken",
-      "label": "TestFetchErrorDoesNotLeakToken()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testfetcherrordoesnotleaktoken()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L351"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testfetchfallsbackonlywhenthefilterisrejected",
-      "label": "TestFetchFallsBackOnlyWhenTheFilterIsRejected()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testfetchfallsbackonlywhenthefilterisrejected()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L464"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testfilteredfetchisblobless",
-      "label": "TestFilteredFetchIsBlobless()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testfilteredfetchisblobless()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L209"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testlistskilldirs",
-      "label": "TestListSkillDirs()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testlistskilldirs()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L367"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testopenlocalreadscheckedouthead",
-      "label": "TestOpenLocalReadsCheckedOutHead()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testopenlocalreadscheckedouthead()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L498"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testopenrefusesescapingkey",
-      "label": "TestOpenRefusesEscapingKey()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testopenrefusesescapingkey()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L241"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testopenwritesconfigonlywhenneeded",
-      "label": "TestOpenWritesConfigOnlyWhenNeeded()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testopenwritesconfigonlywhenneeded()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L431"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testreadfile",
-      "label": "TestReadFile()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testreadfile()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L397"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testresolverefs",
-      "label": "TestResolveRefs()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testresolverefs()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L127"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testresolverejectsrevisionexpressions",
-      "label": "TestResolveRejectsRevisionExpressions()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testresolverejectsrevisionexpressions()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L273"
-    },
-    {
       "id": "internal_gitx_gitx_test_testsanitizestderr",
       "label": "TestSanitizeStderr()",
       "_origin": "ast",
@@ -860,39 +541,6 @@
       "norm_label": "testsanitizestderr()",
       "source_file": "internal/gitx/gitx_test.go",
       "source_location": "L308"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testsymlinkerrorquotespath",
-      "label": "TestSymlinkErrorQuotesPath()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testsymlinkerrorquotespath()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L325"
-    },
-    {
-      "id": "internal_gitx_gitx_test_testtreeshachangesonlywhensubtreechanges",
-      "label": "TestTreeSHAChangesOnlyWhenSubtreeChanges()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "testtreeshachangesonlywhensubtreechanges()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L152"
-    },
-    {
-      "id": "internal_gitx_gitx_test_write",
-      "label": "write()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "write()",
-      "source_file": "internal/gitx/gitx_test.go",
-      "source_location": "L32"
     },
     {
       "id": "internal_install_add",
@@ -925,7 +573,7 @@
       "file_type": "code",
       "norm_label": "exporttree()",
       "source_file": "internal/install/add.go",
-      "source_location": "L712"
+      "source_location": "L706"
     },
     {
       "id": "internal_install_add_exporttree_41e689",
@@ -969,7 +617,7 @@
       "file_type": "code",
       "norm_label": "host()",
       "source_file": "internal/install/add.go",
-      "source_location": "L680"
+      "source_location": "L674"
     },
     {
       "id": "internal_install_add_init",
@@ -991,7 +639,7 @@
       "file_type": "code",
       "norm_label": "installname()",
       "source_file": "internal/install/add.go",
-      "source_location": "L648"
+      "source_location": "L642"
     },
     {
       "id": "internal_install_add_manifestsource",
@@ -1002,29 +650,7 @@
       "file_type": "code",
       "norm_label": "manifestsource()",
       "source_file": "internal/install/add.go",
-      "source_location": "L658"
-    },
-    {
-      "id": "internal_install_add_moveaside",
-      "label": "MoveAside()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "moveaside()",
-      "source_file": "internal/install/add.go",
-      "source_location": "L544"
-    },
-    {
-      "id": "internal_install_add_nosymlinks",
-      "label": "NoSymlinks()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "nosymlinks()",
-      "source_file": "internal/install/add.go",
-      "source_location": "L708"
+      "source_location": "L652"
     },
     {
       "id": "internal_install_add_nosymlinks_3ac719",
@@ -1046,7 +672,7 @@
       "file_type": "code",
       "norm_label": "openfetch()",
       "source_file": "internal/install/add.go",
-      "source_location": "L702"
+      "source_location": "L696"
     },
     {
       "id": "internal_install_add_openfetch_9332bd",
@@ -1123,7 +749,7 @@
       "file_type": "code",
       "norm_label": "show()",
       "source_file": "internal/install/add.go",
-      "source_location": "L639"
+      "source_location": "L633"
     },
     {
       "id": "internal_skillfs_safe_invalid",
@@ -1156,7 +782,7 @@
       "file_type": "code",
       "norm_label": ".key()",
       "source_file": "internal/source/spec.go",
-      "source_location": "L218"
+      "source_location": "L220"
     },
     {
       "id": "source_spec_string",
@@ -1167,7 +793,7 @@
       "file_type": "code",
       "norm_label": ".string()",
       "source_file": "internal/source/spec.go",
-      "source_location": "L204"
+      "source_location": "L206"
     },
     {
       "id": "status_fakefetcher",
@@ -1190,6 +816,28 @@
       "norm_label": ".latest()",
       "source_file": "internal/status/status_test.go",
       "source_location": "L35"
+    },
+    {
+      "id": "status_gitfetcher",
+      "label": "GitFetcher",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Repo",
+      "file_type": "code",
+      "norm_label": "gitfetcher",
+      "source_file": "internal/status/status.go",
+      "source_location": "L279"
+    },
+    {
+      "id": "status_gitfetcher_latest",
+      "label": ".Latest()",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Repo",
+      "file_type": "code",
+      "norm_label": ".latest()",
+      "source_file": "internal/status/status.go",
+      "source_location": "L288"
     },
     {
       "id": "install_action",
@@ -1266,7 +914,7 @@
       "file_type": "code",
       "norm_label": "lockcommit()",
       "source_file": "internal/install/add.go",
-      "source_location": "L673"
+      "source_location": "L667"
     },
     {
       "id": "internal_install_add_place",
@@ -1662,7 +1310,7 @@
       "file_type": "code",
       "norm_label": "remove()",
       "source_file": "internal/install/remove.go",
-      "source_location": "L28"
+      "source_location": "L29"
     },
     {
       "id": "internal_install_remove_test",
@@ -2252,7 +1900,7 @@
       "label": "os.FileMode",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "os.filemode",
       "source_file": "",
@@ -2263,7 +1911,7 @@
       "label": "safe.go",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "safe.go",
       "source_file": "internal/skillfs/safe.go",
@@ -2274,7 +1922,7 @@
       "label": "ensureDirs()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "ensuredirs()",
       "source_file": "internal/skillfs/safe.go",
@@ -2285,7 +1933,7 @@
       "label": "Tree",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "tree",
       "source_file": "internal/skillfs/safe.go",
@@ -2296,7 +1944,7 @@
       "label": "Tree",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "tree",
       "source_file": "",
@@ -2307,7 +1955,7 @@
       "label": "quote()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "quote()",
       "source_file": "internal/skillfs/safe.go",
@@ -2318,7 +1966,7 @@
       "label": "safePath()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "safepath()",
       "source_file": "internal/skillfs/safe.go",
@@ -2329,7 +1977,7 @@
       "label": "Validate()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validate()",
       "source_file": "internal/skillfs/safe.go",
@@ -2340,7 +1988,7 @@
       "label": "validatePath()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validatepath()",
       "source_file": "internal/skillfs/safe.go",
@@ -2351,7 +1999,7 @@
       "label": "validateSegment()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validatesegment()",
       "source_file": "internal/skillfs/safe.go",
@@ -2362,18 +2010,249 @@
       "label": "writeNew()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "writenew()",
       "source_file": "internal/skillfs/safe.go",
       "source_location": "L221"
     },
     {
+      "id": "internal_skillfs_tree_test",
+      "label": "tree_test.go",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "tree_test.go",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_skillfs_tree_test_go_tree",
+      "label": "Tree",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "tree",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "internal_skillfs_tree_test_skillmd",
+      "label": "skillMD()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "skillmd()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L11"
+    },
+    {
+      "id": "internal_skillfs_tree_test_static",
+      "label": "static()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "static()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L63"
+    },
+    {
+      "id": "internal_skillfs_tree_test_symlinkorskip",
+      "label": "symlinkOrSkip()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "symlinkorskip()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testdiffkinds",
+      "label": "TestDiffKinds()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testdiffkinds()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L320"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalbinaryexact",
+      "label": "TestEqualBinaryExact()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalbinaryexact()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L31"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalcomparesexecandfileset",
+      "label": "TestEqualComparesExecAndFileSet()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalcomparesexecandfileset()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L49"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalignoresexecwhennotcompared",
+      "label": "TestEqualIgnoresExecWhenNotCompared()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalignoresexecwhennotcompared()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L238"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testreaddirlimits",
+      "label": "TestReadDirLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testreaddirlimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L299"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testreaddirrejectssymlink",
+      "label": "TestReadDirRejectsSymlink()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testreaddirrejectssymlink()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L114"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidatelimits",
+      "label": "TestValidateLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidatelimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L286"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidaterejects",
+      "label": "TestValidateRejects()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidaterejects()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L67"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidaterejectscollisionsandreserved",
+      "label": "TestValidateRejectsCollisionsAndReserved()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidaterejectscollisionsandreserved()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L209"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetoinvalidwritesnothing",
+      "label": "TestWriteToInvalidWritesNothing()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetoinvalidwritesnothing()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L158"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusesnonemptytarget",
+      "label": "TestWriteToRefusesNonEmptyTarget()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusesnonemptytarget()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L249"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkcomponent",
+      "label": "TestWriteToRefusesSymlinkComponent()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinkcomponent()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L169"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkfile",
+      "label": "TestWriteToRefusesSymlinkFile()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinkfile()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L189"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinktarget",
+      "label": "TestWriteToRefusesSymlinkTarget()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinktarget()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L263"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwriteuncheckedkeepspathsafety",
+      "label": "TestWriteUncheckedKeepsPathSafety()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwriteuncheckedkeepspathsafety()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L368"
+    },
+    {
+      "id": "internal_skillfs_tree_test_withlimits",
+      "label": "withLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "withlimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L279"
+    },
+    {
       "id": "skillfs_invaliderr",
       "label": "invalidErr",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "invaliderr",
       "source_file": "internal/skillfs/safe.go",
@@ -2384,7 +2263,7 @@
       "label": ".Unwrap()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".unwrap()",
       "source_file": "internal/skillfs/safe.go",
@@ -2395,7 +2274,7 @@
       "label": ".WriteTo()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".writeto()",
       "source_file": "internal/skillfs/safe.go",
@@ -2406,7 +2285,7 @@
       "label": ".WriteUnchecked()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".writeunchecked()",
       "source_file": "internal/skillfs/safe.go",
@@ -2677,257 +2556,356 @@
       "source_location": "L115"
     },
     {
-      "id": "internal_merge_classify_test_testclassifydeletevsmodifyfromplan",
-      "label": "TestClassifyDeleteVsModifyFromPlan()",
+      "id": "internal_gitx_auth",
+      "label": "auth.go",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testclassifydeletevsmodifyfromplan()",
-      "source_file": "internal/merge/classify_test.go",
-      "source_location": "L87"
-    },
-    {
-      "id": "internal_merge_plan_test",
-      "label": "plan_test.go",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "plan_test.go",
-      "file_type": "code",
-      "norm_label": "plan_test.go",
-      "source_file": "internal/merge/plan_test.go",
+      "norm_label": "auth.go",
+      "source_file": "internal/gitx/auth.go",
       "source_location": "L1"
     },
     {
-      "id": "internal_merge_plan_test_bypath",
-      "label": "byPath()",
+      "id": "internal_gitx_auth_authenv",
+      "label": "AuthEnv()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "bypath()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L100"
+      "norm_label": "authenv()",
+      "source_file": "internal/gitx/auth.go",
+      "source_location": "L12"
     },
     {
-      "id": "internal_merge_plan_test_f",
-      "label": "f()",
+      "id": "internal_gitx_auth_test",
+      "label": "auth_test.go",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "f()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L13"
+      "norm_label": "auth_test.go",
+      "source_file": "internal/gitx/auth_test.go",
+      "source_location": "L1"
     },
     {
-      "id": "internal_merge_plan_test_markerlines",
-      "label": "markerLines()",
+      "id": "internal_gitx_auth_test_envmap",
+      "label": "envMap()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "markerlines()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L251"
+      "norm_label": "envmap()",
+      "source_file": "internal/gitx/auth_test.go",
+      "source_location": "L10"
     },
     {
-      "id": "internal_merge_plan_test_plan",
-      "label": "plan()",
+      "id": "internal_gitx_auth_test_testauthenvonlygithub",
+      "label": "TestAuthEnvOnlyGithub()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "plan()",
-      "source_file": "internal/merge/plan_test.go",
+      "norm_label": "testauthenvonlygithub()",
+      "source_file": "internal/gitx/auth_test.go",
+      "source_location": "L19"
+    },
+    {
+      "id": "internal_gitx_auth_test_testauthenvtokenorder",
+      "label": "TestAuthEnvTokenOrder()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "testauthenvtokenorder()",
+      "source_file": "internal/gitx/auth_test.go",
+      "source_location": "L55"
+    },
+    {
+      "id": "internal_gitx_auth_test_testscrubremovescredentials",
+      "label": "TestScrubRemovesCredentials()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "testscrubremovescredentials()",
+      "source_file": "internal/gitx/auth_test.go",
+      "source_location": "L45"
+    },
+    {
+      "id": "internal_gitx_gitx_open",
+      "label": "Open()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "open()",
+      "source_file": "internal/gitx/gitx.go",
+      "source_location": "L72"
+    },
+    {
+      "id": "internal_gitx_gitx_test",
+      "label": "gitx_test.go",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "gitx_test.go",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_gitx_gitx_test_exportat",
+      "label": "exportAt()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "exportat()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L423"
+    },
+    {
+      "id": "internal_gitx_gitx_test_fixture",
+      "label": "fixture()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "fixture()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L45"
+    },
+    {
+      "id": "internal_gitx_gitx_test_fixturespec",
+      "label": "fixtureSpec()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "fixturespec()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L69"
+    },
+    {
+      "id": "internal_gitx_gitx_test_git",
+      "label": "git()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "git()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L20"
+    },
+    {
+      "id": "internal_gitx_gitx_test_hashstring",
+      "label": "hashString()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "hashstring()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L342"
+    },
+    {
+      "id": "internal_gitx_gitx_test_openfetched",
+      "label": "openFetched()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "openfetched()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L78"
+    },
+    {
+      "id": "internal_gitx_gitx_test_testenvironstripsinheritedconfig",
+      "label": "TestEnvironStripsInheritedConfig()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "testenvironstripsinheritedconfig()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L282"
+    },
+    {
+      "id": "internal_gitx_gitx_test_testexportenforceslimitsbeforereading",
+      "label": "TestExportEnforcesLimitsBeforeReading()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "testexportenforceslimitsbeforereading()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L252"
+    },
+    {
+      "id": "internal_gitx_gitx_test_testexportequalscommittedbytes",
+      "label": "TestExportEqualsCommittedBytes()",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "gitx_test.go",
+      "file_type": "code",
+      "norm_label": "testexportequalscommittedbytes()",
+      "source_file": "internal/gitx/gitx_test.go",
       "source_location": "L90"
     },
     {
-      "id": "internal_merge_plan_test_testplanaddaddconflict",
-      "label": "TestPlanAddAddConflict()",
+      "id": "internal_gitx_gitx_test_testexportrejectssymlinkandsubmodule",
+      "label": "TestExportRejectsSymlinkAndSubmodule()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanaddaddconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L212"
+      "norm_label": "testexportrejectssymlinkandsubmodule()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L183"
     },
     {
-      "id": "internal_merge_plan_test_testplanbinarybothchangedconflict",
-      "label": "TestPlanBinaryBothChangedConflict()",
+      "id": "internal_gitx_gitx_test_testfetcherrordoesnotleaktoken",
+      "label": "TestFetchErrorDoesNotLeakToken()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanbinarybothchangedconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L196"
+      "norm_label": "testfetcherrordoesnotleaktoken()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L351"
     },
     {
-      "id": "internal_merge_plan_test_testplandeletevsmodifyconflict",
-      "label": "TestPlanDeleteVsModifyConflict()",
+      "id": "internal_gitx_gitx_test_testfetchfallsbackonlywhenthefilterisrejected",
+      "label": "TestFetchFallsBackOnlyWhenTheFilterIsRejected()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplandeletevsmodifyconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L203"
+      "norm_label": "testfetchfallsbackonlywhenthefilterisrejected()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L464"
     },
     {
-      "id": "internal_merge_plan_test_testplandeletevsunchanged",
-      "label": "TestPlanDeleteVsUnchanged()",
+      "id": "internal_gitx_gitx_test_testfilteredfetchisblobless",
+      "label": "TestFilteredFetchIsBlobless()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplandeletevsunchanged()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L147"
+      "norm_label": "testfilteredfetchisblobless()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L209"
     },
     {
-      "id": "internal_merge_plan_test_testplandisjointeditsmerge",
-      "label": "TestPlanDisjointEditsMerge()",
+      "id": "internal_gitx_gitx_test_testlistskilldirs",
+      "label": "TestListSkillDirs()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplandisjointeditsmerge()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L164"
+      "norm_label": "testlistskilldirs()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L367"
     },
     {
-      "id": "internal_merge_plan_test_testplanexecbitonlychange",
-      "label": "TestPlanExecBitOnlyChange()",
+      "id": "internal_gitx_gitx_test_testopenlocalreadscheckedouthead",
+      "label": "TestOpenLocalReadsCheckedOutHead()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanexecbitonlychange()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L238"
+      "norm_label": "testopenlocalreadscheckedouthead()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L498"
     },
     {
-      "id": "internal_merge_plan_test_testplanhunkoursstartinourslines",
-      "label": "TestPlanHunkOursStartInOursLines()",
+      "id": "internal_gitx_gitx_test_testopenrefusesescapingkey",
+      "label": "TestOpenRefusesEscapingKey()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanhunkoursstartinourslines()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L185"
+      "norm_label": "testopenrefusesescapingkey()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L241"
     },
     {
-      "id": "internal_merge_plan_test_testplanhunkwithmarkercontentline",
-      "label": "TestPlanHunkWithMarkerContentLine()",
+      "id": "internal_gitx_gitx_test_testopenwritesconfigonlywhenneeded",
+      "label": "TestOpenWritesConfigOnlyWhenNeeded()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanhunkwithmarkercontentline()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L287"
+      "norm_label": "testopenwritesconfigonlywhenneeded()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L431"
     },
     {
-      "id": "internal_merge_plan_test_testplanlegitmarkersmergecleanly",
-      "label": "TestPlanLegitMarkersMergeCleanly()",
+      "id": "internal_gitx_gitx_test_testreadfile",
+      "label": "TestReadFile()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanlegitmarkersmergecleanly()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L230"
+      "norm_label": "testreadfile()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L397"
     },
     {
-      "id": "internal_merge_plan_test_testplanneveremitsmarkers",
-      "label": "TestPlanNeverEmitsMarkers()",
+      "id": "internal_gitx_gitx_test_testresolverefs",
+      "label": "TestResolveRefs()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanneveremitsmarkers()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L263"
+      "norm_label": "testresolverefs()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L127"
     },
     {
-      "id": "internal_merge_plan_test_testplanoursunchangedtakestheirs",
-      "label": "TestPlanOursUnchangedTakesTheirs()",
+      "id": "internal_gitx_gitx_test_testresolverejectsrevisionexpressions",
+      "label": "TestResolveRejectsRevisionExpressions()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanoursunchangedtakestheirs()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L111"
+      "norm_label": "testresolverejectsrevisionexpressions()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L273"
     },
     {
-      "id": "internal_merge_plan_test_testplanoverlapisconflict",
-      "label": "TestPlanOverlapIsConflict()",
+      "id": "internal_gitx_gitx_test_testsymlinkerrorquotespath",
+      "label": "TestSymlinkErrorQuotesPath()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanoverlapisconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L171"
+      "norm_label": "testsymlinkerrorquotespath()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L325"
     },
     {
-      "id": "internal_merge_plan_test_testplanpreservescrlfstyle",
-      "label": "TestPlanPreservesCRLFStyle()",
+      "id": "internal_gitx_gitx_test_testtreeshachangesonlywhensubtreechanges",
+      "label": "TestTreeSHAChangesOnlyWhenSubtreeChanges()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplanpreservescrlfstyle()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L223"
+      "norm_label": "testtreeshachangesonlywhensubtreechanges()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L152"
     },
     {
-      "id": "internal_merge_plan_test_testplansamechangekeeps",
-      "label": "TestPlanSameChangeKeeps()",
+      "id": "internal_gitx_gitx_test_write",
+      "label": "write()",
       "_origin": "ast",
       "community": 12,
-      "community_name": "plan_test.go",
+      "community_name": "gitx_test.go",
       "file_type": "code",
-      "norm_label": "testplansamechangekeeps()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L157"
-    },
-    {
-      "id": "internal_merge_plan_test_testplantheirsunchangedkeepsours",
-      "label": "TestPlanTheirsUnchangedKeepsOurs()",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "plan_test.go",
-      "file_type": "code",
-      "norm_label": "testplantheirsunchangedkeepsours()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L134"
-    },
-    {
-      "id": "internal_merge_plan_test_tr",
-      "label": "tr()",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "plan_test.go",
-      "file_type": "code",
-      "norm_label": "tr()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L15"
-    },
-    {
-      "id": "merge_fixture",
-      "label": "fixture",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "plan_test.go",
-      "file_type": "code",
-      "norm_label": "fixture",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L17"
+      "norm_label": "write()",
+      "source_file": "internal/gitx/gitx_test.go",
+      "source_location": "L32"
     },
     {
       "id": "find_hit",
@@ -3413,6 +3391,270 @@
       "source_location": "L9"
     },
     {
+      "id": "internal_source_spec",
+      "label": "spec.go",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "spec.go",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_source_spec_go_source_options",
+      "label": "Options",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "options",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L24"
+    },
+    {
+      "id": "internal_source_spec_ownerrepo",
+      "label": "ownerRepo()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "ownerrepo()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L154"
+    },
+    {
+      "id": "internal_source_spec_parse",
+      "label": "Parse()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "parse()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L27"
+    },
+    {
+      "id": "internal_source_spec_parsewith",
+      "label": "ParseWith()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "parsewith()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L33"
+    },
+    {
+      "id": "internal_source_spec_reject",
+      "label": "reject()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "reject()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L139"
+    },
+    {
+      "id": "internal_source_spec_safescheme",
+      "label": "safeScheme()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "safescheme()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L145"
+    },
+    {
+      "id": "internal_source_spec_sameurl",
+      "label": "SameURL()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "sameurl()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L129"
+    },
+    {
+      "id": "internal_source_spec_test",
+      "label": "spec_test.go",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "spec_test.go",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_source_spec_test_testcanonicalurl",
+      "label": "TestCanonicalURL()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testcanonicalurl()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L105"
+    },
+    {
+      "id": "internal_source_spec_test_testcredentialsnotechoed",
+      "label": "TestCredentialsNotEchoed()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testcredentialsnotechoed()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L137"
+    },
+    {
+      "id": "internal_source_spec_test_testextrasegmentnamed",
+      "label": "TestExtraSegmentNamed()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testextrasegmentnamed()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L164"
+    },
+    {
+      "id": "internal_source_spec_test_testgithubcomwithoutscheme",
+      "label": "TestGithubComWithoutScheme()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testgithubcomwithoutscheme()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L183"
+    },
+    {
+      "id": "internal_source_spec_test_testkey",
+      "label": "TestKey()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testkey()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L191"
+    },
+    {
+      "id": "internal_source_spec_test_testkeyfileurlisshorthash",
+      "label": "TestKeyFileURLIsShortHash()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testkeyfileurlisshorthash()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L207"
+    },
+    {
+      "id": "internal_source_spec_test_testotherhostskeepownerrepocase",
+      "label": "TestOtherHostsKeepOwnerRepoCase()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testotherhostskeepownerrepocase()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L127"
+    },
+    {
+      "id": "internal_source_spec_test_testparse",
+      "label": "TestParse()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testparse()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L8"
+    },
+    {
+      "id": "internal_source_spec_test_testparseerrors",
+      "label": "TestParseErrors()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testparseerrors()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L30"
+    },
+    {
+      "id": "internal_source_spec_test_testparsesamerepo",
+      "label": "TestParseSameRepo()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testparsesamerepo()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L234"
+    },
+    {
+      "id": "internal_source_spec_test_testparsewithallowfile",
+      "label": "TestParseWithAllowFile()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testparsewithallowfile()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L66"
+    },
+    {
+      "id": "internal_source_spec_test_testrefafterrepostillparses",
+      "label": "TestRefAfterRepoStillParses()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testrefafterrepostillparses()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L171"
+    },
+    {
+      "id": "internal_source_spec_test_testsameurlfoldsoldlockentries",
+      "label": "TestSameURLFoldsOldLockEntries()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "testsameurlfoldsoldlockentries()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L218"
+    },
+    {
+      "id": "internal_source_spec_test_teststringroundtrip",
+      "label": "TestStringRoundTrip()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "teststringroundtrip()",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L80"
+    },
+    {
+      "id": "internal_source_spec_validpart",
+      "label": "validPart()",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "ParseWith",
+      "file_type": "code",
+      "norm_label": "validpart()",
+      "source_file": "internal/source/spec.go",
+      "source_location": "L185"
+    },
+    {
       "id": "internal_dirs_dirs",
       "label": "dirs.go",
       "_origin": "ast",
@@ -3575,18 +3817,7 @@
       "file_type": "code",
       "norm_label": "locate()",
       "source_file": "internal/install/add.go",
-      "source_location": "L696"
-    },
-    {
-      "id": "internal_manifest_manifest_readwith",
-      "label": "ReadWith()",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "setup",
-      "file_type": "code",
-      "norm_label": "readwith()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L72"
+      "source_location": "L690"
     },
     {
       "id": "internal_update_apply_test",
@@ -3963,6 +4194,17 @@
       "source_location": "L90"
     },
     {
+      "id": "internal_update_update_shellarg",
+      "label": "shellArg()",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "setup",
+      "file_type": "code",
+      "norm_label": "shellarg()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L343"
+    },
+    {
       "id": "internal_update_update_test",
       "label": "update_test.go",
       "_origin": "ast",
@@ -4128,17 +4370,6 @@
       "source_location": "L310"
     },
     {
-      "id": "internal_update_update_test_testplanfailsoninvalidref",
-      "label": "TestPlanFailsOnInvalidRef()",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "setup",
-      "file_type": "code",
-      "norm_label": "testplanfailsoninvalidref()",
-      "source_file": "internal/update/update_test.go",
-      "source_location": "L402"
-    },
-    {
       "id": "internal_update_update_test_testplankeepsgoingwhenonefolderisgoneupstream",
       "label": "TestPlanKeepsGoingWhenOneFolderIsGoneUpstream()",
       "_origin": "ast",
@@ -4225,6 +4456,17 @@
       "norm_label": "testresolvehintkeepsmanifestflag()",
       "source_file": "internal/update/update_test.go",
       "source_location": "L560"
+    },
+    {
+      "id": "internal_update_update_test_testshellargquotesrepopaths",
+      "label": "TestShellArgQuotesRepoPaths()",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "setup",
+      "file_type": "code",
+      "norm_label": "testshellargquotesrepopaths()",
+      "source_file": "internal/update/update_test.go",
+      "source_location": "L516"
     },
     {
       "id": "internal_update_update_test_write",
@@ -4326,125 +4568,37 @@
       "source_location": "L102"
     },
     {
-      "id": "internal_backup_backup",
-      "label": "backup.go",
+      "id": "update_options",
+      "label": "Options",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "backup.go",
-      "source_file": "internal/backup/backup.go",
-      "source_location": "L1"
+      "norm_label": "options",
+      "source_file": "internal/update/update.go",
+      "source_location": "L31"
     },
     {
-      "id": "internal_backup_backup_save",
-      "label": "Save()",
+      "id": "update_proposal",
+      "label": "Proposal",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "save()",
-      "source_file": "internal/backup/backup.go",
-      "source_location": "L22"
+      "norm_label": "proposal",
+      "source_file": "internal/update/update.go",
+      "source_location": "L40"
     },
     {
-      "id": "internal_backup_backup_test",
-      "label": "backup_test.go",
+      "id": "update_proposal_skipped",
+      "label": ".Skipped()",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "backup_test.go",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_backup_backup_test_fixednow",
-      "label": "fixedNow()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "fixednow()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L13"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaveappendssuffixoncollision",
-      "label": "TestSaveAppendsSuffixOnCollision()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsaveappendssuffixoncollision()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L56"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavecreatesmissingdatadir",
-      "label": "TestSaveCreatesMissingDataDir()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsavecreatesmissingdatadir()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L123"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavedirsareprivate",
-      "label": "TestSaveDirsArePrivate()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsavedirsareprivate()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L87"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaverejectsbadname",
-      "label": "TestSaveRejectsBadName()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsaverejectsbadname()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L75"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaveusertreebreakingupstreamrules",
-      "label": "TestSaveUserTreeBreakingUpstreamRules()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsaveusertreebreakingupstreamrules()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L108"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavewithoutpatchwritesnopatchfile",
-      "label": "TestSaveWithoutPatchWritesNoPatchFile()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsavewithoutpatchwritesnopatchfile()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L45"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavewritesfilesandpatch",
-      "label": "TestSaveWritesFilesAndPatch()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testsavewritesfilesandpatch()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L25"
+      "norm_label": ".skipped()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L327"
     },
     {
       "id": "internal_golden_golden_test",
@@ -4500,6 +4654,28 @@
       "norm_label": "existing()",
       "source_file": "internal/install/add.go",
       "source_location": "L501"
+    },
+    {
+      "id": "internal_install_add_moveaside",
+      "label": "MoveAside()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "moveaside()",
+      "source_file": "internal/install/add.go",
+      "source_location": "L544"
+    },
+    {
+      "id": "internal_install_add_nosymlinks",
+      "label": "NoSymlinks()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "nosymlinks()",
+      "source_file": "internal/install/add.go",
+      "source_location": "L702"
     },
     {
       "id": "internal_install_add_stage",
@@ -4731,6 +4907,17 @@
       "norm_label": "testmarkersize()",
       "source_file": "internal/merge/plan_test.go",
       "source_location": "L299"
+    },
+    {
+      "id": "internal_render_render_sanitize",
+      "label": "Sanitize()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "sanitize()",
+      "source_file": "internal/render/render.go",
+      "source_location": "L144"
     },
     {
       "id": "internal_skillfs_tree",
@@ -5096,17 +5283,6 @@
       "source_location": "L480"
     },
     {
-      "id": "internal_update_update_shellarg",
-      "label": "shellArg()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "shellarg()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L343"
-    },
-    {
       "id": "internal_update_update_short",
       "label": "short()",
       "_origin": "ast",
@@ -5118,17 +5294,6 @@
       "source_location": "L334"
     },
     {
-      "id": "internal_update_update_test_testshellargquotesrepopaths",
-      "label": "TestShellArgQuotesRepoPaths()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testshellargquotesrepopaths()",
-      "source_file": "internal/update/update_test.go",
-      "source_location": "L516"
-    },
-    {
       "id": "internal_update_update_text",
       "label": "text()",
       "_origin": "ast",
@@ -5138,6 +5303,17 @@
       "norm_label": "text()",
       "source_file": "internal/update/update.go",
       "source_location": "L258"
+    },
+    {
+      "id": "internal_update_update_warnleftovers",
+      "label": "warnLeftovers()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "warnleftovers()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L246"
     },
     {
       "id": "merge_hunk",
@@ -5239,17 +5415,6 @@
       "source_location": "L432"
     },
     {
-      "id": "update_options",
-      "label": "Options",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "options",
-      "source_file": "internal/update/update.go",
-      "source_location": "L31"
-    },
-    {
       "id": "update_prompter",
       "label": "Prompter",
       "_origin": "ast",
@@ -5261,17 +5426,6 @@
       "source_location": "L83"
     },
     {
-      "id": "update_proposal",
-      "label": "Proposal",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "proposal",
-      "source_file": "internal/update/update.go",
-      "source_location": "L40"
-    },
-    {
       "id": "update_proposal_conflicts",
       "label": ".Conflicts()",
       "_origin": "ast",
@@ -5281,17 +5435,6 @@
       "norm_label": ".conflicts()",
       "source_file": "internal/update/update.go",
       "source_location": "L311"
-    },
-    {
-      "id": "update_proposal_skipped",
-      "label": ".Skipped()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": ".skipped()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L327"
     },
     {
       "id": "update_proposal_writetext",
@@ -5336,6 +5479,259 @@
       "norm_label": "targetplan",
       "source_file": "internal/update/update.go",
       "source_location": "L65"
+    },
+    {
+      "id": "internal_merge_classify_test_testclassifydeletevsmodifyfromplan",
+      "label": "TestClassifyDeleteVsModifyFromPlan()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testclassifydeletevsmodifyfromplan()",
+      "source_file": "internal/merge/classify_test.go",
+      "source_location": "L87"
+    },
+    {
+      "id": "internal_merge_plan_test",
+      "label": "plan_test.go",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "plan_test.go",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_merge_plan_test_bypath",
+      "label": "byPath()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "bypath()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L100"
+    },
+    {
+      "id": "internal_merge_plan_test_f",
+      "label": "f()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "f()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_merge_plan_test_markerlines",
+      "label": "markerLines()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "markerlines()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L251"
+    },
+    {
+      "id": "internal_merge_plan_test_plan",
+      "label": "plan()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "plan()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L90"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanaddaddconflict",
+      "label": "TestPlanAddAddConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanaddaddconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L212"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanbinarybothchangedconflict",
+      "label": "TestPlanBinaryBothChangedConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanbinarybothchangedconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L196"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandeletevsmodifyconflict",
+      "label": "TestPlanDeleteVsModifyConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandeletevsmodifyconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L203"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandeletevsunchanged",
+      "label": "TestPlanDeleteVsUnchanged()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandeletevsunchanged()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L147"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandisjointeditsmerge",
+      "label": "TestPlanDisjointEditsMerge()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandisjointeditsmerge()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L164"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanexecbitonlychange",
+      "label": "TestPlanExecBitOnlyChange()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanexecbitonlychange()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L238"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanhunkoursstartinourslines",
+      "label": "TestPlanHunkOursStartInOursLines()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanhunkoursstartinourslines()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L185"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanhunkwithmarkercontentline",
+      "label": "TestPlanHunkWithMarkerContentLine()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanhunkwithmarkercontentline()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L287"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanlegitmarkersmergecleanly",
+      "label": "TestPlanLegitMarkersMergeCleanly()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanlegitmarkersmergecleanly()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L230"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanneveremitsmarkers",
+      "label": "TestPlanNeverEmitsMarkers()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanneveremitsmarkers()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L263"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanoursunchangedtakestheirs",
+      "label": "TestPlanOursUnchangedTakesTheirs()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanoursunchangedtakestheirs()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L111"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanoverlapisconflict",
+      "label": "TestPlanOverlapIsConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanoverlapisconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L171"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanpreservescrlfstyle",
+      "label": "TestPlanPreservesCRLFStyle()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanpreservescrlfstyle()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L223"
+    },
+    {
+      "id": "internal_merge_plan_test_testplansamechangekeeps",
+      "label": "TestPlanSameChangeKeeps()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplansamechangekeeps()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L157"
+    },
+    {
+      "id": "internal_merge_plan_test_testplantheirsunchangedkeepsours",
+      "label": "TestPlanTheirsUnchangedKeepsOurs()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplantheirsunchangedkeepsours()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L134"
+    },
+    {
+      "id": "internal_merge_plan_test_tr",
+      "label": "tr()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "tr()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L15"
+    },
+    {
+      "id": "merge_fixture",
+      "label": "fixture",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "fixture",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L17"
     },
     {
       "id": "scripts_install",
@@ -5945,17 +6341,6 @@
       "source_location": "L11"
     },
     {
-      "id": "internal_install_add_go_install_location",
-      "label": "Location",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "fixture",
-      "file_type": "code",
-      "norm_label": "location",
-      "source_file": "internal/install/add.go",
-      "source_location": "L689"
-    },
-    {
       "id": "internal_status_status",
       "label": "status/status.go",
       "_origin": "ast",
@@ -6363,28 +6748,6 @@
       "source_location": "L53"
     },
     {
-      "id": "status_gitfetcher",
-      "label": "GitFetcher",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "fixture",
-      "file_type": "code",
-      "norm_label": "gitfetcher",
-      "source_file": "internal/status/status.go",
-      "source_location": "L279"
-    },
-    {
-      "id": "status_gitfetcher_latest",
-      "label": ".Latest()",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "fixture",
-      "file_type": "code",
-      "norm_label": ".latest()",
-      "source_file": "internal/status/status.go",
-      "source_location": "L288"
-    },
-    {
       "id": "status_input",
       "label": "Input",
       "_origin": "ast",
@@ -6426,7 +6789,18 @@
       "file_type": "code",
       "norm_label": "huhprompter",
       "source_file": "internal/cli/update.go",
-      "source_location": "L19"
+      "source_location": "L22"
+    },
+    {
+      "id": "cli_listrow",
+      "label": "listRow",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "listrow",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L103"
     },
     {
       "id": "cli_state",
@@ -6437,7 +6811,7 @@
       "file_type": "code",
       "norm_label": "state",
       "source_file": "internal/cli/list.go",
-      "source_location": "L31"
+      "source_location": "L33"
     },
     {
       "id": "cmd_cali_main",
@@ -6583,6 +6957,17 @@
       "source_location": "L1"
     },
     {
+      "id": "internal_cli_list_isglobal",
+      "label": "isGlobal()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "isglobal()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91"
+    },
+    {
       "id": "internal_cli_list_istty",
       "label": "isTTY()",
       "_origin": "ast",
@@ -6591,7 +6976,18 @@
       "file_type": "code",
       "norm_label": "istty()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L21"
+      "source_location": "L23"
+    },
+    {
+      "id": "internal_cli_list_listrows",
+      "label": "listRows()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "listrows()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L112"
     },
     {
       "id": "internal_cli_list_load",
@@ -6602,7 +6998,7 @@
       "file_type": "code",
       "norm_label": "load()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38"
+      "source_location": "L40"
     },
     {
       "id": "internal_cli_list_loadfrom",
@@ -6613,7 +7009,18 @@
       "file_type": "code",
       "norm_label": "loadfrom()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46"
+      "source_location": "L48"
+    },
+    {
+      "id": "internal_cli_list_loadscopes",
+      "label": "loadScopes()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "loadscopes()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69"
     },
     {
       "id": "internal_cli_list_newlistcmd",
@@ -6624,7 +7031,18 @@
       "file_type": "code",
       "norm_label": "newlistcmd()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L75"
+      "source_location": "L143"
+    },
+    {
+      "id": "internal_cli_list_scopename",
+      "label": "scopeName()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "scopename()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L136"
     },
     {
       "id": "internal_cli_list_short",
@@ -6635,7 +7053,7 @@
       "file_type": "code",
       "norm_label": "short()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L65"
+      "source_location": "L93"
     },
     {
       "id": "internal_cli_remove",
@@ -6679,7 +7097,7 @@
       "file_type": "code",
       "norm_label": "dash()",
       "source_file": "internal/cli/show.go",
-      "source_location": "L89"
+      "source_location": "L106"
     },
     {
       "id": "internal_cli_show_newshowcmd",
@@ -6690,7 +7108,7 @@
       "file_type": "code",
       "norm_label": "newshowcmd()",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "internal_cli_status",
@@ -6726,6 +7144,28 @@
       "source_location": "L1"
     },
     {
+      "id": "internal_cli_sync_exists",
+      "label": "exists()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "exists()",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L27"
+    },
+    {
+      "id": "internal_cli_sync_firstrun",
+      "label": "firstRun()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "firstrun()",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L82"
+    },
+    {
       "id": "internal_cli_sync_newsynccmd",
       "label": "newSyncCmd()",
       "_origin": "ast",
@@ -6734,7 +7174,7 @@
       "file_type": "code",
       "norm_label": "newsynccmd()",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L11"
+      "source_location": "L35"
     },
     {
       "id": "internal_cli_update",
@@ -6748,6 +7188,17 @@
       "source_location": "L1"
     },
     {
+      "id": "internal_cli_update_expandsources",
+      "label": "expandSources()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "expandsources()",
+      "source_file": "internal/cli/update.go",
+      "source_location": "L128"
+    },
+    {
       "id": "internal_cli_update_newupdatecmd",
       "label": "newUpdateCmd()",
       "_origin": "ast",
@@ -6756,7 +7207,18 @@
       "file_type": "code",
       "norm_label": "newupdatecmd()",
       "source_file": "internal/cli/update.go",
-      "source_location": "L50"
+      "source_location": "L53"
+    },
+    {
+      "id": "internal_install_add_go_install_location",
+      "label": "Location",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "location",
+      "source_file": "internal/install/add.go",
+      "source_location": "L683"
     },
     {
       "id": "internal_render_render",
@@ -6790,17 +7252,6 @@
       "norm_label": "modefor()",
       "source_file": "internal/render/render.go",
       "source_location": "L27"
-    },
-    {
-      "id": "internal_render_render_sanitize",
-      "label": "Sanitize()",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "io.Writer",
-      "file_type": "code",
-      "norm_label": "sanitize()",
-      "source_file": "internal/render/render.go",
-      "source_location": "L144"
     },
     {
       "id": "internal_render_render_sanitize_b64c5f",
@@ -6924,17 +7375,6 @@
       "source_location": "L112"
     },
     {
-      "id": "internal_update_update_warnleftovers",
-      "label": "warnLeftovers()",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "io.Writer",
-      "file_type": "code",
-      "norm_label": "warnleftovers()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L246"
-    },
-    {
       "id": "render_mode",
       "label": "Mode",
       "_origin": "ast",
@@ -6987,7 +7427,7 @@
       "file_type": "code",
       "norm_label": ".choose()",
       "source_file": "internal/cli/update.go",
-      "source_location": "L21"
+      "source_location": "L24"
     },
     {
       "id": "internal_merge_classify",
@@ -7496,6 +7936,127 @@
       "source_location": ""
     },
     {
+      "id": "internal_backup_backup",
+      "label": "backup.go",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "backup.go",
+      "source_file": "internal/backup/backup.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_backup_backup_save",
+      "label": "Save()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "save()",
+      "source_file": "internal/backup/backup.go",
+      "source_location": "L22"
+    },
+    {
+      "id": "internal_backup_backup_test",
+      "label": "backup_test.go",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "backup_test.go",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_backup_backup_test_fixednow",
+      "label": "fixedNow()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "fixednow()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaveappendssuffixoncollision",
+      "label": "TestSaveAppendsSuffixOnCollision()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaveappendssuffixoncollision()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L56"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavecreatesmissingdatadir",
+      "label": "TestSaveCreatesMissingDataDir()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavecreatesmissingdatadir()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L123"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavedirsareprivate",
+      "label": "TestSaveDirsArePrivate()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavedirsareprivate()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L87"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaverejectsbadname",
+      "label": "TestSaveRejectsBadName()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaverejectsbadname()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L75"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaveusertreebreakingupstreamrules",
+      "label": "TestSaveUserTreeBreakingUpstreamRules()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaveusertreebreakingupstreamrules()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L108"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavewithoutpatchwritesnopatchfile",
+      "label": "TestSaveWithoutPatchWritesNoPatchFile()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavewithoutpatchwritesnopatchfile()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L45"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavewritesfilesandpatch",
+      "label": "TestSaveWritesFilesAndPatch()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavewritesfilesandpatch()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L25"
+    },
+    {
       "id": "internal_cli_agentskills_test",
       "label": "agentskills_test.go",
       "_origin": "ast",
@@ -7925,6 +8486,138 @@
       "source_location": "L11"
     },
     {
+      "id": "internal_cli_usage_test",
+      "label": "usage_test.go",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "usage_test.go",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_cli_usage_test_addsecondskill",
+      "label": "addSecondSkill()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "addsecondskill()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "label": "TestAddWholeRepoInstallsEverySkill()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testaddwholerepoinstallseveryskill()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L26"
+    },
+    {
+      "id": "internal_cli_usage_test_testbothscopesfromhome",
+      "label": "TestBothScopesFromHome()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testbothscopesfromhome()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159"
+    },
+    {
+      "id": "internal_cli_usage_test_testfindsearchesbothscopes",
+      "label": "TestFindSearchesBothScopes()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testfindsearchesbothscopes()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L82"
+    },
+    {
+      "id": "internal_cli_usage_test_testlistallscopes",
+      "label": "TestListAllScopes()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testlistallscopes()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L61"
+    },
+    {
+      "id": "internal_cli_usage_test_testremoveprintsrestore",
+      "label": "TestRemovePrintsRestore()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testremoveprintsrestore()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L104"
+    },
+    {
+      "id": "internal_cli_usage_test_testremoverestorekeepsref",
+      "label": "TestRemoveRestoreKeepsRef()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testremoverestorekeepsref()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173"
+    },
+    {
+      "id": "internal_cli_usage_test_testshowfallsbacktoglobal",
+      "label": "TestShowFallsBackToGlobal()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testshowfallsbacktoglobal()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L94"
+    },
+    {
+      "id": "internal_cli_usage_test_testsyncglobalusesprojectmanifest",
+      "label": "TestSyncGlobalUsesProjectManifest()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsyncglobalusesprojectmanifest()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L115"
+    },
+    {
+      "id": "internal_cli_usage_test_testsyncwithoutmanifest",
+      "label": "TestSyncWithoutManifest()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsyncwithoutmanifest()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L134"
+    },
+    {
+      "id": "internal_cli_usage_test_testupdatebysourcespec",
+      "label": "TestUpdateBySourceSpec()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testupdatebysourcespec()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L39"
+    },
+    {
       "id": "internal_lock_lock_test",
       "label": "lock_test.go",
       "_origin": "ast",
@@ -8046,407 +8739,33 @@
       "source_location": "L101"
     },
     {
-      "id": "internal_skillfs_tree_test",
-      "label": "tree_test.go",
+      "id": "internal_manifest_manifest_skillnamevalid",
+      "label": "SkillNameValid()",
       "_origin": "ast",
       "community": 7,
       "community_name": "testing.T",
       "file_type": "code",
-      "norm_label": "tree_test.go",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L1"
+      "norm_label": "skillnamevalid()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L57"
     },
     {
-      "id": "internal_skillfs_tree_test_go_tree",
-      "label": "Tree",
+      "id": "internal_manifest_manifest_test_testskillnamevalid",
+      "label": "TestSkillNameValid()",
       "_origin": "ast",
       "community": 7,
       "community_name": "testing.T",
       "file_type": "code",
-      "norm_label": "tree",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "internal_skillfs_tree_test_skillmd",
-      "label": "skillMD()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "skillmd()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L11"
-    },
-    {
-      "id": "internal_skillfs_tree_test_static",
-      "label": "static()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "static()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L63"
-    },
-    {
-      "id": "internal_skillfs_tree_test_symlinkorskip",
-      "label": "symlinkOrSkip()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "symlinkorskip()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L13"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testdiffkinds",
-      "label": "TestDiffKinds()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testdiffkinds()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L320"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalbinaryexact",
-      "label": "TestEqualBinaryExact()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalbinaryexact()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L31"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalcomparesexecandfileset",
-      "label": "TestEqualComparesExecAndFileSet()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalcomparesexecandfileset()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L49"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalignoresexecwhennotcompared",
-      "label": "TestEqualIgnoresExecWhenNotCompared()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalignoresexecwhennotcompared()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L238"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testreaddirlimits",
-      "label": "TestReadDirLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testreaddirlimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L299"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testreaddirrejectssymlink",
-      "label": "TestReadDirRejectsSymlink()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testreaddirrejectssymlink()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L114"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidatelimits",
-      "label": "TestValidateLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidatelimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L286"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidaterejects",
-      "label": "TestValidateRejects()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidaterejects()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L67"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidaterejectscollisionsandreserved",
-      "label": "TestValidateRejectsCollisionsAndReserved()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidaterejectscollisionsandreserved()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L209"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetoinvalidwritesnothing",
-      "label": "TestWriteToInvalidWritesNothing()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetoinvalidwritesnothing()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L158"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusesnonemptytarget",
-      "label": "TestWriteToRefusesNonEmptyTarget()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusesnonemptytarget()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L249"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkcomponent",
-      "label": "TestWriteToRefusesSymlinkComponent()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinkcomponent()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L169"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkfile",
-      "label": "TestWriteToRefusesSymlinkFile()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinkfile()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L189"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinktarget",
-      "label": "TestWriteToRefusesSymlinkTarget()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinktarget()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L263"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwriteuncheckedkeepspathsafety",
-      "label": "TestWriteUncheckedKeepsPathSafety()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwriteuncheckedkeepspathsafety()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L368"
-    },
-    {
-      "id": "internal_skillfs_tree_test_withlimits",
-      "label": "withLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "withlimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L279"
-    },
-    {
-      "id": "internal_source_spec_parse",
-      "label": "Parse()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "parse()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L27"
-    },
-    {
-      "id": "internal_source_spec_test",
-      "label": "spec_test.go",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "spec_test.go",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_source_spec_test_testcanonicalurl",
-      "label": "TestCanonicalURL()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testcanonicalurl()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L105"
-    },
-    {
-      "id": "internal_source_spec_test_testcredentialsnotechoed",
-      "label": "TestCredentialsNotEchoed()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testcredentialsnotechoed()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L137"
-    },
-    {
-      "id": "internal_source_spec_test_testextrasegmentnamed",
-      "label": "TestExtraSegmentNamed()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testextrasegmentnamed()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L164"
-    },
-    {
-      "id": "internal_source_spec_test_testkey",
-      "label": "TestKey()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testkey()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L183"
-    },
-    {
-      "id": "internal_source_spec_test_testkeyfileurlisshorthash",
-      "label": "TestKeyFileURLIsShortHash()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testkeyfileurlisshorthash()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L199"
-    },
-    {
-      "id": "internal_source_spec_test_testotherhostskeepownerrepocase",
-      "label": "TestOtherHostsKeepOwnerRepoCase()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testotherhostskeepownerrepocase()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L127"
-    },
-    {
-      "id": "internal_source_spec_test_testparse",
-      "label": "TestParse()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testparse()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L8"
-    },
-    {
-      "id": "internal_source_spec_test_testparseerrors",
-      "label": "TestParseErrors()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testparseerrors()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L30"
-    },
-    {
-      "id": "internal_source_spec_test_testparsesamerepo",
-      "label": "TestParseSameRepo()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testparsesamerepo()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L226"
-    },
-    {
-      "id": "internal_source_spec_test_testparsewithallowfile",
-      "label": "TestParseWithAllowFile()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testparsewithallowfile()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L66"
-    },
-    {
-      "id": "internal_source_spec_test_testrefafterrepostillparses",
-      "label": "TestRefAfterRepoStillParses()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testrefafterrepostillparses()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L171"
-    },
-    {
-      "id": "internal_source_spec_test_testsameurlfoldsoldlockentries",
-      "label": "TestSameURLFoldsOldLockEntries()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testsameurlfoldsoldlockentries()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L210"
-    },
-    {
-      "id": "internal_source_spec_test_teststringroundtrip",
-      "label": "TestStringRoundTrip()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "teststringroundtrip()",
-      "source_file": "internal/source/spec_test.go",
-      "source_location": "L80"
+      "norm_label": "testskillnamevalid()",
+      "source_file": "internal/manifest/manifest_test.go",
+      "source_location": "L111"
     },
     {
       "id": "internal_manifest_manifest",
       "label": "manifest.go",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "manifest.go",
       "source_file": "internal/manifest/manifest.go",
@@ -8457,7 +8776,7 @@
       "label": "copyComments()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "copycomments()",
       "source_file": "internal/manifest/manifest.go",
@@ -8468,7 +8787,7 @@
       "label": "ensureMapping()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "ensuremapping()",
       "source_file": "internal/manifest/manifest.go",
@@ -8479,7 +8798,7 @@
       "label": "Manifest",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "manifest",
       "source_file": "internal/manifest/manifest.go",
@@ -8490,7 +8809,7 @@
       "label": "Skill",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "skill",
       "source_file": "internal/manifest/manifest.go",
@@ -8501,7 +8820,7 @@
       "label": "markFlow()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "markflow()",
       "source_file": "internal/manifest/manifest.go",
@@ -8512,18 +8831,29 @@
       "label": "Read()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "read()",
       "source_file": "internal/manifest/manifest.go",
       "source_location": "L68"
     },
     {
+      "id": "internal_manifest_manifest_readwith",
+      "label": "ReadWith()",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "manifest.go",
+      "file_type": "code",
+      "norm_label": "readwith()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L72"
+    },
+    {
       "id": "internal_manifest_manifest_removekey",
       "label": "removeKey()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "removekey()",
       "source_file": "internal/manifest/manifest.go",
@@ -8534,7 +8864,7 @@
       "label": "render()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "render()",
       "source_file": "internal/manifest/manifest.go",
@@ -8545,7 +8875,7 @@
       "label": "setList()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "setlist()",
       "source_file": "internal/manifest/manifest.go",
@@ -8556,29 +8886,18 @@
       "label": "setScalar()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "setscalar()",
       "source_file": "internal/manifest/manifest.go",
       "source_location": "L321"
     },
     {
-      "id": "internal_manifest_manifest_skillnamevalid",
-      "label": "SkillNameValid()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "skillnamevalid()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L57"
-    },
-    {
       "id": "internal_manifest_manifest_test",
       "label": "manifest_test.go",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "manifest_test.go",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8589,7 +8908,7 @@
       "label": "TestReadRejectsBadSource()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadrejectsbadsource()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8600,7 +8919,7 @@
       "label": "TestReadRejectsBadVersion()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadrejectsbadversion()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8611,7 +8930,7 @@
       "label": "TestReadRejectsMissingSourceAndBadName()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadrejectsmissingsourceandbadname()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8622,7 +8941,7 @@
       "label": "TestReadRejectsRefOnSameRepoSource()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadrejectsrefonsamereposource()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8633,7 +8952,7 @@
       "label": "TestReadUnknownKeyIsError()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadunknownkeyiserror()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8644,7 +8963,7 @@
       "label": "TestReadValid()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadvalid()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8655,29 +8974,18 @@
       "label": "TestReadValidatesTargets()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testreadvalidatestargets()",
       "source_file": "internal/manifest/manifest_test.go",
       "source_location": "L87"
     },
     {
-      "id": "internal_manifest_manifest_test_testskillnamevalid",
-      "label": "TestSkillNameValid()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "testskillnamevalid()",
-      "source_file": "internal/manifest/manifest_test.go",
-      "source_location": "L111"
-    },
-    {
       "id": "internal_manifest_manifest_test_testtargetsforoverride",
       "label": "TestTargetsForOverride()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testtargetsforoverride()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8688,7 +8996,7 @@
       "label": "TestWritePreservesComments()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testwritepreservescomments()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8699,7 +9007,7 @@
       "label": "TestWriteRejectsInvalid()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testwriterejectsinvalid()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8710,7 +9018,7 @@
       "label": "TestWriteRemovesAndChanges()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testwriteremovesandchanges()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8721,7 +9029,7 @@
       "label": "TestWriteRoundTrip()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testwriteroundtrip()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8732,7 +9040,7 @@
       "label": "TestWriteWithAllowsFileScheme()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "testwritewithallowsfilescheme()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8743,7 +9051,7 @@
       "label": "writeFile()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "writefile()",
       "source_file": "internal/manifest/manifest_test.go",
@@ -8754,7 +9062,7 @@
       "label": "update()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "update()",
       "source_file": "internal/manifest/manifest.go",
@@ -8765,7 +9073,7 @@
       "label": "validTargets()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "validtargets()",
       "source_file": "internal/manifest/manifest.go",
@@ -8776,7 +9084,7 @@
       "label": "valueOf()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "valueof()",
       "source_file": "internal/manifest/manifest.go",
@@ -8787,7 +9095,7 @@
       "label": "Write()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "write()",
       "source_file": "internal/manifest/manifest.go",
@@ -8798,106 +9106,29 @@
       "label": "WriteWith()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "writewith()",
       "source_file": "internal/manifest/manifest.go",
       "source_location": "L149"
     },
     {
-      "id": "internal_source_spec",
-      "label": "spec.go",
+      "id": "internal_update_update_test_testplanfailsoninvalidref",
+      "label": "TestPlanFailsOnInvalidRef()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
-      "norm_label": "spec.go",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_source_spec_go_source_options",
-      "label": "Options",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "options",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L24"
-    },
-    {
-      "id": "internal_source_spec_ownerrepo",
-      "label": "ownerRepo()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "ownerrepo()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L152"
-    },
-    {
-      "id": "internal_source_spec_parsewith",
-      "label": "ParseWith()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "parsewith()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L33"
-    },
-    {
-      "id": "internal_source_spec_reject",
-      "label": "reject()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "reject()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L137"
-    },
-    {
-      "id": "internal_source_spec_safescheme",
-      "label": "safeScheme()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "safescheme()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L143"
-    },
-    {
-      "id": "internal_source_spec_sameurl",
-      "label": "SameURL()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "sameurl()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L127"
-    },
-    {
-      "id": "internal_source_spec_validpart",
-      "label": "validPart()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "validpart()",
-      "source_file": "internal/source/spec.go",
-      "source_location": "L183"
+      "norm_label": "testplanfailsoninvalidref()",
+      "source_file": "internal/update/update_test.go",
+      "source_location": "L402"
     },
     {
       "id": "manifest_manifest_targetsfor",
       "label": ".TargetsFor()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": ".targetsfor()",
       "source_file": "internal/manifest/manifest.go",
@@ -8908,7 +9139,7 @@
       "label": ".validate()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": ".validate()",
       "source_file": "internal/manifest/manifest.go",
@@ -8919,7 +9150,7 @@
       "label": ".EffectiveRef()",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": ".effectiveref()",
       "source_file": "internal/manifest/manifest.go",
@@ -8930,7 +9161,7 @@
       "label": "yaml.Node",
       "_origin": "ast",
       "community": 9,
-      "community_name": "ParseWith",
+      "community_name": "manifest.go",
       "file_type": "code",
       "norm_label": "yaml.node",
       "source_file": "",
@@ -9340,7 +9571,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L30",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -9352,7 +9583,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L36",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -9892,7 +10123,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/agentskills_test.go",
-      "source_location": "L139",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -9904,7 +10135,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/agentskills_test.go",
-      "source_location": "L140",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -10497,6 +10728,30 @@
     },
     {
       "source": "internal_cli_find_newfindcmd",
+      "target": "internal_render_render_modefor",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/find.go",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_find_newfindcmd",
+      "target": "internal_render_render_writejson",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/find.go",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_find_newfindcmd",
       "target": "internal_source_spec_parsewith",
       "relation": "calls",
       "_origin": "ast",
@@ -10504,7 +10759,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L45",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -10516,7 +10771,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L58",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -10528,7 +10783,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L64",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -10540,7 +10795,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L68",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -10552,31 +10807,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L72",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
-      "source": "internal_cli_find_newfindcmd",
-      "target": "internal_render_render_modefor",
+      "source": "internal_cli_list_listrows",
+      "target": "internal_status_status_unmanagedrows",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
-      "source_file": "internal/cli/find.go",
-      "source_location": "L87",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_find_newfindcmd",
-      "target": "internal_render_render_writejson",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "internal/cli/find.go",
-      "source_location": "L99",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -10588,7 +10831,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -10600,7 +10843,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -10612,7 +10855,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -10624,31 +10867,79 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L58",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
-      "source": "internal_cli_list_newlistcmd",
-      "target": "internal_cli_list_short",
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_cli_list_loadfrom",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L105",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
-      "source": "internal_cli_list_newlistcmd",
-      "target": "internal_status_status_unmanagedrows",
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_cli_list_scopename",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L107",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_listrows",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L167",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_isglobal",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_scopename",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -10660,7 +10951,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L115",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -10672,7 +10963,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L115",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -10684,19 +10975,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L117",
+      "source_location": "L180",
       "weight": 1.0
     },
     {
       "source": "internal_cli_list_newlistcmd",
-      "target": "internal_cli_list_load",
+      "target": "internal_cli_list_short",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L82",
+      "source_location": "L189",
       "weight": 1.0
     },
     {
@@ -10768,7 +11059,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L43",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -10780,7 +11071,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L52",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -10792,7 +11083,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L59",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -10804,7 +11095,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L61",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -10816,7 +11107,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L67",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -10828,7 +11119,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L71",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -10892,6 +11183,54 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_sync_firstrun",
+      "target": "internal_install_add_add",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync_newsynccmd",
+      "target": "internal_install_add_locate",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync_newsynccmd",
+      "target": "internal_cli_sync_exists",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync_newsynccmd",
+      "target": "internal_cli_sync_firstrun",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_sync_newsynccmd",
       "target": "internal_install_sync_sync",
       "relation": "calls",
@@ -10900,19 +11239,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L23",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
-      "source": "internal_cli_update_newupdatecmd",
-      "target": "internal_update_update_plan",
+      "source": "internal_cli_update_expandsources",
+      "target": "internal_source_spec_parsewith",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L84",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -10924,7 +11263,67 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L94",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_update_newupdatecmd",
+      "target": "internal_cli_update_expandsources",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/update.go",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_update_newupdatecmd",
+      "target": "internal_update_update_plan",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/update.go",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "target": "internal_cli_usage_test_addsecondskill",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testlistallscopes",
+      "target": "internal_cli_usage_test_addsecondskill",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testupdatebysourcespec",
+      "target": "internal_cli_usage_test_addsecondskill",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -12232,7 +12631,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/add.go",
-      "source_location": "L713",
+      "source_location": "L707",
       "weight": 1.0
     },
     {
@@ -12304,7 +12703,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/add.go",
-      "source_location": "L697",
+      "source_location": "L691",
       "weight": 1.0
     },
     {
@@ -12316,7 +12715,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/add.go",
-      "source_location": "L708",
+      "source_location": "L702",
       "weight": 1.0
     },
     {
@@ -12328,7 +12727,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/add.go",
-      "source_location": "L703",
+      "source_location": "L697",
       "weight": 1.0
     },
     {
@@ -12412,7 +12811,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/add.go",
-      "source_location": "L617",
+      "source_location": "L616",
       "weight": 1.0
     },
     {
@@ -13732,7 +14131,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L102",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -13744,7 +14143,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L131",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_install_remove_remove",
+      "target": "internal_source_spec_parsewith",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/install/remove.go",
+      "source_location": "L155",
       "weight": 1.0
     },
     {
@@ -13756,7 +14167,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L146",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
@@ -13768,7 +14179,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L151",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -13780,7 +14191,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -13792,7 +14203,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L51",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -13804,7 +14215,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L59",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -13816,7 +14227,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L70",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -13828,7 +14239,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L91",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -13840,7 +14251,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L95",
+      "source_location": "L96",
       "weight": 1.0
     },
     {
@@ -16756,7 +17167,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L157",
+      "source_location": "L159",
       "weight": 1.0
     },
     {
@@ -16768,7 +17179,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L165",
+      "source_location": "L167",
       "weight": 1.0
     },
     {
@@ -16792,7 +17203,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L103",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -16804,7 +17215,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L44",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -16816,7 +17227,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -16828,7 +17239,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L92",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -16840,7 +17251,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/source/spec.go",
-      "source_location": "L131",
+      "source_location": "L133",
       "weight": 1.0
     },
     {
@@ -20704,7 +21115,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -20716,7 +21127,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -20728,7 +21139,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -20824,7 +21235,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/install/add.go",
-      "source_location": "L690",
+      "source_location": "L684",
       "weight": 1.0
     },
     {
@@ -21244,7 +21655,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/update.go",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -21256,7 +21667,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/update.go",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -21836,6 +22247,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_list_isglobal",
+      "target": "cli_state",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_list_istty",
       "target": "go_type_io_writer",
       "relation": "references",
@@ -21844,7 +22267,19 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L21",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_listrows",
+      "target": "cli_state",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -21856,7 +22291,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -21868,7 +22303,31 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "go_type_io_writer",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_install_add_go_install_deps",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -21880,7 +22339,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L75",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -22012,7 +22471,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -22028,6 +22487,30 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_sync_firstrun",
+      "target": "go_type_github_com_spf13_cobra_command",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync_firstrun",
+      "target": "internal_install_add_go_install_deps",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_sync_newsynccmd",
       "target": "go_type_io_writer",
       "relation": "references",
@@ -22036,7 +22519,19 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L11",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_update_expandsources",
+      "target": "go_type_io_writer",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/update.go",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -22048,7 +22543,139 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/update.go",
-      "source_location": "L50",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_addsecondskill",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testfindsearchesbothscopes",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testlistallscopes",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoveprintsrestore",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testshowfallsbacktoglobal",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncglobalusesprojectmanifest",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncwithoutmanifest",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testupdatebysourcespec",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -22792,7 +23419,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L712",
+      "source_location": "L706",
       "weight": 1.0
     },
     {
@@ -22828,7 +23455,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L648",
+      "source_location": "L642",
       "weight": 1.0
     },
     {
@@ -22840,7 +23467,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L696",
+      "source_location": "L690",
       "weight": 1.0
     },
     {
@@ -22852,7 +23479,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L673",
+      "source_location": "L667",
       "weight": 1.0
     },
     {
@@ -22864,7 +23491,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L658",
+      "source_location": "L652",
       "weight": 1.0
     },
     {
@@ -22876,7 +23503,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L702",
+      "source_location": "L696",
       "weight": 1.0
     },
     {
@@ -22888,7 +23515,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L702",
+      "source_location": "L696",
       "weight": 1.0
     },
     {
@@ -22900,7 +23527,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L702",
+      "source_location": "L696",
       "weight": 1.0
     },
     {
@@ -23452,7 +24079,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/remove.go",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -23464,7 +24091,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/install/remove.go",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -25768,7 +26395,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/source/spec.go",
-      "source_location": "L127",
+      "source_location": "L129",
       "weight": 1.0
     },
     {
@@ -25808,7 +26435,7 @@
       "weight": 1.0
     },
     {
-      "source": "internal_source_spec_test_testkey",
+      "source": "internal_source_spec_test_testgithubcomwithoutscheme",
       "target": "go_type_testing_t",
       "relation": "references",
       "_origin": "ast",
@@ -25820,6 +26447,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_source_spec_test_testkey",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
       "source": "internal_source_spec_test_testkeyfileurlisshorthash",
       "target": "go_type_testing_t",
       "relation": "references",
@@ -25828,7 +26467,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L199",
+      "source_location": "L207",
       "weight": 1.0
     },
     {
@@ -25876,7 +26515,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L226",
+      "source_location": "L234",
       "weight": 1.0
     },
     {
@@ -25912,7 +26551,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L210",
+      "source_location": "L218",
       "weight": 1.0
     },
     {
@@ -27500,6 +28139,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_list_listrows",
+      "target": "cli_listrow",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "return_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_list_load",
       "target": "cli_state",
       "relation": "references",
@@ -27508,7 +28159,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -27520,7 +28171,19 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "cli_state",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "return_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -27532,7 +28195,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L75",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -27556,7 +28219,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -27580,7 +28243,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L11",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -27592,7 +28255,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/update.go",
-      "source_location": "L50",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -27760,7 +28423,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L712",
+      "source_location": "L706",
       "weight": 1.0
     },
     {
@@ -27784,7 +28447,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L696",
+      "source_location": "L690",
       "weight": 1.0
     },
     {
@@ -27796,7 +28459,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/install/add.go",
-      "source_location": "L702",
+      "source_location": "L696",
       "weight": 1.0
     },
     {
@@ -29732,57 +30395,35 @@
     },
     {
       "source": "internal_cli_list",
-      "target": "internal_cli_list_istty",
+      "target": "cli_listrow",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L21",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
       "source": "internal_cli_list",
-      "target": "cli_state",
+      "target": "internal_cli_list_listrows",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L31",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
       "source": "internal_cli_list",
-      "target": "internal_cli_list_load",
+      "target": "internal_cli_list_scopename",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L38",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_loadfrom",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L46",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_short",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L65",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -29793,7 +30434,84 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L75",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_istty",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "cli_state",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_load",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_loadfrom",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_isglobal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_short",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -29908,24 +30626,24 @@
     },
     {
       "source": "internal_cli_show",
-      "target": "internal_cli_show_newshowcmd",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/show.go",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_show",
       "target": "internal_cli_show_dash",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/show.go",
-      "source_location": "L89",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_show",
+      "target": "internal_cli_show_newshowcmd",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/show.go",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -29941,13 +30659,46 @@
     },
     {
       "source": "internal_cli_sync",
+      "target": "internal_cli_sync_exists",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync",
       "target": "internal_cli_sync_newsynccmd",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/sync.go",
-      "source_location": "L11",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync",
+      "target": "internal_cli_sync_firstrun",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_update",
+      "target": "internal_cli_update_expandsources",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/update.go",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -29958,7 +30709,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/update.go",
-      "source_location": "L19",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -29969,7 +30720,128 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/update.go",
-      "source_location": "L50",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testremoveprintsrestore",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testsyncglobalusesprojectmanifest",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_addsecondskill",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testsyncwithoutmanifest",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testbothscopesfromhome",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testremoverestorekeepsref",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testupdatebysourcespec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testlistallscopes",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testfindsearchesbothscopes",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testshowfallsbacktoglobal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -30970,7 +31842,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L639",
+      "source_location": "L633",
       "weight": 1.0
     },
     {
@@ -30981,7 +31853,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L648",
+      "source_location": "L642",
       "weight": 1.0
     },
     {
@@ -30992,7 +31864,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L658",
+      "source_location": "L652",
       "weight": 1.0
     },
     {
@@ -31003,7 +31875,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L673",
+      "source_location": "L667",
       "weight": 1.0
     },
     {
@@ -31014,7 +31886,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L680",
+      "source_location": "L674",
       "weight": 1.0
     },
     {
@@ -31025,12 +31897,23 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L689",
+      "source_location": "L683",
       "weight": 1.0
     },
     {
       "source": "internal_install_add",
       "target": "internal_install_add_locate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/install/add.go",
+      "source_location": "L690",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_install_add",
+      "target": "internal_install_add_openfetch",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -31052,7 +31935,7 @@
     },
     {
       "source": "internal_install_add",
-      "target": "internal_install_add_openfetch",
+      "target": "internal_install_add_nosymlinks",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -31063,24 +31946,13 @@
     },
     {
       "source": "internal_install_add",
-      "target": "internal_install_add_nosymlinks",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/install/add.go",
-      "source_location": "L708",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_install_add",
       "target": "internal_install_add_exporttree",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/add.go",
-      "source_location": "L712",
+      "source_location": "L706",
       "weight": 1.0
     },
     {
@@ -31476,7 +32348,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/install/remove.go",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -34138,7 +35010,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L127",
+      "source_location": "L129",
       "weight": 1.0
     },
     {
@@ -34149,7 +35021,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L137",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -34160,7 +35032,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L143",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -34182,7 +35054,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L152",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -34193,7 +35065,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L183",
+      "source_location": "L185",
       "weight": 1.0
     },
     {
@@ -34286,7 +35158,7 @@
     },
     {
       "source": "internal_source_spec_test",
-      "target": "internal_source_spec_test_testkey",
+      "target": "internal_source_spec_test_testgithubcomwithoutscheme",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -34297,13 +35169,24 @@
     },
     {
       "source": "internal_source_spec_test",
+      "target": "internal_source_spec_test_testkey",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_source_spec_test",
       "target": "internal_source_spec_test_testkeyfileurlisshorthash",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L199",
+      "source_location": "L207",
       "weight": 1.0
     },
     {
@@ -34314,7 +35197,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L210",
+      "source_location": "L218",
       "weight": 1.0
     },
     {
@@ -34325,7 +35208,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L226",
+      "source_location": "L234",
       "weight": 1.0
     },
     {
@@ -35777,7 +36660,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/update.go",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -36063,7 +36946,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L204",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -36074,7 +36957,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/source/spec.go",
-      "source_location": "L218",
+      "source_location": "L220",
       "weight": 1.0
     },
     {
@@ -36459,7 +37342,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/agentskills_test.go",
-      "source_location": "L130",
+      "source_location": "L133",
       "weight": 1.0
     },
     {
@@ -36471,7 +37354,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/agentskills_test.go",
-      "source_location": "L133",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -36584,6 +37467,18 @@
     },
     {
       "source": "internal_cli_find_newfindcmd",
+      "target": "internal_cli_list_istty",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/find.go",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_find_newfindcmd",
       "target": "internal_cli_cli_deps",
       "relation": "calls",
       "_origin": "ast",
@@ -36596,26 +37491,38 @@
     },
     {
       "source": "internal_cli_find_newfindcmd",
-      "target": "internal_cli_list_loadfrom",
+      "target": "internal_cli_list_loadscopes",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L34",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
       "source": "internal_cli_find_newfindcmd",
-      "target": "internal_cli_list_istty",
+      "target": "internal_cli_list_isglobal",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L87",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_find_newfindcmd",
+      "target": "internal_cli_list_scopename",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/find.go",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -36627,7 +37534,19 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L39",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_cli_deps",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L157",
       "weight": 1.0
     },
     {
@@ -36836,14 +37755,26 @@
     },
     {
       "source": "internal_cli_show_newshowcmd",
-      "target": "internal_cli_list_load",
+      "target": "internal_cli_cli_deps",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L26",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_show_newshowcmd",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/show.go",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -36891,7 +37822,19 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L18",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_update_expandsources",
+      "target": "internal_cli_list_load",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/update.go",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -36903,7 +37846,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L78",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -36915,7 +37858,259 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/update.go",
-      "source_location": "L90",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_addsecondskill",
+      "target": "internal_cli_cli_test_gitrun",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testaddwholerepoinstallseveryskill",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testfindsearchesbothscopes",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testfindsearchesbothscopes",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L84",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testlistallscopes",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testlistallscopes",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoveprintsrestore",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoveprintsrestore",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L174",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testshowfallsbacktoglobal",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testshowfallsbacktoglobal",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncglobalusesprojectmanifest",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncglobalusesprojectmanifest",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L117",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncwithoutmanifest",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L135",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testsyncwithoutmanifest",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testupdatebysourcespec",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testupdatebysourcespec",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -37551,7 +38746,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L125",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -37563,7 +38758,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -37575,7 +38770,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L38",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -37587,7 +38782,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L75",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -41311,6 +42506,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_source_spec_test_testgithubcomwithoutscheme",
+      "target": "internal_source_spec_parse",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/source/spec_test.go",
+      "source_location": "L184",
+      "weight": 1.0
+    },
+    {
       "source": "internal_source_spec_test_testkey",
       "target": "internal_source_spec_parse",
       "relation": "calls",
@@ -41319,7 +42526,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L189",
+      "source_location": "L197",
       "weight": 1.0
     },
     {
@@ -41367,7 +42574,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L232",
+      "source_location": "L240",
       "weight": 1.0
     },
     {
@@ -41403,7 +42610,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/source/spec_test.go",
-      "source_location": "L211",
+      "source_location": "L219",
       "weight": 1.0
     },
     {
@@ -42897,5 +44104,5 @@
       "source_file": "docs/adr/0005-on-disk-layout.md"
     }
   ],
-  "built_at_commit": "5dcc99aac46f7f72077142816166ad2f620fb5c1"
+  "built_at_commit": "526b633adcc2ce37384a596fbca6fc0707f7e05d"
 }

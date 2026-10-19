@@ -293,9 +293,9 @@ func TestAddDiscovery(t *testing.T) {
 	r := monorepo(t)
 
 	e := newEnv(t)
-	_, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r)})
-	if err == nil || !strings.Contains(err.Error(), `"skills/x"`) || !strings.Contains(err.Error(), `"skills/y"`) {
-		t.Fatalf("err = %v, want both candidates listed", err)
+	res, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r)})
+	if err != nil || len(res.Skills) != 2 {
+		t.Fatalf("whole repo: res = %+v, err = %v; want both skills installed", res, err)
 	}
 
 	e = newEnv(t)
@@ -313,7 +313,7 @@ func TestAddDiscovery(t *testing.T) {
 	}
 
 	e = newEnv(t)
-	res, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r), All: true})
+	res, err = Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r), All: true})
 	if err != nil || len(res.Skills) != 2 {
 		t.Fatalf("res = %+v, err = %v", res, err)
 	}

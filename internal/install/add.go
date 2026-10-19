@@ -53,7 +53,7 @@ type Deps struct {
 type AddRequest struct {
 	Spec    string
 	Skill   string   // pick this skill when the spec has no //path
-	All     bool     // install every skill found when the spec has no //path
+	All     bool     // kept for --all; a spec without //path or Skill installs every skill anyway
 	Global  bool     // global scope instead of project scope
 	Targets []string // --target; empty means the manifest's targets
 	Adopt   bool     // take over an existing differing folder as is
@@ -608,31 +608,25 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 	for i, p := range found {
 		list[i] = show(p)
 	}
-	switch {
-	case req.All:
+	if req.Skill == "" { // a whole repo installs every skill, with or without --all
 		return found, nil
-	case req.Skill != "":
-		var hits []string
-		for _, p := range found {
-			if installName(spec, p) == req.Skill {
-				hits = append(hits, p)
-			}
+	}
+	var hits []string
+	for _, p := range found {
+		if installName(spec, p) == req.Skill {
+			hits = append(hits, p)
 		}
-		switch len(hits) {
-		case 0:
-			return nil, fmt.Errorf("no skill named %q in %s; found: %s", req.Skill, spec.URL, strings.Join(list, ", "))
-		case 1:
-			return hits, nil
-		default:
-			for i, h := range hits {
-				hits[i] = show(h)
-			}
-			return nil, fmt.Errorf("several skills named %q in %s; use a //path to pick one: %s", req.Skill, spec.URL, strings.Join(hits, ", "))
-		}
-	case len(found) == 1:
-		return found, nil
+	}
+	switch len(hits) {
+	case 0:
+		return nil, fmt.Errorf("no skill named %q in %s; found: %s", req.Skill, spec.URL, strings.Join(list, ", "))
+	case 1:
+		return hits, nil
 	default:
-		return nil, fmt.Errorf("%s has %d skills: %s; pass --skill <name> or --all", spec.URL, len(found), strings.Join(list, ", "))
+		for i, h := range hits {
+			hits[i] = show(h)
+		}
+		return nil, fmt.Errorf("several skills named %q in %s; use a //path to pick one: %s", req.Skill, spec.URL, strings.Join(hits, ", "))
 	}
 }
 

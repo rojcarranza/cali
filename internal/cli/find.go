@@ -30,30 +30,50 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			d.Global = *global // OpenFetch finds a same-repo source through the scope
-			s, err := loadFrom(d, *global)
+			// Search the given scope; without -g or --manifest, the global one too.
+			scopes := []bool{*global}
+			if !*global && manifestPath == "" {
+				scopes = append(scopes, true)
+			}
+			type src struct {
+				spec   source.Spec
+				global bool // OpenFetch finds a same-repo source through the scope
+			}
+			seen := map[string]bool{}
+			var urls []src
+			states, err := loadScopes(d, scopes, cmd.ErrOrStderr())
 			if err != nil {
 				return err
 			}
-			specs := append([]string{}, s.m.Sources...)
-			for _, sk := range s.m.Skills {
-				specs = append(specs, sk.Source)
-			}
-			seen := map[string]bool{}
-			var urls []source.Spec
-			for _, raw := range specs {
-				sp, err := source.ParseWith(raw, source.Options{AllowFile: allowFileScheme})
-				if err != nil || seen[sp.URL] {
-					continue // the manifest was validated on load
+			for _, s := range states {
+				g := isGlobal(s)
+				specs := append([]string{}, s.m.Sources...)
+				for _, sk := range s.m.Skills {
+					specs = append(specs, sk.Source)
 				}
-				seen[sp.URL] = true
-				urls = append(urls, sp)
+				for _, raw := range specs {
+					sp, err := source.ParseWith(raw, source.Options{AllowFile: allowFileScheme})
+					if err != nil {
+						continue // the manifest was validated on load
+					}
+					key := sp.URL
+					if sp.URL == source.Here {
+						key += scopeName(g)
+					}
+					if seen[key] {
+						continue
+					}
+					seen[key] = true
+					urls = append(urls, src{sp, g})
+				}
 			}
-			sort.Slice(urls, func(i, j int) bool { return urls[i].URL < urls[j].URL })
+			sort.Slice(urls, func(i, j int) bool { return urls[i].spec.URL < urls[j].spec.URL })
 
 			warn := cmd.ErrOrStderr()
 			hits := []find.Hit{}
-			for _, sp := range urls {
+			for _, u := range urls {
+				sp := u.spec
+				d.Global = u.global
 				local := sp.URL == source.Here // read in place, never fetched: no mirror
 				if offline && !local && !gitx.MirrorExists(d.Dirs.Cache, sp) {
 					_, _ = fmt.Fprintf(warn, "warning: %s: no local mirror (run without --offline)\n", sp.URL)
