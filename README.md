@@ -66,7 +66,7 @@ cali sync --frozen # CI: fail instead of changing cali.lock
 **Default global manifest.** To make plain `-g` commands (`list -g`, `find`, `show`, `status -g`, `update -g`, `remove -g`) use that manifest, set its absolute path once in your shell profile:
 
 ```sh
-export CALI_MANIFEST="$HOME/Dev/projects/agent-skills/cali.yaml"
+export CALI_MANIFEST="$HOME/path/to/agent-skills/cali.yaml"   # your clone
 ```
 
 `--manifest` still wins over `CALI_MANIFEST`, and `sync -g` in a project still uses that project's `cali.yaml`. Project scope ignores `CALI_MANIFEST`.

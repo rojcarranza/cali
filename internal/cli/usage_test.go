@@ -211,6 +211,12 @@ func TestCaliManifestIsTheDefaultGlobalManifest(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(os.Getenv("CALI_CONFIG_DIR"), "cali.yaml")); err == nil {
 		t.Fatal("the config dir manifest was written")
 	}
+	if code, out, errs := run("list", "-g", "--manifest", filepath.Join(t.TempDir(), "cali.yaml")); code != 0 || strings.Contains(out, repoURL) {
+		t.Fatalf("--manifest must win over CALI_MANIFEST: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("list"); code != 0 || strings.Contains(out, repoURL) {
+		t.Fatalf("project scope must ignore CALI_MANIFEST: code=%d out=%q err=%q", code, out, errs)
+	}
 
 	t.Setenv("CALI_MANIFEST", "cali.yaml")
 	if code, _, errs := run("list", "-g"); code != 1 || !strings.Contains(errs, "CALI_MANIFEST") {
