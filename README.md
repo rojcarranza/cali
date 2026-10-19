@@ -61,6 +61,8 @@ cali sync -g       # install this project's cali.yaml into your home folder, for
 cali sync --frozen # CI: fail instead of changing cali.lock
 ```
 
+`cali sync -g` in a project is short for `cali sync -g --manifest cali.yaml`. Only `sync` makes that switch, so pass `--manifest cali.yaml` to later `-g` commands on those skills, for example `cali update -g --manifest cali.yaml --apply`.
+
 **First run.** If there is no `cali.yaml` yet, `sync` offers to install a default skill repo. Set it once in your shell profile:
 
 ```sh

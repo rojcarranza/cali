@@ -554,17 +554,6 @@
       "source_location": "L1"
     },
     {
-      "id": "internal_install_add_existing",
-      "label": "existing()",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Repo",
-      "file_type": "code",
-      "norm_label": "existing()",
-      "source_file": "internal/install/add.go",
-      "source_location": "L501"
-    },
-    {
       "id": "internal_install_add_exportskill",
       "label": "exportSkill()",
       "_origin": "ast",
@@ -805,6 +794,17 @@
       "norm_label": ".string()",
       "source_file": "internal/source/spec.go",
       "source_location": "L206"
+    },
+    {
+      "id": "status_fakefetcher",
+      "label": "fakeFetcher",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Repo",
+      "file_type": "code",
+      "norm_label": "fakefetcher",
+      "source_file": "internal/status/status_test.go",
+      "source_location": "L29"
     },
     {
       "id": "status_fakefetcher_latest",
@@ -1874,17 +1874,6 @@
       "source_location": "L72"
     },
     {
-      "id": "internal_lock_lock_test_testwritefailureleavesnotemp",
-      "label": "TestWriteFailureLeavesNoTemp()",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Add",
-      "file_type": "code",
-      "norm_label": "testwritefailureleavesnotemp()",
-      "source_file": "internal/lock/lock_test.go",
-      "source_location": "L101"
-    },
-    {
       "id": "internal_lock_lock_write",
       "label": "Write()",
       "_origin": "ast",
@@ -1894,17 +1883,6 @@
       "norm_label": "write()",
       "source_file": "internal/lock/lock.go",
       "source_location": "L107"
-    },
-    {
-      "id": "internal_skillfs_tree_equal",
-      "label": "Equal()",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Add",
-      "file_type": "code",
-      "norm_label": "equal()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L156"
     },
     {
       "id": "lock_lock_marshal",
@@ -1922,7 +1900,7 @@
       "label": "os.FileMode",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "os.filemode",
       "source_file": "",
@@ -1933,7 +1911,7 @@
       "label": "safe.go",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "safe.go",
       "source_file": "internal/skillfs/safe.go",
@@ -1944,7 +1922,7 @@
       "label": "ensureDirs()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "ensuredirs()",
       "source_file": "internal/skillfs/safe.go",
@@ -1955,7 +1933,7 @@
       "label": "Tree",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "tree",
       "source_file": "internal/skillfs/safe.go",
@@ -1966,7 +1944,7 @@
       "label": "Tree",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "tree",
       "source_file": "",
@@ -1977,7 +1955,7 @@
       "label": "quote()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "quote()",
       "source_file": "internal/skillfs/safe.go",
@@ -1988,7 +1966,7 @@
       "label": "safePath()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "safepath()",
       "source_file": "internal/skillfs/safe.go",
@@ -1999,7 +1977,7 @@
       "label": "Validate()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validate()",
       "source_file": "internal/skillfs/safe.go",
@@ -2010,7 +1988,7 @@
       "label": "validatePath()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validatepath()",
       "source_file": "internal/skillfs/safe.go",
@@ -2021,7 +1999,7 @@
       "label": "validateSegment()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "validatesegment()",
       "source_file": "internal/skillfs/safe.go",
@@ -2032,18 +2010,249 @@
       "label": "writeNew()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "writenew()",
       "source_file": "internal/skillfs/safe.go",
       "source_location": "L221"
     },
     {
+      "id": "internal_skillfs_tree_test",
+      "label": "tree_test.go",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "tree_test.go",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_skillfs_tree_test_go_tree",
+      "label": "Tree",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "tree",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "internal_skillfs_tree_test_skillmd",
+      "label": "skillMD()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "skillmd()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L11"
+    },
+    {
+      "id": "internal_skillfs_tree_test_static",
+      "label": "static()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "static()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L63"
+    },
+    {
+      "id": "internal_skillfs_tree_test_symlinkorskip",
+      "label": "symlinkOrSkip()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "symlinkorskip()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testdiffkinds",
+      "label": "TestDiffKinds()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testdiffkinds()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L320"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalbinaryexact",
+      "label": "TestEqualBinaryExact()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalbinaryexact()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L31"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalcomparesexecandfileset",
+      "label": "TestEqualComparesExecAndFileSet()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalcomparesexecandfileset()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L49"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testequalignoresexecwhennotcompared",
+      "label": "TestEqualIgnoresExecWhenNotCompared()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testequalignoresexecwhennotcompared()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L238"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testreaddirlimits",
+      "label": "TestReadDirLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testreaddirlimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L299"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testreaddirrejectssymlink",
+      "label": "TestReadDirRejectsSymlink()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testreaddirrejectssymlink()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L114"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidatelimits",
+      "label": "TestValidateLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidatelimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L286"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidaterejects",
+      "label": "TestValidateRejects()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidaterejects()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L67"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testvalidaterejectscollisionsandreserved",
+      "label": "TestValidateRejectsCollisionsAndReserved()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testvalidaterejectscollisionsandreserved()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L209"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetoinvalidwritesnothing",
+      "label": "TestWriteToInvalidWritesNothing()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetoinvalidwritesnothing()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L158"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusesnonemptytarget",
+      "label": "TestWriteToRefusesNonEmptyTarget()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusesnonemptytarget()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L249"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkcomponent",
+      "label": "TestWriteToRefusesSymlinkComponent()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinkcomponent()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L169"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkfile",
+      "label": "TestWriteToRefusesSymlinkFile()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinkfile()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L189"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetorefusessymlinktarget",
+      "label": "TestWriteToRefusesSymlinkTarget()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwritetorefusessymlinktarget()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L263"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwriteuncheckedkeepspathsafety",
+      "label": "TestWriteUncheckedKeepsPathSafety()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "testwriteuncheckedkeepspathsafety()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L368"
+    },
+    {
+      "id": "internal_skillfs_tree_test_withlimits",
+      "label": "withLimits()",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "tree_test.go",
+      "file_type": "code",
+      "norm_label": "withlimits()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L279"
+    },
+    {
       "id": "skillfs_invaliderr",
       "label": "invalidErr",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": "invaliderr",
       "source_file": "internal/skillfs/safe.go",
@@ -2054,7 +2263,7 @@
       "label": ".Unwrap()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".unwrap()",
       "source_file": "internal/skillfs/safe.go",
@@ -2065,7 +2274,7 @@
       "label": ".WriteTo()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".writeto()",
       "source_file": "internal/skillfs/safe.go",
@@ -2076,7 +2285,7 @@
       "label": ".WriteUnchecked()",
       "_origin": "ast",
       "community": 10,
-      "community_name": "Validate",
+      "community_name": "tree_test.go",
       "file_type": "code",
       "norm_label": ".writeunchecked()",
       "source_file": "internal/skillfs/safe.go",
@@ -3182,17 +3391,6 @@
       "source_location": "L9"
     },
     {
-      "id": "internal_manifest_manifest_validtargets",
-      "label": "validTargets()",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": "validtargets()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L134"
-    },
-    {
       "id": "internal_source_spec",
       "label": "spec.go",
       "_origin": "ast",
@@ -3457,17 +3655,6 @@
       "source_location": "L185"
     },
     {
-      "id": "manifest_manifest_validate",
-      "label": ".validate()",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "ParseWith",
-      "file_type": "code",
-      "norm_label": ".validate()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L95"
-    },
-    {
       "id": "internal_dirs_dirs",
       "label": "dirs.go",
       "_origin": "ast",
@@ -3631,17 +3818,6 @@
       "norm_label": "locate()",
       "source_file": "internal/install/add.go",
       "source_location": "L690"
-    },
-    {
-      "id": "internal_manifest_manifest_readwith",
-      "label": "ReadWith()",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "setup",
-      "file_type": "code",
-      "norm_label": "readwith()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L72"
     },
     {
       "id": "internal_update_apply_test",
@@ -4194,17 +4370,6 @@
       "source_location": "L310"
     },
     {
-      "id": "internal_update_update_test_testplanfailsoninvalidref",
-      "label": "TestPlanFailsOnInvalidRef()",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "setup",
-      "file_type": "code",
-      "norm_label": "testplanfailsoninvalidref()",
-      "source_file": "internal/update/update_test.go",
-      "source_location": "L402"
-    },
-    {
       "id": "internal_update_update_test_testplankeepsgoingwhenonefolderisgoneupstream",
       "label": "TestPlanKeepsGoingWhenOneFolderIsGoneUpstream()",
       "_origin": "ast",
@@ -4403,132 +4568,44 @@
       "source_location": "L102"
     },
     {
-      "id": "internal_backup_backup",
-      "label": "backup.go",
+      "id": "update_options",
+      "label": "Options",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "backup.go",
-      "source_file": "internal/backup/backup.go",
-      "source_location": "L1"
+      "norm_label": "options",
+      "source_file": "internal/update/update.go",
+      "source_location": "L31"
     },
     {
-      "id": "internal_backup_backup_save",
-      "label": "Save()",
+      "id": "update_proposal",
+      "label": "Proposal",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "save()",
-      "source_file": "internal/backup/backup.go",
-      "source_location": "L22"
+      "norm_label": "proposal",
+      "source_file": "internal/update/update.go",
+      "source_location": "L40"
     },
     {
-      "id": "internal_backup_backup_test",
-      "label": "backup_test.go",
+      "id": "update_proposal_skipped",
+      "label": ".Skipped()",
       "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
+      "community": 2,
+      "community_name": "setup",
       "file_type": "code",
-      "norm_label": "backup_test.go",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_backup_backup_test_fixednow",
-      "label": "fixedNow()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "fixednow()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L13"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaveappendssuffixoncollision",
-      "label": "TestSaveAppendsSuffixOnCollision()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsaveappendssuffixoncollision()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L56"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavecreatesmissingdatadir",
-      "label": "TestSaveCreatesMissingDataDir()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsavecreatesmissingdatadir()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L123"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavedirsareprivate",
-      "label": "TestSaveDirsArePrivate()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsavedirsareprivate()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L87"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaverejectsbadname",
-      "label": "TestSaveRejectsBadName()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsaverejectsbadname()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L75"
-    },
-    {
-      "id": "internal_backup_backup_test_testsaveusertreebreakingupstreamrules",
-      "label": "TestSaveUserTreeBreakingUpstreamRules()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsaveusertreebreakingupstreamrules()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L108"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavewithoutpatchwritesnopatchfile",
-      "label": "TestSaveWithoutPatchWritesNoPatchFile()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsavewithoutpatchwritesnopatchfile()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L45"
-    },
-    {
-      "id": "internal_backup_backup_test_testsavewritesfilesandpatch",
-      "label": "TestSaveWritesFilesAndPatch()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "testsavewritesfilesandpatch()",
-      "source_file": "internal/backup/backup_test.go",
-      "source_location": "L25"
+      "norm_label": ".skipped()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L327"
     },
     {
       "id": "internal_golden_golden_test",
       "label": "golden_test.go",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "golden_test.go",
       "source_file": "internal/golden/golden_test.go",
@@ -4539,7 +4616,7 @@
       "label": "run()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "run()",
       "source_file": "internal/golden/golden_test.go",
@@ -4550,7 +4627,7 @@
       "label": "TestSameLockSameBytes()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "testsamelocksamebytes()",
       "source_file": "internal/golden/golden_test.go",
@@ -4561,18 +4638,29 @@
       "label": "treeHash()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "treehash()",
       "source_file": "internal/golden/golden_test.go",
       "source_location": "L55"
     },
     {
+      "id": "internal_install_add_existing",
+      "label": "existing()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "existing()",
+      "source_file": "internal/install/add.go",
+      "source_location": "L501"
+    },
+    {
       "id": "internal_install_add_moveaside",
       "label": "MoveAside()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "moveaside()",
       "source_file": "internal/install/add.go",
@@ -4583,7 +4671,7 @@
       "label": "NoSymlinks()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "nosymlinks()",
       "source_file": "internal/install/add.go",
@@ -4594,29 +4682,370 @@
       "label": "Stage()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "stage()",
       "source_file": "internal/install/add.go",
       "source_location": "L525"
     },
     {
+      "id": "internal_merge_classify_changedlines",
+      "label": "ChangedLines()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "changedlines()",
+      "source_file": "internal/merge/classify.go",
+      "source_location": "L238"
+    },
+    {
+      "id": "internal_merge_classify_test_testchangedlines",
+      "label": "TestChangedLines()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testchangedlines()",
+      "source_file": "internal/merge/classify_test.go",
+      "source_location": "L190"
+    },
+    {
+      "id": "internal_merge_classify_test_testchangedlinesrefusesbinary",
+      "label": "TestChangedLinesRefusesBinary()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testchangedlinesrefusesbinary()",
+      "source_file": "internal/merge/classify_test.go",
+      "source_location": "L203"
+    },
+    {
+      "id": "internal_merge_plan",
+      "label": "plan.go",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "plan.go",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_merge_plan_data",
+      "label": "data()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "data()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L63"
+    },
+    {
+      "id": "internal_merge_plan_encodelike",
+      "label": "EncodeLike()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "encodelike()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L131"
+    },
+    {
+      "id": "internal_merge_plan_git",
+      "label": "git()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "git()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L152"
+    },
+    {
+      "id": "internal_merge_plan_gitenv",
+      "label": "gitEnv()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "gitenv()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L141"
+    },
+    {
+      "id": "internal_merge_plan_go_merge_action",
+      "label": "Action",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "action",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L21"
+    },
+    {
+      "id": "internal_merge_plan_go_merge_fileplan",
+      "label": "FilePlan",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "fileplan",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L33"
+    },
+    {
+      "id": "internal_merge_plan_localpatch",
+      "label": "LocalPatch()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "localpatch()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L169"
+    },
+    {
+      "id": "internal_merge_plan_markersize",
+      "label": "markerSize()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "markersize()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L227"
+    },
+    {
+      "id": "internal_merge_plan_merge3",
+      "label": "merge3()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "merge3()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L189"
+    },
+    {
+      "id": "internal_merge_plan_mergefile",
+      "label": "mergeFile()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "mergefile()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L213"
+    },
+    {
+      "id": "internal_merge_plan_ourslines",
+      "label": "oursLines()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "ourslines()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L283"
+    },
+    {
+      "id": "internal_merge_plan_parseconflicts",
+      "label": "parseConflicts()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "parseconflicts()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L244"
+    },
+    {
+      "id": "internal_merge_plan_plan",
+      "label": "Plan()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "plan()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L72"
+    },
+    {
+      "id": "internal_merge_plan_span",
+      "label": "span()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "span()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L315"
+    },
+    {
+      "id": "internal_merge_plan_take",
+      "label": "take()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "take()",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L56"
+    },
+    {
+      "id": "internal_merge_plan_test_testmarkersize",
+      "label": "TestMarkerSize()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testmarkersize()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L299"
+    },
+    {
       "id": "internal_render_render_sanitize",
       "label": "Sanitize()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "sanitize()",
       "source_file": "internal/render/render.go",
       "source_location": "L144"
     },
     {
+      "id": "internal_skillfs_tree",
+      "label": "tree.go",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "tree.go",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_skillfs_tree_diff",
+      "label": "Diff()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "diff()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L161"
+    },
+    {
+      "id": "internal_skillfs_tree_equal",
+      "label": "Equal()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "equal()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L156"
+    },
+    {
+      "id": "internal_skillfs_tree_fileequal",
+      "label": "FileEqual()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "fileequal()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L131"
+    },
+    {
+      "id": "internal_skillfs_tree_fileequalptr",
+      "label": "FileEqualPtr()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "fileequalptr()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L122"
+    },
+    {
+      "id": "internal_skillfs_tree_go_skillfs_file",
+      "label": "File",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "file",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L32"
+    },
+    {
+      "id": "internal_skillfs_tree_go_skillfs_tree",
+      "label": "Tree",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "tree",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L39"
+    },
+    {
+      "id": "internal_skillfs_tree_index",
+      "label": "Index()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "index()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L113"
+    },
+    {
+      "id": "internal_skillfs_tree_index_e540cd",
+      "label": "index()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "index()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L146"
+    },
+    {
+      "id": "internal_skillfs_tree_istext",
+      "label": "IsText()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "istext()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L105"
+    },
+    {
+      "id": "internal_skillfs_tree_normalizelf",
+      "label": "NormalizeLF()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "normalizelf()",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L142"
+    },
+    {
       "id": "internal_skillfs_tree_readdir",
       "label": "ReadDir()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "readdir()",
       "source_file": "internal/skillfs/tree.go",
@@ -4627,29 +5056,139 @@
       "label": "SameBytes()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "samebytes()",
       "source_file": "internal/skillfs/tree.go",
       "source_location": "L184"
     },
     {
+      "id": "internal_skillfs_tree_test_testequalignorescrlfintext",
+      "label": "TestEqualIgnoresCRLFInText()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testequalignorescrlfintext()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L20"
+    },
+    {
+      "id": "internal_skillfs_tree_test_testwritetothenreaddirequal",
+      "label": "TestWriteToThenReadDirEqual()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testwritetothenreaddirequal()",
+      "source_file": "internal/skillfs/tree_test.go",
+      "source_location": "L129"
+    },
+    {
       "id": "internal_skillfs_tree_test_testwriteuncheckedskipscontentrules",
       "label": "TestWriteUncheckedSkipsContentRules()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "testwriteuncheckedskipscontentrules()",
       "source_file": "internal/skillfs/tree_test.go",
       "source_location": "L353"
     },
     {
+      "id": "internal_store_pristine",
+      "label": "pristine.go",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "pristine.go",
+      "source_file": "internal/store/pristine.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_store_pristine_checktree",
+      "label": "checkTree()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "checktree()",
+      "source_file": "internal/store/pristine.go",
+      "source_location": "L17"
+    },
+    {
+      "id": "internal_store_pristine_get",
+      "label": "Get()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "get()",
+      "source_file": "internal/store/pristine.go",
+      "source_location": "L65"
+    },
+    {
+      "id": "internal_store_pristine_put",
+      "label": "Put()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "put()",
+      "source_file": "internal/store/pristine.go",
+      "source_location": "L26"
+    },
+    {
+      "id": "internal_store_pristine_test",
+      "label": "pristine_test.go",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "pristine_test.go",
+      "source_file": "internal/store/pristine_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_store_pristine_test_testputgetroundtrip",
+      "label": "TestPutGetRoundTrip()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testputgetroundtrip()",
+      "source_file": "internal/store/pristine_test.go",
+      "source_location": "L21"
+    },
+    {
+      "id": "internal_store_pristine_test_testputrejectsbadtreesha",
+      "label": "TestPutRejectsBadTreeSHA()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "testputrejectsbadtreesha()",
+      "source_file": "internal/store/pristine_test.go",
+      "source_location": "L48"
+    },
+    {
+      "id": "internal_store_pristine_test_tree",
+      "label": "tree()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "tree()",
+      "source_file": "internal/store/pristine_test.go",
+      "source_location": "L14"
+    },
+    {
       "id": "internal_update_apply",
       "label": "apply.go",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "apply.go",
       "source_file": "internal/update/apply.go",
@@ -4660,7 +5199,7 @@
       "label": "Apply()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "apply()",
       "source_file": "internal/update/apply.go",
@@ -4671,7 +5210,7 @@
       "label": "checkFlags()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "checkflags()",
       "source_file": "internal/update/apply.go",
@@ -4682,7 +5221,7 @@
       "label": "Options",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "options",
       "source_file": "",
@@ -4693,7 +5232,7 @@
       "label": "resolveSkill()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "resolveskill()",
       "source_file": "internal/update/apply.go",
@@ -4704,7 +5243,7 @@
       "label": "swap()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "swap()",
       "source_file": "internal/update/apply.go",
@@ -4715,18 +5254,29 @@
       "label": "update/update.go",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "update/update.go",
       "source_file": "internal/update/update.go",
       "source_location": "L1"
     },
     {
+      "id": "internal_update_update_decide",
+      "label": "decide()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "decide()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L269"
+    },
+    {
       "id": "internal_update_update_resolvehint",
       "label": "resolveHint()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "resolvehint()",
       "source_file": "internal/update/update.go",
@@ -4737,29 +5287,62 @@
       "label": "short()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "short()",
       "source_file": "internal/update/update.go",
       "source_location": "L334"
     },
     {
+      "id": "internal_update_update_text",
+      "label": "text()",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "text()",
+      "source_file": "internal/update/update.go",
+      "source_location": "L258"
+    },
+    {
       "id": "internal_update_update_warnleftovers",
       "label": "warnLeftovers()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "warnleftovers()",
       "source_file": "internal/update/update.go",
       "source_location": "L246"
     },
     {
+      "id": "merge_hunk",
+      "label": "Hunk",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "hunk",
+      "source_file": "internal/merge/plan.go",
+      "source_location": "L49"
+    },
+    {
+      "id": "skillfs_change",
+      "label": "Change",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "Tree",
+      "file_type": "code",
+      "norm_label": "change",
+      "source_file": "internal/skillfs/tree.go",
+      "source_location": "L42"
+    },
+    {
       "id": "update_filedecision",
       "label": "FileDecision",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "filedecision",
       "source_file": "internal/update/update.go",
@@ -4770,7 +5353,7 @@
       "label": "job",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "job",
       "source_file": "internal/update/apply.go",
@@ -4781,7 +5364,7 @@
       "label": "jsonConflict",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "jsonconflict",
       "source_file": "internal/update/update.go",
@@ -4792,7 +5375,7 @@
       "label": "jsonFile",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "jsonfile",
       "source_file": "internal/update/update.go",
@@ -4803,7 +5386,7 @@
       "label": "jsonHunk",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "jsonhunk",
       "source_file": "internal/update/update.go",
@@ -4814,7 +5397,7 @@
       "label": "jsonSkill",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "jsonskill",
       "source_file": "internal/update/update.go",
@@ -4825,73 +5408,40 @@
       "label": "jsonTarget",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "jsontarget",
       "source_file": "internal/update/update.go",
       "source_location": "L432"
     },
     {
-      "id": "update_options",
-      "label": "Options",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "options",
-      "source_file": "internal/update/update.go",
-      "source_location": "L31"
-    },
-    {
       "id": "update_prompter",
       "label": "Prompter",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "prompter",
       "source_file": "internal/update/update.go",
       "source_location": "L83"
     },
     {
-      "id": "update_proposal",
-      "label": "Proposal",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": "proposal",
-      "source_file": "internal/update/update.go",
-      "source_location": "L40"
-    },
-    {
       "id": "update_proposal_conflicts",
       "label": ".Conflicts()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": ".conflicts()",
       "source_file": "internal/update/update.go",
       "source_location": "L311"
     },
     {
-      "id": "update_proposal_skipped",
-      "label": ".Skipped()",
-      "_origin": "ast",
-      "community": 20,
-      "community_name": "Apply",
-      "file_type": "code",
-      "norm_label": ".skipped()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L327"
-    },
-    {
       "id": "update_proposal_writetext",
       "label": ".WriteText()",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": ".writetext()",
       "source_file": "internal/update/update.go",
@@ -4902,7 +5452,7 @@
       "label": "SkillPlan",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "skillplan",
       "source_file": "internal/update/update.go",
@@ -4913,7 +5463,7 @@
       "label": "swapped",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "swapped",
       "source_file": "internal/update/apply.go",
@@ -4924,99 +5474,264 @@
       "label": "TargetPlan",
       "_origin": "ast",
       "community": 20,
-      "community_name": "Apply",
+      "community_name": "Tree",
       "file_type": "code",
       "norm_label": "targetplan",
       "source_file": "internal/update/update.go",
       "source_location": "L65"
     },
     {
-      "id": "internal_store_pristine",
-      "label": "pristine.go",
+      "id": "internal_merge_classify_test_testclassifydeletevsmodifyfromplan",
+      "label": "TestClassifyDeleteVsModifyFromPlan()",
       "_origin": "ast",
       "community": 21,
-      "community_name": "Get",
+      "community_name": "plan_test.go",
       "file_type": "code",
-      "norm_label": "pristine.go",
-      "source_file": "internal/store/pristine.go",
+      "norm_label": "testclassifydeletevsmodifyfromplan()",
+      "source_file": "internal/merge/classify_test.go",
+      "source_location": "L87"
+    },
+    {
+      "id": "internal_merge_plan_test",
+      "label": "plan_test.go",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "plan_test.go",
+      "source_file": "internal/merge/plan_test.go",
       "source_location": "L1"
     },
     {
-      "id": "internal_store_pristine_checktree",
-      "label": "checkTree()",
+      "id": "internal_merge_plan_test_bypath",
+      "label": "byPath()",
       "_origin": "ast",
       "community": 21,
-      "community_name": "Get",
+      "community_name": "plan_test.go",
       "file_type": "code",
-      "norm_label": "checktree()",
-      "source_file": "internal/store/pristine.go",
+      "norm_label": "bypath()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L100"
+    },
+    {
+      "id": "internal_merge_plan_test_f",
+      "label": "f()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "f()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_merge_plan_test_markerlines",
+      "label": "markerLines()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "markerlines()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L251"
+    },
+    {
+      "id": "internal_merge_plan_test_plan",
+      "label": "plan()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "plan()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L90"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanaddaddconflict",
+      "label": "TestPlanAddAddConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanaddaddconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L212"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanbinarybothchangedconflict",
+      "label": "TestPlanBinaryBothChangedConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanbinarybothchangedconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L196"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandeletevsmodifyconflict",
+      "label": "TestPlanDeleteVsModifyConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandeletevsmodifyconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L203"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandeletevsunchanged",
+      "label": "TestPlanDeleteVsUnchanged()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandeletevsunchanged()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L147"
+    },
+    {
+      "id": "internal_merge_plan_test_testplandisjointeditsmerge",
+      "label": "TestPlanDisjointEditsMerge()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplandisjointeditsmerge()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L164"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanexecbitonlychange",
+      "label": "TestPlanExecBitOnlyChange()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanexecbitonlychange()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L238"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanhunkoursstartinourslines",
+      "label": "TestPlanHunkOursStartInOursLines()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanhunkoursstartinourslines()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L185"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanhunkwithmarkercontentline",
+      "label": "TestPlanHunkWithMarkerContentLine()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanhunkwithmarkercontentline()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L287"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanlegitmarkersmergecleanly",
+      "label": "TestPlanLegitMarkersMergeCleanly()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanlegitmarkersmergecleanly()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L230"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanneveremitsmarkers",
+      "label": "TestPlanNeverEmitsMarkers()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanneveremitsmarkers()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L263"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanoursunchangedtakestheirs",
+      "label": "TestPlanOursUnchangedTakesTheirs()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanoursunchangedtakestheirs()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L111"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanoverlapisconflict",
+      "label": "TestPlanOverlapIsConflict()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanoverlapisconflict()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L171"
+    },
+    {
+      "id": "internal_merge_plan_test_testplanpreservescrlfstyle",
+      "label": "TestPlanPreservesCRLFStyle()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplanpreservescrlfstyle()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L223"
+    },
+    {
+      "id": "internal_merge_plan_test_testplansamechangekeeps",
+      "label": "TestPlanSameChangeKeeps()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplansamechangekeeps()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L157"
+    },
+    {
+      "id": "internal_merge_plan_test_testplantheirsunchangedkeepsours",
+      "label": "TestPlanTheirsUnchangedKeepsOurs()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "testplantheirsunchangedkeepsours()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L134"
+    },
+    {
+      "id": "internal_merge_plan_test_tr",
+      "label": "tr()",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "tr()",
+      "source_file": "internal/merge/plan_test.go",
+      "source_location": "L15"
+    },
+    {
+      "id": "merge_fixture",
+      "label": "fixture",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "plan_test.go",
+      "file_type": "code",
+      "norm_label": "fixture",
+      "source_file": "internal/merge/plan_test.go",
       "source_location": "L17"
-    },
-    {
-      "id": "internal_store_pristine_get",
-      "label": "Get()",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "get()",
-      "source_file": "internal/store/pristine.go",
-      "source_location": "L65"
-    },
-    {
-      "id": "internal_store_pristine_put",
-      "label": "Put()",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "put()",
-      "source_file": "internal/store/pristine.go",
-      "source_location": "L26"
-    },
-    {
-      "id": "internal_store_pristine_test",
-      "label": "pristine_test.go",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "pristine_test.go",
-      "source_file": "internal/store/pristine_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_store_pristine_test_testputgetroundtrip",
-      "label": "TestPutGetRoundTrip()",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "testputgetroundtrip()",
-      "source_file": "internal/store/pristine_test.go",
-      "source_location": "L21"
-    },
-    {
-      "id": "internal_store_pristine_test_testputrejectsbadtreesha",
-      "label": "TestPutRejectsBadTreeSHA()",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "testputrejectsbadtreesha()",
-      "source_file": "internal/store/pristine_test.go",
-      "source_location": "L48"
-    },
-    {
-      "id": "internal_store_pristine_test_tree",
-      "label": "tree()",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "Get",
-      "file_type": "code",
-      "norm_label": "tree()",
-      "source_file": "internal/store/pristine_test.go",
-      "source_location": "L14"
     },
     {
       "id": "scripts_install",
@@ -5626,17 +6341,6 @@
       "source_location": "L11"
     },
     {
-      "id": "internal_install_add_go_install_location",
-      "label": "Location",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "fixture",
-      "file_type": "code",
-      "norm_label": "location",
-      "source_file": "internal/install/add.go",
-      "source_location": "L683"
-    },
-    {
       "id": "internal_status_status",
       "label": "status/status.go",
       "_origin": "ast",
@@ -6033,17 +6737,6 @@
       "source_location": "L30"
     },
     {
-      "id": "status_fakefetcher",
-      "label": "fakeFetcher",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "fixture",
-      "file_type": "code",
-      "norm_label": "fakefetcher",
-      "source_file": "internal/status/status_test.go",
-      "source_location": "L29"
-    },
-    {
       "id": "status_fetcher",
       "label": "Fetcher",
       "_origin": "ast",
@@ -6107,7 +6800,7 @@
       "file_type": "code",
       "norm_label": "listrow",
       "source_file": "internal/cli/list.go",
-      "source_location": "L75"
+      "source_location": "L103"
     },
     {
       "id": "cli_state",
@@ -6118,7 +6811,7 @@
       "file_type": "code",
       "norm_label": "state",
       "source_file": "internal/cli/list.go",
-      "source_location": "L31"
+      "source_location": "L33"
     },
     {
       "id": "cmd_cali_main",
@@ -6264,6 +6957,17 @@
       "source_location": "L1"
     },
     {
+      "id": "internal_cli_list_isglobal",
+      "label": "isGlobal()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "isglobal()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91"
+    },
+    {
       "id": "internal_cli_list_istty",
       "label": "isTTY()",
       "_origin": "ast",
@@ -6272,7 +6976,7 @@
       "file_type": "code",
       "norm_label": "istty()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L21"
+      "source_location": "L23"
     },
     {
       "id": "internal_cli_list_listrows",
@@ -6283,7 +6987,7 @@
       "file_type": "code",
       "norm_label": "listrows()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L84"
+      "source_location": "L112"
     },
     {
       "id": "internal_cli_list_load",
@@ -6294,7 +6998,7 @@
       "file_type": "code",
       "norm_label": "load()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38"
+      "source_location": "L40"
     },
     {
       "id": "internal_cli_list_loadfrom",
@@ -6305,7 +7009,18 @@
       "file_type": "code",
       "norm_label": "loadfrom()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46"
+      "source_location": "L48"
+    },
+    {
+      "id": "internal_cli_list_loadscopes",
+      "label": "loadScopes()",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "loadscopes()",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69"
     },
     {
       "id": "internal_cli_list_newlistcmd",
@@ -6316,7 +7031,7 @@
       "file_type": "code",
       "norm_label": "newlistcmd()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L115"
+      "source_location": "L143"
     },
     {
       "id": "internal_cli_list_scopename",
@@ -6327,7 +7042,7 @@
       "file_type": "code",
       "norm_label": "scopename()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L108"
+      "source_location": "L136"
     },
     {
       "id": "internal_cli_list_short",
@@ -6338,7 +7053,7 @@
       "file_type": "code",
       "norm_label": "short()",
       "source_file": "internal/cli/list.go",
-      "source_location": "L65"
+      "source_location": "L93"
     },
     {
       "id": "internal_cli_remove",
@@ -6382,7 +7097,7 @@
       "file_type": "code",
       "norm_label": "dash()",
       "source_file": "internal/cli/show.go",
-      "source_location": "L96"
+      "source_location": "L106"
     },
     {
       "id": "internal_cli_show_newshowcmd",
@@ -6393,7 +7108,7 @@
       "file_type": "code",
       "norm_label": "newshowcmd()",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "internal_cli_status",
@@ -6437,7 +7152,7 @@
       "file_type": "code",
       "norm_label": "exists()",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L24"
+      "source_location": "L27"
     },
     {
       "id": "internal_cli_sync_firstrun",
@@ -6448,7 +7163,7 @@
       "file_type": "code",
       "norm_label": "firstrun()",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L61"
+      "source_location": "L82"
     },
     {
       "id": "internal_cli_sync_newsynccmd",
@@ -6459,7 +7174,7 @@
       "file_type": "code",
       "norm_label": "newsynccmd()",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L26"
+      "source_location": "L35"
     },
     {
       "id": "internal_cli_update",
@@ -6493,6 +7208,17 @@
       "norm_label": "newupdatecmd()",
       "source_file": "internal/cli/update.go",
       "source_location": "L53"
+    },
+    {
+      "id": "internal_install_add_go_install_location",
+      "label": "Location",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "io.Writer",
+      "file_type": "code",
+      "norm_label": "location",
+      "source_file": "internal/install/add.go",
+      "source_location": "L683"
     },
     {
       "id": "internal_render_render",
@@ -6697,7 +7423,7 @@
       "label": ".Choose()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": ".choose()",
       "source_file": "internal/cli/update.go",
@@ -6708,7 +7434,7 @@
       "label": "classify.go",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "classify.go",
       "source_file": "internal/merge/classify.go",
@@ -6719,7 +7445,7 @@
       "label": "allDisjoint()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "alldisjoint()",
       "source_file": "internal/merge/classify.go",
@@ -6730,29 +7456,18 @@
       "label": "binary()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "binary()",
       "source_file": "internal/merge/classify.go",
       "source_location": "L73"
     },
     {
-      "id": "internal_merge_classify_changedlines",
-      "label": "ChangedLines()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "changedlines()",
-      "source_file": "internal/merge/classify.go",
-      "source_location": "L238"
-    },
-    {
       "id": "internal_merge_classify_classify",
       "label": "Classify()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "classify()",
       "source_file": "internal/merge/classify.go",
@@ -6763,7 +7478,7 @@
       "label": "edits()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "edits()",
       "source_file": "internal/merge/classify.go",
@@ -6774,7 +7489,7 @@
       "label": "frontmatter()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "frontmatter()",
       "source_file": "internal/merge/classify.go",
@@ -6785,7 +7500,7 @@
       "label": "Class",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "class",
       "source_file": "internal/merge/classify.go",
@@ -6796,7 +7511,7 @@
       "label": "Recommendation",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "recommendation",
       "source_file": "internal/merge/classify.go",
@@ -6807,7 +7522,7 @@
       "label": "inFrontmatter()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "infrontmatter()",
       "source_file": "internal/merge/classify.go",
@@ -6818,7 +7533,7 @@
       "label": "mergeHunk()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "mergehunk()",
       "source_file": "internal/merge/classify.go",
@@ -6829,7 +7544,7 @@
       "label": "PreResolve()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "preresolve()",
       "source_file": "internal/merge/classify.go",
@@ -6840,7 +7555,7 @@
       "label": "ResolveDisjoint()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "resolvedisjoint()",
       "source_file": "internal/merge/classify.go",
@@ -6851,7 +7566,7 @@
       "label": "sameLines()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "samelines()",
       "source_file": "internal/merge/classify.go",
@@ -6862,7 +7577,7 @@
       "label": "classify_test.go",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "classify_test.go",
       "source_file": "internal/merge/classify_test.go",
@@ -6873,7 +7588,7 @@
       "label": "check()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "check()",
       "source_file": "internal/merge/classify_test.go",
@@ -6884,7 +7599,7 @@
       "label": "conflictOf()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "conflictof()",
       "source_file": "internal/merge/classify_test.go",
@@ -6895,7 +7610,7 @@
       "label": "TestBinaryNotSafe()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testbinarynotsafe()",
       "source_file": "internal/merge/classify_test.go",
@@ -6906,40 +7621,18 @@
       "label": "TestBothLargeNotSafe()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testbothlargenotsafe()",
       "source_file": "internal/merge/classify_test.go",
       "source_location": "L53"
     },
     {
-      "id": "internal_merge_classify_test_testchangedlines",
-      "label": "TestChangedLines()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testchangedlines()",
-      "source_file": "internal/merge/classify_test.go",
-      "source_location": "L190"
-    },
-    {
-      "id": "internal_merge_classify_test_testchangedlinesrefusesbinary",
-      "label": "TestChangedLinesRefusesBinary()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testchangedlinesrefusesbinary()",
-      "source_file": "internal/merge/classify_test.go",
-      "source_location": "L203"
-    },
-    {
       "id": "internal_merge_classify_test_testclassifybinaryskillmdisbinary",
       "label": "TestClassifyBinarySkillMDIsBinary()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifybinaryskillmdisbinary()",
       "source_file": "internal/merge/classify_test.go",
@@ -6950,7 +7643,7 @@
       "label": "TestClassifyBothSmallSmallerSideDecides()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifybothsmallsmallersidedecides()",
       "source_file": "internal/merge/classify_test.go",
@@ -6961,29 +7654,18 @@
       "label": "TestClassifyDeleteVsModify()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifydeletevsmodify()",
       "source_file": "internal/merge/classify_test.go",
       "source_location": "L80"
     },
     {
-      "id": "internal_merge_classify_test_testclassifydeletevsmodifyfromplan",
-      "label": "TestClassifyDeleteVsModifyFromPlan()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testclassifydeletevsmodifyfromplan()",
-      "source_file": "internal/merge/classify_test.go",
-      "source_location": "L87"
-    },
-    {
       "id": "internal_merge_classify_test_testclassifydisjointhunks",
       "label": "TestClassifyDisjointHunks()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifydisjointhunks()",
       "source_file": "internal/merge/classify_test.go",
@@ -6994,7 +7676,7 @@
       "label": "TestClassifyFrontmatterOnlyAtSkillRoot()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyfrontmatteronlyatskillroot()",
       "source_file": "internal/merge/classify_test.go",
@@ -7005,7 +7687,7 @@
       "label": "TestClassifyFrontmatterRemovedLocally()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyfrontmatterremovedlocally()",
       "source_file": "internal/merge/classify_test.go",
@@ -7016,7 +7698,7 @@
       "label": "TestClassifyFrontmatterUpstreamOnlyChange()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyfrontmatterupstreamonlychange()",
       "source_file": "internal/merge/classify_test.go",
@@ -7027,7 +7709,7 @@
       "label": "TestClassifyLocalSmall()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifylocalsmall()",
       "source_file": "internal/merge/classify_test.go",
@@ -7038,7 +7720,7 @@
       "label": "TestClassifyOverlapIsNotDisjoint()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyoverlapisnotdisjoint()",
       "source_file": "internal/merge/classify_test.go",
@@ -7049,7 +7731,7 @@
       "label": "TestClassifySkillMDBodyConflictIsNotFrontmatter()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyskillmdbodyconflictisnotfrontmatter()",
       "source_file": "internal/merge/classify_test.go",
@@ -7060,7 +7742,7 @@
       "label": "TestClassifyUpstreamSmall()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testclassifyupstreamsmall()",
       "source_file": "internal/merge/classify_test.go",
@@ -7071,7 +7753,7 @@
       "label": "TestFrontmatterNeverRecommendsTheirs()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testfrontmatterneverrecommendstheirs()",
       "source_file": "internal/merge/classify_test.go",
@@ -7082,7 +7764,7 @@
       "label": "TestMergeHunkRefusesHugeHunk()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testmergehunkrefuseshugehunk()",
       "source_file": "internal/merge/classify_test.go",
@@ -7093,7 +7775,7 @@
       "label": "TestPreResolveDeletionIsNotWhitespace()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testpreresolvedeletionisnotwhitespace()",
       "source_file": "internal/merge/classify_test.go",
@@ -7104,7 +7786,7 @@
       "label": "TestPreResolveKeepsRealWhitespaceChanges()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testpreresolvekeepsrealwhitespacechanges()",
       "source_file": "internal/merge/classify_test.go",
@@ -7115,7 +7797,7 @@
       "label": "TestPreResolveWhitespaceOnly()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testpreresolvewhitespaceonly()",
       "source_file": "internal/merge/classify_test.go",
@@ -7126,7 +7808,7 @@
       "label": "TestResolveDisjointCRLFReturnsLF()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointcrlfreturnslf()",
       "source_file": "internal/merge/classify_test.go",
@@ -7137,7 +7819,7 @@
       "label": "TestResolveDisjointMarkerLineInBase()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointmarkerlineinbase()",
       "source_file": "internal/merge/classify_test.go",
@@ -7148,7 +7830,7 @@
       "label": "TestResolveDisjointMarkerLineIsConflict()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointmarkerlineisconflict()",
       "source_file": "internal/merge/classify_test.go",
@@ -7159,7 +7841,7 @@
       "label": "TestResolveDisjointMergesAdjacentEdits()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointmergesadjacentedits()",
       "source_file": "internal/merge/classify_test.go",
@@ -7170,7 +7852,7 @@
       "label": "TestResolveDisjointRefusesOverlap()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointrefusesoverlap()",
       "source_file": "internal/merge/classify_test.go",
@@ -7181,7 +7863,7 @@
       "label": "TestResolveDisjointRefusesSameInsertionPoint()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testresolvedisjointrefusessameinsertionpoint()",
       "source_file": "internal/merge/classify_test.go",
@@ -7192,656 +7874,40 @@
       "label": "TestThresholdBoundary()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "testthresholdboundary()",
       "source_file": "internal/merge/classify_test.go",
       "source_location": "L63"
     },
     {
-      "id": "internal_merge_plan",
-      "label": "plan.go",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "plan.go",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_merge_plan_data",
-      "label": "data()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "data()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L63"
-    },
-    {
-      "id": "internal_merge_plan_encodelike",
-      "label": "EncodeLike()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "encodelike()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L131"
-    },
-    {
-      "id": "internal_merge_plan_git",
-      "label": "git()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "git()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L152"
-    },
-    {
-      "id": "internal_merge_plan_gitenv",
-      "label": "gitEnv()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "gitenv()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L141"
-    },
-    {
-      "id": "internal_merge_plan_go_merge_action",
-      "label": "Action",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "action",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L21"
-    },
-    {
       "id": "internal_merge_plan_go_merge_conflict",
       "label": "Conflict",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "conflict",
       "source_file": "internal/merge/plan.go",
       "source_location": "L43"
     },
     {
-      "id": "internal_merge_plan_go_merge_fileplan",
-      "label": "FilePlan",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "fileplan",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L33"
-    },
-    {
-      "id": "internal_merge_plan_localpatch",
-      "label": "LocalPatch()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "localpatch()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L169"
-    },
-    {
-      "id": "internal_merge_plan_markersize",
-      "label": "markerSize()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "markersize()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L227"
-    },
-    {
-      "id": "internal_merge_plan_merge3",
-      "label": "merge3()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "merge3()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L189"
-    },
-    {
-      "id": "internal_merge_plan_mergefile",
-      "label": "mergeFile()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "mergefile()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L213"
-    },
-    {
-      "id": "internal_merge_plan_ourslines",
-      "label": "oursLines()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "ourslines()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L283"
-    },
-    {
-      "id": "internal_merge_plan_parseconflicts",
-      "label": "parseConflicts()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "parseconflicts()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L244"
-    },
-    {
-      "id": "internal_merge_plan_plan",
-      "label": "Plan()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "plan()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L72"
-    },
-    {
-      "id": "internal_merge_plan_span",
-      "label": "span()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "span()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L315"
-    },
-    {
-      "id": "internal_merge_plan_take",
-      "label": "take()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "take()",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L56"
-    },
-    {
-      "id": "internal_merge_plan_test",
-      "label": "plan_test.go",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "plan_test.go",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_merge_plan_test_bypath",
-      "label": "byPath()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "bypath()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L100"
-    },
-    {
-      "id": "internal_merge_plan_test_f",
-      "label": "f()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "f()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L13"
-    },
-    {
-      "id": "internal_merge_plan_test_markerlines",
-      "label": "markerLines()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "markerlines()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L251"
-    },
-    {
-      "id": "internal_merge_plan_test_plan",
-      "label": "plan()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "plan()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L90"
-    },
-    {
-      "id": "internal_merge_plan_test_testmarkersize",
-      "label": "TestMarkerSize()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testmarkersize()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L299"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanaddaddconflict",
-      "label": "TestPlanAddAddConflict()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanaddaddconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L212"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanbinarybothchangedconflict",
-      "label": "TestPlanBinaryBothChangedConflict()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanbinarybothchangedconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L196"
-    },
-    {
-      "id": "internal_merge_plan_test_testplandeletevsmodifyconflict",
-      "label": "TestPlanDeleteVsModifyConflict()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplandeletevsmodifyconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L203"
-    },
-    {
-      "id": "internal_merge_plan_test_testplandeletevsunchanged",
-      "label": "TestPlanDeleteVsUnchanged()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplandeletevsunchanged()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L147"
-    },
-    {
-      "id": "internal_merge_plan_test_testplandisjointeditsmerge",
-      "label": "TestPlanDisjointEditsMerge()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplandisjointeditsmerge()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L164"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanexecbitonlychange",
-      "label": "TestPlanExecBitOnlyChange()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanexecbitonlychange()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L238"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanhunkoursstartinourslines",
-      "label": "TestPlanHunkOursStartInOursLines()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanhunkoursstartinourslines()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L185"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanhunkwithmarkercontentline",
-      "label": "TestPlanHunkWithMarkerContentLine()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanhunkwithmarkercontentline()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L287"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanlegitmarkersmergecleanly",
-      "label": "TestPlanLegitMarkersMergeCleanly()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanlegitmarkersmergecleanly()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L230"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanneveremitsmarkers",
-      "label": "TestPlanNeverEmitsMarkers()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanneveremitsmarkers()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L263"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanoursunchangedtakestheirs",
-      "label": "TestPlanOursUnchangedTakesTheirs()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanoursunchangedtakestheirs()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L111"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanoverlapisconflict",
-      "label": "TestPlanOverlapIsConflict()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanoverlapisconflict()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L171"
-    },
-    {
-      "id": "internal_merge_plan_test_testplanpreservescrlfstyle",
-      "label": "TestPlanPreservesCRLFStyle()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplanpreservescrlfstyle()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L223"
-    },
-    {
-      "id": "internal_merge_plan_test_testplansamechangekeeps",
-      "label": "TestPlanSameChangeKeeps()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplansamechangekeeps()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L157"
-    },
-    {
-      "id": "internal_merge_plan_test_testplantheirsunchangedkeepsours",
-      "label": "TestPlanTheirsUnchangedKeepsOurs()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testplantheirsunchangedkeepsours()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L134"
-    },
-    {
-      "id": "internal_merge_plan_test_tr",
-      "label": "tr()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "tr()",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L15"
-    },
-    {
-      "id": "internal_skillfs_tree",
-      "label": "tree.go",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "tree.go",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L1"
-    },
-    {
-      "id": "internal_skillfs_tree_diff",
-      "label": "Diff()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "diff()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L161"
-    },
-    {
-      "id": "internal_skillfs_tree_fileequal",
-      "label": "FileEqual()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "fileequal()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L131"
-    },
-    {
-      "id": "internal_skillfs_tree_fileequalptr",
-      "label": "FileEqualPtr()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "fileequalptr()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L122"
-    },
-    {
-      "id": "internal_skillfs_tree_go_skillfs_file",
-      "label": "File",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "file",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L32"
-    },
-    {
-      "id": "internal_skillfs_tree_go_skillfs_tree",
-      "label": "Tree",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "tree",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L39"
-    },
-    {
-      "id": "internal_skillfs_tree_index",
-      "label": "Index()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "index()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L113"
-    },
-    {
-      "id": "internal_skillfs_tree_index_e540cd",
-      "label": "index()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "index()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L146"
-    },
-    {
-      "id": "internal_skillfs_tree_istext",
-      "label": "IsText()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "istext()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L105"
-    },
-    {
-      "id": "internal_skillfs_tree_normalizelf",
-      "label": "NormalizeLF()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "normalizelf()",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L142"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testdiffkinds",
-      "label": "TestDiffKinds()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testdiffkinds()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L320"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalignorescrlfintext",
-      "label": "TestEqualIgnoresCRLFInText()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testequalignorescrlfintext()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L20"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetothenreaddirequal",
-      "label": "TestWriteToThenReadDirEqual()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "testwritetothenreaddirequal()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L129"
-    },
-    {
-      "id": "internal_update_update_decide",
-      "label": "decide()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "decide()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L269"
-    },
-    {
-      "id": "internal_update_update_text",
-      "label": "text()",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "text()",
-      "source_file": "internal/update/update.go",
-      "source_location": "L258"
-    },
-    {
       "id": "merge_edit",
       "label": "edit",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "edit",
       "source_file": "internal/merge/classify.go",
       "source_location": "L110"
     },
     {
-      "id": "merge_fixture",
-      "label": "fixture",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "fixture",
-      "source_file": "internal/merge/plan_test.go",
-      "source_location": "L17"
-    },
-    {
-      "id": "merge_hunk",
-      "label": "Hunk",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "hunk",
-      "source_file": "internal/merge/plan.go",
-      "source_location": "L49"
-    },
-    {
-      "id": "skillfs_change",
-      "label": "Change",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "Tree",
-      "file_type": "code",
-      "norm_label": "change",
-      "source_file": "internal/skillfs/tree.go",
-      "source_location": "L42"
-    },
-    {
       "id": "update_fakeprompter",
       "label": "fakePrompter",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": "fakeprompter",
       "source_file": "internal/update/apply_test.go",
@@ -7852,7 +7918,7 @@
       "label": ".Choose()",
       "_origin": "ast",
       "community": 6,
-      "community_name": "Tree",
+      "community_name": "classify_test.go",
       "file_type": "code",
       "norm_label": ".choose()",
       "source_file": "internal/update/apply_test.go",
@@ -7868,6 +7934,127 @@
       "norm_label": "testing.t",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "internal_backup_backup",
+      "label": "backup.go",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "backup.go",
+      "source_file": "internal/backup/backup.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_backup_backup_save",
+      "label": "Save()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "save()",
+      "source_file": "internal/backup/backup.go",
+      "source_location": "L22"
+    },
+    {
+      "id": "internal_backup_backup_test",
+      "label": "backup_test.go",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "backup_test.go",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L1"
+    },
+    {
+      "id": "internal_backup_backup_test_fixednow",
+      "label": "fixedNow()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "fixednow()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L13"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaveappendssuffixoncollision",
+      "label": "TestSaveAppendsSuffixOnCollision()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaveappendssuffixoncollision()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L56"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavecreatesmissingdatadir",
+      "label": "TestSaveCreatesMissingDataDir()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavecreatesmissingdatadir()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L123"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavedirsareprivate",
+      "label": "TestSaveDirsArePrivate()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavedirsareprivate()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L87"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaverejectsbadname",
+      "label": "TestSaveRejectsBadName()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaverejectsbadname()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L75"
+    },
+    {
+      "id": "internal_backup_backup_test_testsaveusertreebreakingupstreamrules",
+      "label": "TestSaveUserTreeBreakingUpstreamRules()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsaveusertreebreakingupstreamrules()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L108"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavewithoutpatchwritesnopatchfile",
+      "label": "TestSaveWithoutPatchWritesNoPatchFile()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavewithoutpatchwritesnopatchfile()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L45"
+    },
+    {
+      "id": "internal_backup_backup_test_testsavewritesfilesandpatch",
+      "label": "TestSaveWritesFilesAndPatch()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testsavewritesfilesandpatch()",
+      "source_file": "internal/backup/backup_test.go",
+      "source_location": "L25"
     },
     {
       "id": "internal_cli_agentskills_test",
@@ -8332,6 +8519,17 @@
       "source_location": "L26"
     },
     {
+      "id": "internal_cli_usage_test_testbothscopesfromhome",
+      "label": "TestBothScopesFromHome()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testbothscopesfromhome()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159"
+    },
+    {
       "id": "internal_cli_usage_test_testfindsearchesbothscopes",
       "label": "TestFindSearchesBothScopes()",
       "_origin": "ast",
@@ -8363,6 +8561,17 @@
       "norm_label": "testremoveprintsrestore()",
       "source_file": "internal/cli/usage_test.go",
       "source_location": "L104"
+    },
+    {
+      "id": "internal_cli_usage_test_testremoverestorekeepsref",
+      "label": "TestRemoveRestoreKeepsRef()",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "testing.T",
+      "file_type": "code",
+      "norm_label": "testremoverestorekeepsref()",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173"
     },
     {
       "id": "internal_cli_usage_test_testshowfallsbacktoglobal",
@@ -8519,224 +8728,37 @@
       "source_location": "L67"
     },
     {
-      "id": "internal_skillfs_tree_test",
-      "label": "tree_test.go",
+      "id": "internal_lock_lock_test_testwritefailureleavesnotemp",
+      "label": "TestWriteFailureLeavesNoTemp()",
       "_origin": "ast",
       "community": 7,
       "community_name": "testing.T",
       "file_type": "code",
-      "norm_label": "tree_test.go",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L1"
+      "norm_label": "testwritefailureleavesnotemp()",
+      "source_file": "internal/lock/lock_test.go",
+      "source_location": "L101"
     },
     {
-      "id": "internal_skillfs_tree_test_go_tree",
-      "label": "Tree",
+      "id": "internal_manifest_manifest_skillnamevalid",
+      "label": "SkillNameValid()",
       "_origin": "ast",
       "community": 7,
       "community_name": "testing.T",
       "file_type": "code",
-      "norm_label": "tree",
-      "source_file": "",
-      "source_location": ""
+      "norm_label": "skillnamevalid()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L57"
     },
     {
-      "id": "internal_skillfs_tree_test_skillmd",
-      "label": "skillMD()",
+      "id": "internal_manifest_manifest_test_testskillnamevalid",
+      "label": "TestSkillNameValid()",
       "_origin": "ast",
       "community": 7,
       "community_name": "testing.T",
       "file_type": "code",
-      "norm_label": "skillmd()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L11"
-    },
-    {
-      "id": "internal_skillfs_tree_test_static",
-      "label": "static()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "static()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L63"
-    },
-    {
-      "id": "internal_skillfs_tree_test_symlinkorskip",
-      "label": "symlinkOrSkip()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "symlinkorskip()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L13"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalbinaryexact",
-      "label": "TestEqualBinaryExact()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalbinaryexact()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L31"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalcomparesexecandfileset",
-      "label": "TestEqualComparesExecAndFileSet()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalcomparesexecandfileset()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L49"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testequalignoresexecwhennotcompared",
-      "label": "TestEqualIgnoresExecWhenNotCompared()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testequalignoresexecwhennotcompared()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L238"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testreaddirlimits",
-      "label": "TestReadDirLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testreaddirlimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L299"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testreaddirrejectssymlink",
-      "label": "TestReadDirRejectsSymlink()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testreaddirrejectssymlink()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L114"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidatelimits",
-      "label": "TestValidateLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidatelimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L286"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidaterejects",
-      "label": "TestValidateRejects()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidaterejects()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L67"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testvalidaterejectscollisionsandreserved",
-      "label": "TestValidateRejectsCollisionsAndReserved()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testvalidaterejectscollisionsandreserved()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L209"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetoinvalidwritesnothing",
-      "label": "TestWriteToInvalidWritesNothing()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetoinvalidwritesnothing()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L158"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusesnonemptytarget",
-      "label": "TestWriteToRefusesNonEmptyTarget()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusesnonemptytarget()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L249"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkcomponent",
-      "label": "TestWriteToRefusesSymlinkComponent()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinkcomponent()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L169"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinkfile",
-      "label": "TestWriteToRefusesSymlinkFile()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinkfile()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L189"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwritetorefusessymlinktarget",
-      "label": "TestWriteToRefusesSymlinkTarget()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwritetorefusessymlinktarget()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L263"
-    },
-    {
-      "id": "internal_skillfs_tree_test_testwriteuncheckedkeepspathsafety",
-      "label": "TestWriteUncheckedKeepsPathSafety()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "testwriteuncheckedkeepspathsafety()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L368"
-    },
-    {
-      "id": "internal_skillfs_tree_test_withlimits",
-      "label": "withLimits()",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "testing.T",
-      "file_type": "code",
-      "norm_label": "withlimits()",
-      "source_file": "internal/skillfs/tree_test.go",
-      "source_location": "L279"
+      "norm_label": "testskillnamevalid()",
+      "source_file": "internal/manifest/manifest_test.go",
+      "source_location": "L111"
     },
     {
       "id": "internal_manifest_manifest",
@@ -8816,6 +8838,17 @@
       "source_location": "L68"
     },
     {
+      "id": "internal_manifest_manifest_readwith",
+      "label": "ReadWith()",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "manifest.go",
+      "file_type": "code",
+      "norm_label": "readwith()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L72"
+    },
+    {
       "id": "internal_manifest_manifest_removekey",
       "label": "removeKey()",
       "_origin": "ast",
@@ -8858,17 +8891,6 @@
       "norm_label": "setscalar()",
       "source_file": "internal/manifest/manifest.go",
       "source_location": "L321"
-    },
-    {
-      "id": "internal_manifest_manifest_skillnamevalid",
-      "label": "SkillNameValid()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "manifest.go",
-      "file_type": "code",
-      "norm_label": "skillnamevalid()",
-      "source_file": "internal/manifest/manifest.go",
-      "source_location": "L57"
     },
     {
       "id": "internal_manifest_manifest_test",
@@ -8959,17 +8981,6 @@
       "source_location": "L87"
     },
     {
-      "id": "internal_manifest_manifest_test_testskillnamevalid",
-      "label": "TestSkillNameValid()",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "manifest.go",
-      "file_type": "code",
-      "norm_label": "testskillnamevalid()",
-      "source_file": "internal/manifest/manifest_test.go",
-      "source_location": "L111"
-    },
-    {
       "id": "internal_manifest_manifest_test_testtargetsforoverride",
       "label": "TestTargetsForOverride()",
       "_origin": "ast",
@@ -9058,6 +9069,17 @@
       "source_location": "L221"
     },
     {
+      "id": "internal_manifest_manifest_validtargets",
+      "label": "validTargets()",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "manifest.go",
+      "file_type": "code",
+      "norm_label": "validtargets()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L134"
+    },
+    {
       "id": "internal_manifest_manifest_valueof",
       "label": "valueOf()",
       "_origin": "ast",
@@ -9091,6 +9113,17 @@
       "source_location": "L149"
     },
     {
+      "id": "internal_update_update_test_testplanfailsoninvalidref",
+      "label": "TestPlanFailsOnInvalidRef()",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "manifest.go",
+      "file_type": "code",
+      "norm_label": "testplanfailsoninvalidref()",
+      "source_file": "internal/update/update_test.go",
+      "source_location": "L402"
+    },
+    {
       "id": "manifest_manifest_targetsfor",
       "label": ".TargetsFor()",
       "_origin": "ast",
@@ -9100,6 +9133,17 @@
       "norm_label": ".targetsfor()",
       "source_file": "internal/manifest/manifest.go",
       "source_location": "L60"
+    },
+    {
+      "id": "manifest_manifest_validate",
+      "label": ".validate()",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "manifest.go",
+      "file_type": "code",
+      "norm_label": ".validate()",
+      "source_file": "internal/manifest/manifest.go",
+      "source_location": "L95"
     },
     {
       "id": "manifest_skill_effectiveref",
@@ -10691,7 +10735,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L108",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -10703,7 +10747,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L120",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -10715,7 +10759,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L59",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -10727,7 +10771,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L79",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -10739,7 +10783,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L85",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -10751,7 +10795,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L89",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -10763,7 +10807,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L93",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -10775,7 +10819,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L98",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -10787,7 +10831,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -10799,7 +10843,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -10811,7 +10855,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -10823,19 +10867,43 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L58",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
-      "source": "internal_cli_list_newlistcmd",
-      "target": "internal_cli_list_load",
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_cli_list_loadfrom",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L131",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_cli_list_scopename",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L161",
       "weight": 1.0
     },
     {
@@ -10847,7 +10915,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L135",
+      "source_location": "L167",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_list_isglobal",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -10859,7 +10939,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L141",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -10871,7 +10951,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L146",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -10883,7 +10963,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L146",
+      "source_location": "L178",
       "weight": 1.0
     },
     {
@@ -10895,7 +10975,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L148",
+      "source_location": "L180",
       "weight": 1.0
     },
     {
@@ -10907,7 +10987,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L157",
+      "source_location": "L189",
       "weight": 1.0
     },
     {
@@ -10979,7 +11059,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L50",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -10991,7 +11071,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L59",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -11003,7 +11083,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L66",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -11015,7 +11095,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L68",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -11027,7 +11107,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L74",
+      "source_location": "L84",
       "weight": 1.0
     },
     {
@@ -11039,7 +11119,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L78",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -11111,19 +11191,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L69",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_sync_newsynccmd",
-      "target": "internal_cli_sync_exists",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "internal/cli/sync.go",
-      "source_location": "L40",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -11135,7 +11203,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L40",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_sync_newsynccmd",
+      "target": "internal_cli_sync_exists",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/cli/sync.go",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -11147,7 +11227,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L49",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -11159,7 +11239,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L51",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -14068,6 +14148,18 @@
     },
     {
       "source": "internal_install_remove_remove",
+      "target": "internal_source_spec_parsewith",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "internal/install/remove.go",
+      "source_location": "L155",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_install_remove_remove",
       "target": "internal_manifest_manifest_writewith",
       "relation": "calls",
       "_origin": "ast",
@@ -14075,7 +14167,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L158",
+      "source_location": "L165",
       "weight": 1.0
     },
     {
@@ -14087,7 +14179,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "internal/install/remove.go",
-      "source_location": "L163",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -21023,7 +21115,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -21035,7 +21127,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -21047,7 +21139,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "internal/cli/list.go",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -22155,6 +22247,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_list_isglobal",
+      "target": "cli_state",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_list_istty",
       "target": "go_type_io_writer",
       "relation": "references",
@@ -22163,7 +22267,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -22175,7 +22279,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L84",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -22187,7 +22291,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -22199,7 +22303,31 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "go_type_io_writer",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "internal_install_add_go_install_deps",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -22211,7 +22339,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L115",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -22343,7 +22471,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -22367,7 +22495,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L61",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -22379,7 +22507,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L61",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -22391,7 +22519,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L26",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -22443,6 +22571,18 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_usage_test_testfindsearchesbothscopes",
       "target": "go_type_testing_t",
       "relation": "references",
@@ -22476,6 +22616,18 @@
       "context": "parameter_type",
       "source_file": "internal/cli/usage_test.go",
       "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "go_type_testing_t",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -27995,7 +28147,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L84",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -28007,7 +28159,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L38",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -28019,7 +28171,19 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L46",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_loadscopes",
+      "target": "cli_state",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "return_type",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -28031,7 +28195,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/list.go",
-      "source_location": "L115",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -28055,7 +28219,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/show.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -28079,7 +28243,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L26",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -30231,90 +30395,13 @@
     },
     {
       "source": "internal_cli_list",
-      "target": "internal_cli_list_scopename",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L108",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_newlistcmd",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L115",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_istty",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "cli_state",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_load",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L38",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_loadfrom",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L46",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
-      "target": "internal_cli_list_short",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/list.go",
-      "source_location": "L65",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_list",
       "target": "cli_listrow",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L75",
+      "source_location": "L103",
       "weight": 1.0
     },
     {
@@ -30325,7 +30412,106 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/list.go",
-      "source_location": "L84",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_scopename",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_newlistcmd",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_istty",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "cli_state",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_load",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_loadfrom",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_isglobal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list",
+      "target": "internal_cli_list_short",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/list.go",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -30440,24 +30626,24 @@
     },
     {
       "source": "internal_cli_show",
-      "target": "internal_cli_show_newshowcmd",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "internal/cli/show.go",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "internal_cli_show",
       "target": "internal_cli_show_dash",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/show.go",
-      "source_location": "L96",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_show",
+      "target": "internal_cli_show_newshowcmd",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/show.go",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -30479,7 +30665,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/sync.go",
-      "source_location": "L24",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -30490,7 +30676,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/sync.go",
-      "source_location": "L26",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -30501,7 +30687,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "internal/cli/sync.go",
-      "source_location": "L61",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -30579,6 +30765,28 @@
       "confidence_score": 1.0,
       "source_file": "internal/cli/usage_test.go",
       "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testbothscopesfromhome",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test",
+      "target": "internal_cli_usage_test_testremoverestorekeepsref",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L173",
       "weight": 1.0
     },
     {
@@ -37266,7 +37474,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L108",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -37283,14 +37491,26 @@
     },
     {
       "source": "internal_cli_find_newfindcmd",
-      "target": "internal_cli_list_loadfrom",
+      "target": "internal_cli_list_loadscopes",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L46",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_find_newfindcmd",
+      "target": "internal_cli_list_isglobal",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/find.go",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -37302,7 +37522,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/find.go",
-      "source_location": "L51",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -37314,7 +37534,19 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/list.go",
-      "source_location": "L39",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_list_newlistcmd",
+      "target": "internal_cli_cli_deps",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/list.go",
+      "source_location": "L157",
       "weight": 1.0
     },
     {
@@ -37523,14 +37755,26 @@
     },
     {
       "source": "internal_cli_show_newshowcmd",
-      "target": "internal_cli_list_load",
+      "target": "internal_cli_cli_deps",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/show.go",
-      "source_location": "L26",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_show_newshowcmd",
+      "target": "internal_cli_list_loadscopes",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/show.go",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -37578,7 +37822,7 @@
       "confidence_score": 0.85,
       "context": "call",
       "source_file": "internal/cli/sync.go",
-      "source_location": "L33",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -37654,6 +37898,30 @@
       "weight": 1.0
     },
     {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testbothscopesfromhome",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
       "source": "internal_cli_usage_test_testfindsearchesbothscopes",
       "target": "internal_cli_cli_test_setup",
       "relation": "calls",
@@ -37723,6 +37991,30 @@
       "context": "call",
       "source_file": "internal/cli/usage_test.go",
       "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "internal_cli_cli_test_setup",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L174",
+      "weight": 1.0
+    },
+    {
+      "source": "internal_cli_usage_test_testremoverestorekeepsref",
+      "target": "internal_cli_cli_test_run",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "internal/cli/usage_test.go",
+      "source_location": "L175",
       "weight": 1.0
     },
     {
@@ -43812,5 +44104,5 @@
       "source_file": "docs/adr/0005-on-disk-layout.md"
     }
   ],
-  "built_at_commit": "c9cbfaa3ab4cff555abaadd235df020cdaa64236"
+  "built_at_commit": "526b633adcc2ce37384a596fbca6fc0707f7e05d"
 }

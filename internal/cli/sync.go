@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 
 	"charm.land/huh/v2"
@@ -13,7 +15,7 @@ import (
 
 // interactive and confirm are vars so tests can answer the first-run prompt.
 var (
-	interactive = isTTY
+	interactive = func(w io.Writer) bool { return isTTY(w) && isTTY(os.Stdin) } // huh reads stdin
 	confirm     = func(q string) (bool, error) {
 		ok := true
 		err := huh.NewConfirm().Title(q).Value(&ok).Run()
@@ -21,7 +23,14 @@ var (
 	}
 )
 
-func exists(p string) bool { _, err := os.Stat(p); return err == nil }
+// exists reports whether p exists; an error other than not-exist is returned.
+func exists(p string) (bool, error) {
+	_, err := os.Stat(p)
+	if errors.Is(err, fs.ErrNotExist) {
+		return false, nil
+	}
+	return err == nil, err
+}
 
 func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 	var frozen bool
@@ -37,15 +46,27 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 			d.Global = *global
 			// -g in a project installs the project's cali.yaml into your home folder.
 			if *global && d.Manifest == "" {
-				if p, err := install.Locate(d, false); err == nil && exists(p.Manifest) {
-					d.Manifest = p.Manifest
+				if p, err := install.Locate(d, false); err == nil {
+					if ok, err := exists(p.Manifest); err != nil {
+						return err
+					} else if ok {
+						d.Manifest = p.Manifest
+					}
 				}
 			}
 			loc, err := install.Locate(d, *global)
 			if err != nil {
 				return err
 			}
-			if !exists(loc.Manifest) && !exists(loc.LockPath) {
+			haveManifest, err := exists(loc.Manifest)
+			if err != nil {
+				return err
+			}
+			haveLock, err := exists(loc.LockPath)
+			if err != nil {
+				return err
+			}
+			if !haveManifest && !haveLock {
 				return firstRun(cmd, d, loc.Manifest, frozen)
 			}
 			_, err = install.Sync(cmd.Context(), d, frozen)

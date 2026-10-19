@@ -72,15 +72,15 @@
     "semantic_hash": ""
   },
   "internal/cli/find.go": {
-    "mtime": 1792427333.3763592,
-    "seen": 1792427484.3808699,
-    "ast_hash": "49c5ba973ed3f921e8a85c0671d2f914",
+    "mtime": 1792431568.0925388,
+    "seen": 1792431629.942003,
+    "ast_hash": "7da29a3c67b3b0a05dbc1fca547aacb7",
     "semantic_hash": ""
   },
   "internal/cli/list.go": {
-    "mtime": 1792427317.169935,
-    "seen": 1792427484.3808699,
-    "ast_hash": "c0e0bb2ce12e16cc2fe80ea33f72b4e3",
+    "mtime": 1792431568.0923767,
+    "seen": 1792431629.942004,
+    "ast_hash": "027ecef3fe830a57b0f4cad88b2a606b",
     "semantic_hash": ""
   },
   "internal/cli/list_test.go": {
@@ -96,9 +96,9 @@
     "semantic_hash": "42f1d042a0768872300412f608b8afcd"
   },
   "internal/cli/show.go": {
-    "mtime": 1792427326.408855,
-    "seen": 1792427484.380872,
-    "ast_hash": "f37d29188d4e9c24416ba3532e889b48",
+    "mtime": 1792431568.0926554,
+    "seen": 1792431629.942006,
+    "ast_hash": "fc388ce9d37a8b181ca6adfa8c38f3f0",
     "semantic_hash": ""
   },
   "internal/cli/status.go": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "internal/cli/sync.go": {
-    "mtime": 1792427362.1727648,
-    "seen": 1792427484.380874,
-    "ast_hash": "d35aadb29a9587f44b24a540cf3de7de",
+    "mtime": 1792431568.092762,
+    "seen": 1792431629.942008,
+    "ast_hash": "5db284b8df30eff36f4139c6b51ee426",
     "semantic_hash": ""
   },
   "internal/cli/update.go": {
@@ -198,9 +198,9 @@
     "semantic_hash": ""
   },
   "internal/install/remove.go": {
-    "mtime": 1792427301.7811966,
-    "seen": 1792427484.380886,
-    "ast_hash": "ff5f134ecea557dc1759933e2880de7c",
+    "mtime": 1792431567.7454493,
+    "seen": 1792431629.9420202,
+    "ast_hash": "1a240e4c8d31764d8f29ce75f7f95012",
     "semantic_hash": ""
   },
   "internal/install/remove_test.go": {
@@ -426,9 +426,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1792427476.8243003,
-    "seen": 1792427484.380912,
-    "ast_hash": "4ceb8e1e2bce32a991c038f01240a4b0",
+    "mtime": 1792431620.0735233,
+    "seen": 1792431629.942048,
+    "ast_hash": "9b4549eebb666c78c2a6c572e8e0394e",
     "semantic_hash": ""
   },
   "SETUP.md": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "internal/cli/usage_test.go": {
-    "mtime": 1792427362.172929,
-    "seen": 1792427484.380875,
-    "ast_hash": "96911f03c615fc75e25043f1feaf080a",
+    "mtime": 1792431597.7310967,
+    "seen": 1792431629.942009,
+    "ast_hash": "75e6373e4767310f987e186a521070af",
     "semantic_hash": ""
   }
 }

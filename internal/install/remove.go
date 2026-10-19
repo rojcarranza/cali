@@ -150,7 +150,14 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 	if d.Manifest != "" {
 		restoreCmd = append(restoreCmd, "--manifest", d.Manifest)
 	}
-	restoreCmd = append(restoreCmd, m.Skills[name].Source)
+	src := m.Skills[name].Source
+	if r := m.Skills[name].Ref; r != "" { // a pin kept in ref: goes back on the spec
+		if sp, err := source.ParseWith(src, opts); err == nil {
+			sp.Ref = r
+			src = sp.String()
+		}
+	}
+	restoreCmd = append(restoreCmd, src)
 	for _, tg := range m.TargetsFor(name) {
 		restoreCmd = append(restoreCmd, "--target", tg)
 	}

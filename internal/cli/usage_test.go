@@ -155,3 +155,39 @@ func TestSyncWithoutManifest(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestBothScopesFromHome(t *testing.T) {
+	repoURL, _ := setup(t)
+	if code, out, errs := run("add", "-g", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add -g: code=%d out=%q err=%q", code, out, errs)
+	}
+	t.Chdir(os.Getenv("HOME"))
+	if code, out, errs := run("show", "x"); code != 0 || !strings.Contains(out, repoURL) {
+		t.Fatalf("show from home: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("list", "-a"); code != 0 || !strings.Contains(out, "global  x") || !strings.Contains(errs, "warning: project scope") {
+		t.Fatalf("list -a from home: code=%d out=%q err=%q", code, out, errs)
+	}
+}
+
+func TestRemoveRestoreKeepsRef(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	mf := filepath.Join(project, "cali.yaml")
+	b, err := os.ReadFile(mf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pinned := strings.Replace(string(b), "    source: "+repoURL+"//skills/x\n", "    source: "+repoURL+"//skills/x\n    ref: main\n", 1)
+	if pinned == string(b) {
+		t.Fatalf("fixture: no source line in %q", b)
+	}
+	if err := os.WriteFile(mf, []byte(pinned), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, errs := run("remove", "x"); code != 0 || !strings.Contains(out, "cali add "+repoURL+"//skills/x@main ") {
+		t.Fatalf("remove: code=%d out=%q err=%q", code, out, errs)
+	}
+}

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"sort"
@@ -15,6 +16,7 @@ import (
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
 	"github.com/rojcarranza/cali/internal/status"
+	"github.com/rojcarranza/cali/internal/targets"
 )
 
 // isTTY reports whether w is a terminal; anything but an *os.File is not.
@@ -61,6 +63,32 @@ func loadFrom(d install.Deps, global bool) (state, error) {
 	}
 	return state{loc, d.Dirs.Home, m, l}, nil
 }
+
+// loadScopes loads each scope (false = project, true = global). With more than
+// one scope, a scope that fails to load is a warning on warn, unless all fail.
+func loadScopes(d install.Deps, scopes []bool, warn io.Writer) ([]state, error) {
+	var out []state
+	var first error
+	for _, g := range scopes {
+		s, err := loadFrom(d, g)
+		if err == nil {
+			out = append(out, s)
+			continue
+		}
+		if first == nil {
+			first = err
+		}
+		if len(scopes) > 1 {
+			_, _ = fmt.Fprintf(warn, "warning: %s scope: %s\n", scopeName(g), err)
+		}
+	}
+	if len(out) == 0 {
+		return nil, first
+	}
+	return out, nil
+}
+
+func isGlobal(s state) bool { return s.loc.Scope == targets.Global }
 
 func short(c string) string {
 	if c == "" {
@@ -118,7 +146,7 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 		Use:   "list",
 		Short: "List installed skills",
 		Args:  cobra.NoArgs,
-		RunE: func(*cobra.Command, []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if all && manifestPath != "" {
 				return errors.New("-a lists both scopes and cannot be used with --manifest")
 			}
@@ -126,19 +154,23 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 			if all {
 				scopes = []bool{false, true}
 			}
+			d, err := deps(out)
+			if err != nil {
+				return err
+			}
+			states, err := loadScopes(d, scopes, cmd.ErrOrStderr())
+			if err != nil {
+				return err
+			}
 			rows := []listRow{}
-			for _, g := range scopes {
-				s, err := load(out, g)
-				if err != nil {
-					return err
-				}
+			for _, s := range states {
 				rs, err := listRows(s)
 				if err != nil {
 					return err
 				}
 				if all {
 					for i := range rs {
-						rs[i].Scope = scopeName(g)
+						rs[i].Scope = scopeName(isGlobal(s))
 					}
 				}
 				rows = append(rows, rs...)

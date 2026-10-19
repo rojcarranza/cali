@@ -41,28 +41,27 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			}
 			seen := map[string]bool{}
 			var urls []src
-			for _, g := range scopes {
-				d.Global = g
-				s, err := loadFrom(d, g)
-				if err != nil {
-					if len(scopes) == 1 {
-						return err
-					}
-					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "warning: %s scope: %s\n", scopeName(g), err)
-					continue
-				}
+			states, err := loadScopes(d, scopes, cmd.ErrOrStderr())
+			if err != nil {
+				return err
+			}
+			for _, s := range states {
+				g := isGlobal(s)
 				specs := append([]string{}, s.m.Sources...)
 				for _, sk := range s.m.Skills {
 					specs = append(specs, sk.Source)
 				}
 				for _, raw := range specs {
 					sp, err := source.ParseWith(raw, source.Options{AllowFile: allowFileScheme})
+					if err != nil {
+						continue // the manifest was validated on load
+					}
 					key := sp.URL
 					if sp.URL == source.Here {
 						key += scopeName(g)
 					}
-					if err != nil || seen[key] {
-						continue // the manifest was validated on load
+					if seen[key] {
+						continue
 					}
 					seen[key] = true
 					urls = append(urls, src{sp, g})

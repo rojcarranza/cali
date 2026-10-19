@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	skilldeps "github.com/rojcarranza/cali/internal/deps"
+	"github.com/rojcarranza/cali/internal/manifest"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/skillfs"
 	"github.com/rojcarranza/cali/internal/targets"
@@ -23,16 +24,25 @@ func newShowCmd(out io.Writer, global *bool) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			name := args[0]
-			s, err := load(out, *global)
+			d, err := deps(out)
 			if err != nil {
 				return err
 			}
-			sk, ok := s.m.Skills[name]
-			if !ok && !*global && manifestPath == "" { // not in the project: try the global scope
-				if g, err := load(out, true); err == nil {
-					if sk, ok = g.m.Skills[name]; ok {
-						s = g
-					}
+			scopes := []bool{*global}
+			if !*global && manifestPath == "" { // not in the project: try the global scope
+				scopes = append(scopes, true)
+			}
+			states, err := loadScopes(d, scopes, io.Discard)
+			if err != nil {
+				return err
+			}
+			var s state
+			var sk manifest.Skill
+			ok := false
+			for _, st := range states {
+				if sk, ok = st.m.Skills[name]; ok {
+					s = st
+					break
 				}
 			}
 			if !ok {
