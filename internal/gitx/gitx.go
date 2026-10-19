@@ -437,12 +437,18 @@ func (r *Repo) fetchMissing(ctx context.Context, tree string) error {
 	if n > limits.files {
 		return skillfs.Invalid(fmt.Errorf("skill has more than %d files", limits.files))
 	}
+	return r.fetchObjects(ctx, want.String(), n)
+}
+
+// fetchObjects downloads the n newline-separated object ids in want in one
+// fetch, the command git itself runs for a lazy fetch.
+func (r *Repo) fetchObjects(ctx context.Context, want string, n int) error {
 	if n == 0 {
 		return nil
 	}
 	cmd := r.command(ctx, r.env, "--git-dir", r.Dir, "-c", "fetch.negotiationAlgorithm=noop",
 		"fetch", "-q", "--no-tags", "--no-write-fetch-head", "--recurse-submodules=no", "--filter=blob:none", "--stdin", "origin")
-	cmd.Stdin = strings.NewReader(want.String())
+	cmd.Stdin = strings.NewReader(want)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
@@ -512,14 +518,51 @@ func (r *Repo) readBlobs(ctx context.Context, entries []entry) (skillfs.Tree, er
 // root, depth 0). The result is sorted. Only tree listings are read, so no
 // blob is downloaded.
 func (r *Repo) ListSkillDirs(commit string, maxDepth int) ([]string, error) {
+	dirs, _, err := r.skillFiles(commit, maxDepth)
+	return dirs, err
+}
+
+// FetchSkillFiles downloads, in one fetch, every SKILL.md blob below the
+// ListSkillDirs folders of commit that the blob-less mirror lacks, so later
+// ReadFile calls do not each trigger a lazy fetch. Offline it fetches nothing.
+func (r *Repo) FetchSkillFiles(commit string, maxDepth int) error {
+	if r.offline {
+		return nil
+	}
+	_, oids, err := r.skillFiles(commit, maxDepth)
+	if err != nil || len(oids) == 0 {
+		return err
+	}
+	ctx := context.Background()
+	// GIT_NO_LAZY_FETCH makes cat-file report a missing blob instead of fetching it.
+	cmd := r.command(ctx, append(append([]string{}, r.env...), "GIT_NO_LAZY_FETCH=1"),
+		"--git-dir", r.Dir, "cat-file", "--batch-check")
+	cmd.Stdin = strings.NewReader(strings.Join(oids, "\n") + "\n")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("git cat-file: %w: %s", err, sanitize(stderr.String(), r.env))
+	}
+	var want strings.Builder
+	n := 0
+	for _, line := range strings.Split(stdout.String(), "\n") {
+		if oid, ok := strings.CutSuffix(line, " missing"); ok {
+			want.WriteString(oid + "\n")
+			n++
+		}
+	}
+	return r.fetchObjects(ctx, want.String(), n)
+}
+
+// skillFiles returns the ListSkillDirs folders and the blob ids of their SKILL.md.
+func (r *Repo) skillFiles(commit string, maxDepth int) (dirs, oids []string, err error) {
 	if !hex40.MatchString(commit) {
-		return nil, fmt.Errorf("invalid commit %q", commit)
+		return nil, nil, fmt.Errorf("invalid commit %q", commit)
 	}
 	out, err := r.git(context.Background(), r.env, "ls-tree", "-r", "-z", "--full-tree", commit)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var dirs []string
 	for _, rec := range bytes.Split(out, []byte{0}) {
 		meta, name, ok := bytes.Cut(rec, []byte{'\t'})
 		if !ok {
@@ -542,9 +585,10 @@ func (r *Repo) ListSkillDirs(commit string, maxDepth int) ([]string, error) {
 			continue
 		}
 		dirs = append(dirs, dir)
+		oids = append(oids, fields[2])
 	}
 	sort.Strings(dirs)
-	return dirs, nil
+	return dirs, oids, nil
 }
 
 // URL returns the source URL the mirror was opened for.

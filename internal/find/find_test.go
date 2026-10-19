@@ -39,7 +39,7 @@ func repoFilter(t *testing.T, files map[string]string, filter bool) *gitx.Repo {
 			t.Fatal(err)
 		}
 	}
-	for _, a := range [][]string{{"init", "-q", "-b", "main"}, {"add", "."}, {"commit", "-q", "-m", "one"}, {"config", "uploadpack.allowFilter", fmt.Sprint(filter)}} {
+	for _, a := range [][]string{{"init", "-q", "-b", "main"}, {"add", "."}, {"commit", "-q", "-m", "one"}, {"config", "uploadpack.allowFilter", fmt.Sprint(filter)}, {"config", "uploadpack.allowAnySHA1InWant", "true"}} {
 		cmd := exec.Command("git", append([]string{"-c", "user.name=T", "-c", "user.email=t@example.invalid"}, a...)...)
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
@@ -125,5 +125,27 @@ func TestSearchOfflineSkipsMissingBlob(t *testing.T) {
 	r.SetOffline(false)
 	if hits, err = Search([]*gitx.Repo{r}, "common"); err != nil || len(hits) != 1 {
 		t.Fatalf("online (proves the blob was only missing): hits=%+v err=%v", hits, err)
+	}
+}
+
+func TestSearchFetchesMissingBlobsInOneFetch(t *testing.T) {
+	files := map[string]string{}
+	for i := 0; i < 5; i++ {
+		files[fmt.Sprintf("skills/s%d/SKILL.md", i)] = skill(fmt.Sprintf("s%d", i), "common word")
+	}
+	r := repoFilter(t, files, true)
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
+	hits, err := Search([]*gitx.Repo{r}, "common")
+	if err != nil || len(hits) != 5 {
+		t.Fatalf("hits=%+v err=%v", hits, err)
+	}
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// All five missing SKILL.md blobs come down in one fetch, not one per blob.
+	if n := strings.Count(string(log), "built-in: git fetch"); n != 1 {
+		t.Errorf("Search ran %d fetches, want 1", n)
 	}
 }

@@ -1,16 +1,16 @@
-# Graph Report - cali  (2026-10-19)
+# Graph Report - sweet-mcclintock-20e99e  (2026-10-19)
 
 ## Corpus Check
-- 85 files · ~73,490 words
+- 85 files · ~73,964 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 849 nodes · 2948 edges · 33 communities (29 shown, 4 thin omitted)
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 554 edges (avg confidence: 0.85)
+- 854 nodes · 2967 edges · 26 communities (22 shown, 4 thin omitted)
+- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 557 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f779d222`
+- Built from commit: `29247147`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -25,10 +25,8 @@
 - testing.T
 - Cali Brief
 - manifest.go
-- tree_test.go
 - Cali design
-- gitx_test.go
-- Search
+- ParseFrontmatter
 - ADR 0006: Copilot target paths
 - ADR 0003: CLI framework
 - ADR 0004: Terminal styling, spinner and prompts
@@ -36,29 +34,24 @@
 - ParseWith
 - Resolve
 - Tree
-- Plan
-- Apply
 - install.sh
 - block-protected.sh
 - post-edit-go.sh
 - stop-tests.sh
 - github.com/rojcarranza/cali
 - Validate
-- Save
-- Get
 - ADR 0008: Default global manifest
-- TestSameLockSameBytes
 
 ## God Nodes (most connected - your core abstractions)
 1. `Add()` - 58 edges
 2. `newEnv()` - 52 edges
 3. `Sync()` - 47 edges
-4. `run()` - 42 edges
-5. `monorepo()` - 41 edges
-6. `setup()` - 40 edges
-7. `fileURL()` - 37 edges
-8. `Tree` - 36 edges
-9. `Repo` - 35 edges
+4. `run()` - 43 edges
+5. `setup()` - 41 edges
+6. `monorepo()` - 41 edges
+7. `Repo` - 38 edges
+8. `fileURL()` - 37 edges
+9. `Tree` - 36 edges
 10. `Read()` - 32 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -80,19 +73,19 @@
 - **Read-only review subagents** — _claude_agents_architecture_guardian_architecture_guardian, _claude_agents_security_reviewer_security_reviewer, _claude_agents_test_auditor_test_auditor [EXTRACTED 1.00]
 - **Safe update: pristine base + git merge-file + conflict flags** — docs_adr_0005_on_disk_layout_pristine_store, docs_adr_0001_system_git_git_merge_file, readme_update_conflict_resolution, docs_brief_safe_updates [INFERRED 0.85]
 
-## Communities (33 total, 4 thin omitted)
+## Communities (26 total, 4 thin omitted)
 
 ### Community 0 - "Repo"
 Cohesion: 0.07
-Nodes (40): entry, context.Context, os/exec.Cmd, AddRequest, Installed, plan, Result, scope (+32 more)
+Nodes (46): entry, context.Context, os/exec.Cmd, AuthEnv(), envMap(), TestAuthEnvOnlyGithub(), TestAuthEnvTokenOrder(), TestScrubRemovesCredentials() (+38 more)
 
 ### Community 1 - "Add"
-Cohesion: 0.11
-Nodes (86): Action, env, Report, Add(), place(), exists(), fileURL(), git() (+78 more)
+Cohesion: 0.10
+Nodes (89): Action, env, Report, Add(), checkScopeFiles(), Init(), LockCommit(), resolveScope() (+81 more)
 
 ### Community 2 - "setup"
 Cohesion: 0.12
-Nodes (57): Locate(), backupDir(), conflictAndClean(), exact(), failSecondStaging(), Options, fx, read() (+49 more)
+Nodes (60): Locate(), backupDir(), conflictAndClean(), exact(), failSecondStaging(), Options, fx, read() (+52 more)
 
 ### Community 3 - "Milestone 1: Walking skeleton (target 2026-10-30)"
 Cohesion: 0.08
@@ -104,15 +97,15 @@ Nodes (47): bytes.Buffer, Check(), Warning, V, Requires(), sortedKeys(), TestChe
 
 ### Community 5 - "io.Writer"
 Cohesion: 0.08
-Nodes (43): huhPrompter, listRow, state, main(), TestMainExitsZeroOnVersion(), github.com/spf13/cobra.Command, io.Writer, deps() (+35 more)
+Nodes (44): listRow, state, main(), TestMainExitsZeroOnVersion(), github.com/spf13/cobra.Command, io.Writer, deps(), Execute() (+36 more)
 
 ### Community 6 - "classify_test.go"
-Cohesion: 0.06
-Nodes (83): allDisjoint(), binary(), ChangedLines(), Classify(), edits(), frontmatter(), Class, Recommendation (+75 more)
+Cohesion: 0.05
+Nodes (93): huhPrompter, allDisjoint(), binary(), ChangedLines(), Classify(), edits(), frontmatter(), Class (+85 more)
 
 ### Community 7 - "testing.T"
-Cohesion: 0.09
-Nodes (66): testing.T, agentSkills(), installedAsDeclared(), TestAgentSkillsFrozenSync(), TestAgentSkillsLockIsCurrent(), TestAgentSkillsNewSkill(), gitRun(), run() (+58 more)
+Cohesion: 0.08
+Nodes (79): testing.T, agentSkills(), installedAsDeclared(), TestAgentSkillsFrozenSync(), TestAgentSkillsLockIsCurrent(), TestAgentSkillsNewSkill(), gitRun(), run() (+71 more)
 
 ### Community 8 - "Cali Brief"
 Cohesion: 0.08
@@ -122,21 +115,13 @@ Nodes (34): architecture-guardian agent, security-reviewer agent, test-auditor a
 Cohesion: 0.15
 Nodes (33): copyComments(), ensureMapping(), Manifest, Skill, markFlow(), Read(), ReadWith(), removeKey() (+25 more)
 
-### Community 10 - "tree_test.go"
-Cohesion: 0.22
-Nodes (18): Tree, skillMD(), static(), symlinkOrSkip(), TestEqualComparesExecAndFileSet(), TestEqualIgnoresExecWhenNotCompared(), TestReadDirLimits(), TestReadDirRejectsSymlink() (+10 more)
-
 ### Community 11 - "Cali design"
 Cohesion: 0.10
 Nodes (21): 10. Commands (behavior contracts), 11. Anti-goals, deferred, and ADRs, 12. Left to the builder, 13. How the brief's questions were closed, 1. Model, 2. Files and where they live, 3. `cali.yaml` (manifest, hand-editable), 4. `cali.lock` (generated, deterministic) (+13 more)
 
-### Community 12 - "gitx_test.go"
-Cohesion: 0.18
-Nodes (29): AuthEnv(), envMap(), TestAuthEnvOnlyGithub(), TestAuthEnvTokenOrder(), TestScrubRemovesCredentials(), Open(), exportAt(), fixture() (+21 more)
-
-### Community 13 - "Search"
-Cohesion: 0.42
-Nodes (9): Hit, Search(), repo(), repoFilter(), skill(), TestSearchDepthLimit(), TestSearchMatchesDescription(), TestSearchNoRegistry() (+1 more)
+### Community 13 - "ParseFrontmatter"
+Cohesion: 0.19
+Nodes (18): Hit, Search(), repo(), repoFilter(), skill(), TestSearchDepthLimit(), TestSearchFetchesMissingBlobsInOneFetch(), TestSearchMatchesDescription() (+10 more)
 
 ### Community 14 - "ADR 0006: Copilot target paths"
 Cohesion: 0.33
@@ -162,17 +147,9 @@ Nodes (22): Options, ownerRepo(), Parse(), ParseWith(), reject(), safeScheme(), 
 Cohesion: 0.37
 Nodes (12): Dirs, join(), pick(), Resolve(), resolveWindows(), check(), envOf(), TestResolveCaliOverrides() (+4 more)
 
-### Community 20 - "Tree"
-Cohesion: 0.18
-Nodes (22): TestSaveUserTreeBreakingUpstreamRules(), existing(), Stage(), Diff(), Equal(), FileEqual(), FileEqualPtr(), File (+14 more)
-
-### Community 21 - "Plan"
-Cohesion: 0.21
-Nodes (16): decide(), Plan(), shellArg(), TestShellArgQuotesRepoPaths(), text(), warnLeftovers(), FileDecision, jsonConflict (+8 more)
-
-### Community 22 - "Apply"
-Cohesion: 0.23
-Nodes (13): MoveAside(), NoSymlinks(), Sanitize(), Apply(), checkFlags(), Options, resolveSkill(), swap() (+5 more)
+### Community 22 - "Tree"
+Cohesion: 0.06
+Nodes (72): AddRequest, Installed, plan, Result, scope, Save(), fixedNow(), TestSaveAppendsSuffixOnCollision() (+64 more)
 
 ### Community 23 - "install.sh"
 Cohesion: 0.83
@@ -182,21 +159,9 @@ Nodes (3): die(), say(), install.sh script
 Cohesion: 0.24
 Nodes (11): os.FileMode, ensureDirs(), Tree, Tree, quote(), safePath(), Validate(), validatePath() (+3 more)
 
-### Community 29 - "Save"
-Cohesion: 0.42
-Nodes (8): Save(), fixedNow(), TestSaveAppendsSuffixOnCollision(), TestSaveCreatesMissingDataDir(), TestSaveDirsArePrivate(), TestSaveRejectsBadName(), TestSaveWithoutPatchWritesNoPatchFile(), TestSaveWritesFilesAndPatch()
-
-### Community 30 - "Get"
-Cohesion: 0.54
-Nodes (6): checkTree(), Get(), Put(), TestPutGetRoundTrip(), TestPutRejectsBadTreeSHA(), tree()
-
 ### Community 31 - "ADR 0008: Default global manifest"
 Cohesion: 0.40
 Nodes (4): ADR 0008: Default global manifest, Consequences, Context, Decision
-
-### Community 32 - "TestSameLockSameBytes"
-Cohesion: 0.83
-Nodes (3): run(), TestSameLockSameBytes(), treeHash()
 
 ## Knowledge Gaps
 - **65 isolated node(s):** `block-protected.sh script`, `post-edit-go.sh script`, `stop-tests.sh script`, `github.com/rojcarranza/cali`, `Context` (+60 more)
@@ -206,11 +171,11 @@ Nodes (3): run(), TestSameLockSameBytes(), treeHash()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Repo` connect `Repo` to `gitx_test.go`, `Search`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `Add()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ParseWith`, `Get`?**
+- **Why does `Repo` connect `Repo` to `Add`, `io.Writer`, `ParseFrontmatter`, `Tree`?**
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `Add()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ParseWith`, `Tree`?**
   _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `Sync()` connect `Add` to `TestSameLockSameBytes`, `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ParseWith`, `Tree`, `Apply`, `Get`?**
+- **Why does `Sync()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ParseWith`, `Tree`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Are the 31 inferred relationships involving `Add()` (e.g. with `TestAddAdoptsIdenticalFolder()` and `TestAddDefaultTargetsWritesBoth()`) actually correct?**
   _`Add()` has 31 INFERRED edges - model-reasoned connections that need verification._
@@ -218,5 +183,5 @@ _Questions this graph is uniquely positioned to answer:_
   _`newEnv()` has 29 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 29 inferred relationships involving `Sync()` (e.g. with `TestSyncSameRepoBaseLostWhenTreeGone()` and `TestSyncSameRepoLockBehind()`) actually correct?**
   _`Sync()` has 29 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 23 inferred relationships involving `run()` (e.g. with `TestAgentSkillsFrozenSync()` and `TestAgentSkillsLockIsCurrent()`) actually correct?**
-  _`run()` has 23 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 24 inferred relationships involving `run()` (e.g. with `TestAgentSkillsFrozenSync()` and `TestAgentSkillsLockIsCurrent()`) actually correct?**
+  _`run()` has 24 INFERRED edges - model-reasoned connections that need verification._
