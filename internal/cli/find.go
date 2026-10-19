@@ -4,14 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/rojcarranza/cali/internal/find"
 	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/loader"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
 )
@@ -70,6 +73,11 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			sort.Slice(urls, func(i, j int) bool { return urls[i].spec.URL < urls[j].spec.URL })
 
 			warn := cmd.ErrOrStderr()
+			stop := func() {}
+			if !asJSON && isTTY(warn) && os.Getenv("NO_COLOR") == "" {
+				l := loader.Start(warn, "cali is fetching skills…", 200*time.Millisecond)
+				stop, warn = l.Stop, l
+			}
 			hits := []find.Hit{}
 			for _, u := range urls {
 				sp := u.spec
@@ -97,6 +105,7 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 					_, _ = fmt.Fprintf(warn, "warning: %s: %s\n", sp.URL, err)
 				}
 			}
+			stop()
 			sort.SliceStable(hits, func(i, j int) bool {
 				if hits[i].Name != hits[j].Name {
 					return hits[i].Name < hits[j].Name
