@@ -2,8 +2,11 @@ package render
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
+
+	"charm.land/lipgloss/v2"
 )
 
 func TestModeFor(t *testing.T) {
@@ -96,5 +99,20 @@ func TestWriteJSONNoHTMLEscape(t *testing.T) {
 func TestSanitizeDropsFormatRunes(t *testing.T) {
 	if got := Sanitize("a\u202eb\u200bc\u2066d\ufeff"); got != "abcd" {
 		t.Fatalf("got %q", got)
+	}
+}
+
+func TestStyledTableFitsTerminalWidth(t *testing.T) {
+	defer func(f func(io.Writer) int) { termWidth = f }(termWidth)
+	termWidth = func(io.Writer) int { return 60 }
+	var b bytes.Buffer
+	Table{Header: []string{"NAME", "DESCRIPTION"}, Rows: [][]string{{"code-tour", strings.Repeat("long words ", 40)}}}.Render(&b, Styled)
+	for _, l := range strings.Split(strings.TrimRight(b.String(), "\n"), "\n") {
+		if w := lipgloss.Width(l); w > 60 {
+			t.Fatalf("line is %d cells wide, terminal is 60:\n%s", w, b.String())
+		}
+	}
+	if !strings.Contains(b.String(), "code-tour") {
+		t.Fatalf("cell lost:\n%s", b.String())
 	}
 }
