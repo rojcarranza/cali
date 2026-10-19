@@ -37,6 +37,8 @@ func ParseWith(s string, o Options) (Spec, error) {
 		scheme, rest = "here", s
 	case strings.HasPrefix(s, "github:"):
 		scheme, rest = "github", strings.TrimPrefix(s, "github:")
+	case strings.HasPrefix(s, "github.com/"):
+		scheme, rest = "github", strings.TrimPrefix(s, "github.com/")
 	case strings.Contains(s, "://"):
 		i := strings.Index(s, "://")
 		scheme, rest = s[:i], s[i+3:]
