@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/rojcarranza/cali/internal/dirs"
 )
 
 func writeFixture(t *testing.T, project string) {
@@ -234,5 +236,27 @@ func TestListUnmanagedWithoutManifest(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(out), "\n")
 	if len(lines) != 2 || strings.Join(strings.Fields(lines[1]), " ") != "foo unmanaged - claude" {
 		t.Fatalf("out = %q", out)
+	}
+}
+
+func TestGlobalWarnsOnSeveralWindowsHomes(t *testing.T) {
+	setup(t)
+	t.Setenv("CALI_CONFIG_DIR", "")
+	t.Setenv("XDG_CONFIG_HOME", "")
+	t.Setenv("WSL_DISTRO_NAME", "Ubuntu")
+	old := dirsFS
+	dirsFS = dirs.FS{Exists: pathExists, Glob: func(p string) ([]string, error) {
+		if p != "/mnt/*/Users/*/.config/cali/cali.yaml" {
+			return nil, nil
+		}
+		return []string{"/mnt/c/Users/a/.config/cali/cali.yaml", "/mnt/c/Users/b/.config/cali/cali.yaml"}, nil
+	}}
+	t.Cleanup(func() { dirsFS = old })
+
+	if code, _, errs := run("list", "-g"); code != 0 || !strings.Contains(errs, "warning: several Windows homes") {
+		t.Fatalf("list -g: code=%d err=%q", code, errs)
+	}
+	if code, _, errs := run("list"); code != 0 || errs != "" {
+		t.Fatalf("list: code=%d err=%q, want no warning in project scope", code, errs)
 	}
 }

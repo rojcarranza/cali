@@ -46,7 +46,7 @@ Then see [README.md](README.md) for adding, updating and removing skills.
 Git Bash and WSL can share one global `cali.yaml` ([ADR 0009](docs/adr/0009-home-relative-config-dir.md)):
 
 - **Git Bash and PowerShell** run `cali.exe`, whose `~` is `C:\Users\<you>`. Create the global manifest from there first.
-- **WSL** uses `/mnt/c/Users/<you>/.config/cali/` when its own `~/.config/cali/cali.yaml` does not exist. If several Windows users have one, Cali uses none of them, and `cali list -g` asks you to set `CALI_CONFIG_DIR`.
+- **WSL** uses `/mnt/c/Users/<you>/.config/cali/` (any drive, or `/c/...` with automount `root = /`) when its own `~/.config/cali/cali.yaml` does not exist. If several Windows users have one, Cali uses none of them, and global commands warn you to set `CALI_CONFIG_DIR`.
 - Skills are still installed in each home. After `cali update -g` on one side, run `cali sync -g` on the other.
 - An older `%APPDATA%\cali\cali.yaml` keeps working until `%USERPROFILE%\.config\cali` exists.
 

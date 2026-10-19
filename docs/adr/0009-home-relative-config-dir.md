@@ -14,7 +14,7 @@ bam-cli, used on the same machines, already shares one presets file between Git 
 
 1. `$CALI_CONFIG_DIR`.
 2. Not on Windows: `$XDG_CONFIG_HOME/cali`. On Windows `XDG_CONFIG_HOME` is ignored, since Git Bash may export it as an MSYS path (`/c/...`) that `cali.exe` cannot open.
-3. In WSL only (`WSL_DISTRO_NAME` set), when `<home>/.config/cali/cali.yaml` does not exist: the one `/mnt/c/Users/*/.config/cali/` that holds a `cali.yaml`. With several matches Cali uses none of them, stays in the WSL home, and `list -g` says to set `CALI_CONFIG_DIR`.
+3. In WSL only (`WSL_DISTRO_NAME` set), when `<home>/.config/cali/cali.yaml` does not exist: the one `/mnt/*/Users/*/.config/cali/` or `/*/Users/*/.config/cali/` (automount `root = /`) that holds a `cali.yaml`. With several matches Cali uses none of them, stays in the WSL home, and every global command warns to set `CALI_CONFIG_DIR`. Other automount roots are not searched; `CALI_CONFIG_DIR` covers them. The search runs once per command, and only when the global scope's config dir is used.
 4. On Windows only, when `<home>\.config\cali` does not exist and `%APPDATA%\cali\cali.yaml` does: `%APPDATA%\cali`, so an existing global manifest keeps working. Cali does not move it.
 5. `<home>/.config/cali`, where `<home>` is `os.UserHomeDir()` (`%USERPROFILE%` on Windows, not the MSYS `$HOME`).
 
@@ -30,7 +30,7 @@ bam-cli adopts the same rule for its config, credentials and presets, under `bam
 
 - Git Bash, PowerShell and WSL on one machine share one global `cali.yaml` and `cali.lock` with no environment variable, as long as WSL has none of its own. The lock holds no absolute paths or per-machine data (`internal/lock/lock.go:3`), so sharing it is safe.
 - Global skills are still installed per home (`~/.claude/skills`, `~/.copilot/skills`), so WSL and Windows each have their own copies. After `update -g` on one side, run `cali sync -g` on the other to bring its folders to the shared lock.
-- WSL reads a manifest on the Windows drive (`/mnt/c`), which is slower than the WSL filesystem. Cali reads it once per command.
+- WSL reads a manifest on the Windows drive, which is slower than the WSL filesystem. Commands that never read the global manifest never search it.
 - macOS, Linux and WSL users with a config already at `~/.config/cali` see no change. Windows users keep `%APPDATA%\cali` until they create `%USERPROFILE%\.config\cali`.
-- `internal/dirs` gains a WSL check and a glob; tests stub both, as bam does with `PresetsLookup.Glob`.
+- `internal/dirs` gains `WSLConfig`, which the CLI calls lazily through `install.Deps.GlobalConfig`; tests stub the glob, as bam does with `PresetsLookup.Glob`.
 - No new dependency, datastore or service.

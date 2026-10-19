@@ -26,11 +26,18 @@ var version = "dev"
 // allowFileScheme admits file:// sources. Only tests set it.
 var allowFileScheme = false
 
+// warnOut receives warnings; Execute points it at its stderr.
+var warnOut io.Writer = os.Stderr
+
+// dirsFS is what dirs asks the file system. Tests replace it.
+var dirsFS = dirs.FS{Exists: pathExists, Glob: filepath.Glob}
+
 // manifestPath is the persistent --manifest flag; newRoot resets it to "" for each run.
 var manifestPath string
 
 // Execute runs cali with args (without the program name) and returns the exit code.
 func Execute(args []string, out, errw io.Writer) int {
+	warnOut = errw
 	root := newRoot(out)
 	root.SetArgs(args)
 	root.SetOut(out)
@@ -109,8 +116,17 @@ func deps(out io.Writer) (install.Deps, error) {
 	if err != nil {
 		return install.Deps{}, err
 	}
+	ds := dirs.Resolve(runtime.GOOS, os.Getenv, home, dirsFS)
+	warn := warnOut
 	return install.Deps{
-		Dirs:            dirs.Resolve(runtime.GOOS, os.Getenv, home, dirs.FS{Exists: pathExists, Glob: filepath.Glob}),
+		Dirs: ds,
+		GlobalConfig: sync.OnceValue(func() string { // globs the Windows drive in WSL, so only on use
+			dir, note := dirs.WSLConfig(os.Getenv, ds.Config, dirsFS)
+			if note != "" {
+				_, _ = fmt.Fprintf(warn, "warning: %s\n", note)
+			}
+			return dir
+		}),
 		Stdout:          out,
 		Getenv:          os.Getenv,
 		GhToken:         sync.OnceValues(ghToken), // at most one gh run per command

@@ -1,6 +1,7 @@
 package dirs
 
 import (
+	"path"
 	"strings"
 	"testing"
 )
@@ -97,58 +98,63 @@ func fsOf(existing []string, matches ...string) FS {
 	}
 	return FS{
 		Exists: func(p string) bool { return set[p] },
-		Glob: func(p string) ([]string, error) {
-			if p != "/mnt/c/Users/*/.config/cali/cali.yaml" {
-				return nil, nil
+		Glob: func(pattern string) ([]string, error) {
+			var out []string
+			for _, m := range matches {
+				if ok, _ := path.Match(pattern, m); ok {
+					out = append(out, m)
+				}
 			}
-			return matches, nil
+			return out, nil
 		},
 	}
 }
 
-func TestResolveWSLFallback(t *testing.T) {
+func TestWSLConfigFallback(t *testing.T) {
 	env := envOf(map[string]string{"WSL_DISTRO_NAME": "Ubuntu"})
 	win := "/mnt/c/Users/r/.config/cali/cali.yaml"
-	got := Resolve("linux", env, "/h", fsOf(nil, win))
-	if got.Config != "/mnt/c/Users/r/.config/cali" || got.Note != "" {
-		t.Errorf("got %+v, want Windows home config", got)
+	for _, win := range []string{win, "/mnt/d/Users/r/.config/cali/cali.yaml", "/c/Users/r/.config/cali/cali.yaml"} {
+		dir, note := WSLConfig(env, "/h/.config/cali", fsOf(nil, win))
+		if want := strings.TrimSuffix(win, "/cali.yaml"); dir != want || note != "" {
+			t.Errorf("%s: got %s %q, want %s", win, dir, note, want)
+		}
 	}
 }
 
-func TestResolveWSLOwnManifestWins(t *testing.T) {
+func TestWSLConfigOwnManifestWins(t *testing.T) {
 	env := envOf(map[string]string{"WSL_DISTRO_NAME": "Ubuntu"})
 	fs := fsOf([]string{"/h/.config/cali/cali.yaml"}, "/mnt/c/Users/r/.config/cali/cali.yaml")
-	if got := Resolve("linux", env, "/h", fs).Config; got != "/h/.config/cali" {
+	if got, _ := WSLConfig(env, "/h/.config/cali", fs); got != "/h/.config/cali" {
 		t.Errorf("Config = %s, want /h/.config/cali", got)
 	}
 }
 
-func TestResolveWSLSeveralWindowsHomes(t *testing.T) {
+func TestWSLConfigSeveralWindowsHomes(t *testing.T) {
 	env := envOf(map[string]string{"WSL_DISTRO_NAME": "Ubuntu"})
 	fs := fsOf(nil, "/mnt/c/Users/a/.config/cali/cali.yaml", "/mnt/c/Users/b/.config/cali/cali.yaml")
-	got := Resolve("linux", env, "/h", fs)
-	if got.Config != "/h/.config/cali" {
-		t.Errorf("Config = %s, want /h/.config/cali", got.Config)
+	dir, note := WSLConfig(env, "/h/.config/cali", fs)
+	if dir != "/h/.config/cali" {
+		t.Errorf("Config = %s, want /h/.config/cali", dir)
 	}
-	if !strings.Contains(got.Note, "CALI_CONFIG_DIR") || !strings.Contains(got.Note, "/mnt/c/Users/b/.config/cali") {
-		t.Errorf("Note = %q, want both homes and CALI_CONFIG_DIR", got.Note)
+	if !strings.Contains(note, "CALI_CONFIG_DIR") || !strings.Contains(note, "/mnt/c/Users/b/.config/cali") {
+		t.Errorf("note = %q, want both homes and CALI_CONFIG_DIR", note)
 	}
 }
 
-func TestResolveWSLOverridesSkipFallback(t *testing.T) {
+func TestWSLConfigOverridesSkipFallback(t *testing.T) {
 	win := "/mnt/c/Users/r/.config/cali/cali.yaml"
 	for k, want := range map[string]string{"CALI_CONFIG_DIR": "/o/c", "XDG_CONFIG_HOME": "/x/c/cali"} {
 		v := strings.TrimSuffix(want, "/cali")
 		env := envOf(map[string]string{"WSL_DISTRO_NAME": "Ubuntu", k: v})
-		if got := Resolve("linux", env, "/h", fsOf(nil, win)).Config; got != want {
+		if got, _ := WSLConfig(env, want, fsOf(nil, win)); got != want {
 			t.Errorf("%s: Config = %s, want %s", k, got, want)
 		}
 	}
 }
 
-func TestResolveNotWSLNoFallback(t *testing.T) {
+func TestWSLConfigNotWSL(t *testing.T) {
 	win := "/mnt/c/Users/r/.config/cali/cali.yaml"
-	if got := Resolve("linux", envOf(nil), "/h", fsOf(nil, win)).Config; got != "/h/.config/cali" {
+	if got, _ := WSLConfig(envOf(nil), "/h/.config/cali", fsOf(nil, win)); got != "/h/.config/cali" {
 		t.Errorf("Config = %s, want /h/.config/cali", got)
 	}
 }
