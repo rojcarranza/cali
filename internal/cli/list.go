@@ -158,7 +158,7 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if (*global || all) && manifestPath == "" && d.Dirs.Note != "" {
+			if (*global || all) && manifestPath == "" && d.Getenv("CALI_MANIFEST") == "" && d.Dirs.Note != "" {
 				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "warning: %s\n", d.Dirs.Note)
 			}
 			states, err := loadScopes(d, scopes, cmd.ErrOrStderr())

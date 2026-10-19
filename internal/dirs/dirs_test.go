@@ -97,7 +97,12 @@ func fsOf(existing []string, matches ...string) FS {
 	}
 	return FS{
 		Exists: func(p string) bool { return set[p] },
-		Glob:   func(string) ([]string, error) { return matches, nil },
+		Glob: func(p string) ([]string, error) {
+			if p != "/mnt/c/Users/*/.config/cali/cali.yaml" {
+				return nil, nil
+			}
+			return matches, nil
+		},
 	}
 }
 
