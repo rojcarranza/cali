@@ -12,7 +12,7 @@
   "10": "tree_test.go",
   "11": "Cali design",
   "12": "gitx_test.go",
-  "13": "ParseFrontmatter",
+  "13": "Search",
   "14": "ADR 0006: Copilot target paths",
   "15": "ADR 0003: CLI framework",
   "16": "ADR 0004: Terminal styling, spinner and prompts",
@@ -20,10 +20,16 @@
   "18": "ParseWith",
   "19": "Resolve",
   "20": "Tree",
-  "21": "plan_test.go",
+  "21": "Plan",
+  "22": "Apply",
   "23": "install.sh",
   "24": "block-protected.sh",
   "25": "post-edit-go.sh",
   "26": "stop-tests.sh",
-  "27": "github.com/rojcarranza/cali"
+  "27": "github.com/rojcarranza/cali",
+  "28": "Validate",
+  "29": "Save",
+  "30": "Get",
+  "31": "ADR 0008: Default global manifest",
+  "32": "TestSameLockSameBytes"
 }
