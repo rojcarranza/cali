@@ -4,14 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"runtime"
 	"sort"
 	"strings"
+	"time"
 
+	"github.com/charmbracelet/x/term"
 	"github.com/spf13/cobra"
 
 	"github.com/rojcarranza/cali/internal/find"
 	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/loader"
 	"github.com/rojcarranza/cali/internal/render"
 	"github.com/rojcarranza/cali/internal/source"
 )
@@ -70,6 +75,12 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			sort.Slice(urls, func(i, j int) bool { return urls[i].spec.URL < urls[j].spec.URL })
 
 			warn := cmd.ErrOrStderr()
+			stop := func() {}
+			const wait = "cali is fetching skills…"
+			if !asJSON && showLoader(warn, wait) {
+				l := loader.Start(warn, wait, 200*time.Millisecond)
+				stop, warn = l.Stop, l
+			}
 			hits := []find.Hit{}
 			for _, u := range urls {
 				sp := u.spec
@@ -97,6 +108,7 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 					_, _ = fmt.Fprintf(warn, "warning: %s: %s\n", sp.URL, err)
 				}
 			}
+			stop()
 			sort.SliceStable(hits, func(i, j int) bool {
 				if hits[i].Name != hits[j].Name {
 					return hits[i].Name < hits[j].Name
@@ -131,4 +143,19 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	cmd.Flags().BoolVar(&offline, "offline", false, "do not fetch; search what the mirrors already have")
 	return cmd
+}
+
+// showLoader reports whether w is a color terminal that understands cursor
+// movement and is wide enough that the loader's rows for msg do not wrap.
+func showLoader(w io.Writer, msg string) bool {
+	f, ok := w.(*os.File)
+	if !ok || !isTTY(w) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
+		return false
+	}
+	// shortcut: Windows consoles may lack VT processing, so no loader there; enable VT mode to add it.
+	if runtime.GOOS == "windows" {
+		return false
+	}
+	cols, _, err := term.GetSize(f.Fd())
+	return err == nil && cols > loader.Width(msg)
 }

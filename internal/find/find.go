@@ -29,22 +29,12 @@ func Search(repos []*gitx.Repo, query string) ([]Hit, error) {
 		if err != nil {
 			return nil, err
 		}
-		dirs, err := r.ListSkillDirs(commit, maxDepth)
+		files, err := r.ReadSkillFiles(commit, maxDepth)
 		if err != nil {
 			return nil, err
 		}
-		if err := r.FetchSkillFiles(commit, maxDepth); err != nil {
-			return nil, err
-		}
-		for _, d := range dirs {
-			p := "SKILL.md"
-			if d != "" {
-				p = d + "/SKILL.md"
-			}
-			data, err := r.ReadFile(commit, p)
-			if err != nil {
-				continue // oversize or unreadable: skip like an unparsable file
-			}
+		// An oversize or (offline) missing SKILL.md is absent from files.
+		for d, data := range files {
 			fm, err := skillfs.ParseFrontmatter(data)
 			if err != nil {
 				continue

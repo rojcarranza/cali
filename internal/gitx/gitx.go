@@ -522,18 +522,64 @@ func (r *Repo) ListSkillDirs(commit string, maxDepth int) ([]string, error) {
 	return dirs, err
 }
 
-// FetchSkillFiles downloads, in one fetch, every SKILL.md blob below the
-// ListSkillDirs folders of commit that the blob-less mirror lacks, so later
-// ReadFile calls do not each trigger a lazy fetch. Offline it fetches nothing.
-func (r *Repo) FetchSkillFiles(commit string, maxDepth int) error {
-	if r.offline {
-		return nil
-	}
-	_, oids, err := r.skillFiles(commit, maxDepth)
+// ReadSkillFiles returns the SKILL.md bytes of every ListSkillDirs folder of
+// commit, keyed by folder. The blobs the blob-less mirror lacks are
+// downloaded first in one fetch (offline: none), then all are read through
+// one git cat-file --batch, so the git process count does not grow with the
+// number of skills. A SKILL.md over the skillfs.MaxFileSize limit, or still
+// missing (offline), is left out.
+func (r *Repo) ReadSkillFiles(commit string, maxDepth int) (map[string][]byte, error) {
+	dirs, oids, err := r.skillFiles(commit, maxDepth)
 	if err != nil || len(oids) == 0 {
-		return err
+		return map[string][]byte{}, err
 	}
 	ctx := context.Background()
+	sizes, missing, err := r.blobSizes(ctx, oids)
+	if err != nil {
+		return nil, err
+	}
+	if len(missing) > 0 && !r.offline {
+		if err := r.fetchObjects(ctx, strings.Join(missing, "\n")+"\n", len(missing)); err != nil {
+			return nil, err
+		}
+		if sizes, _, err = r.blobSizes(ctx, oids); err != nil {
+			return nil, err
+		}
+	}
+	var entries []entry
+	for i, d := range dirs {
+		if size, ok := sizes[oids[i]]; ok && size <= limits.file {
+			entries = append(entries, entry{path: d, sha: oids[i], size: size})
+		}
+	}
+	t := r.readEach(ctx, entries)
+	out := make(map[string][]byte, len(t))
+	for _, f := range t {
+		out[f.Path] = f.Data
+	}
+	return out, nil
+}
+
+// readEach reads entries through one git cat-file --batch; if that fails,
+// it reads them one by one and leaves out the ones that fail, so one
+// unreadable SKILL.md does not hide the others.
+func (r *Repo) readEach(ctx context.Context, entries []entry) skillfs.Tree {
+	t, err := r.readBlobs(ctx, entries)
+	if err == nil {
+		return t
+	}
+	t = nil
+	for _, e := range entries {
+		if one, err := r.readBlobs(ctx, []entry{e}); err == nil {
+			t = append(t, one...)
+		}
+	}
+	return t
+}
+
+// blobSizes asks one git cat-file --batch-check for the size of each blob in
+// oids; the ones the mirror lacks are returned in missing instead.
+func (r *Repo) blobSizes(ctx context.Context, oids []string) (sizes map[string]int64, missing []string, err error) {
 	// GIT_NO_LAZY_FETCH makes cat-file report a missing blob instead of fetching it.
 	cmd := r.command(ctx, append(append([]string{}, r.env...), "GIT_NO_LAZY_FETCH=1"),
 		"--git-dir", r.Dir, "cat-file", "--batch-check")
@@ -541,20 +587,25 @@ func (r *Repo) FetchSkillFiles(commit string, maxDepth int) error {
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git cat-file: %w: %s", err, sanitize(stderr.String(), r.env))
+		return nil, nil, fmt.Errorf("git cat-file: %w: %s", err, sanitize(stderr.String(), r.env))
 	}
-	var want strings.Builder
-	n := 0
+	sizes = map[string]int64{}
 	for _, line := range strings.Split(stdout.String(), "\n") {
 		if oid, ok := strings.CutSuffix(line, " missing"); ok {
-			want.WriteString(oid + "\n")
-			n++
+			missing = append(missing, oid)
+			continue
+		}
+		if f := strings.Fields(line); len(f) == 3 && f[1] == "blob" {
+			if n, err := strconv.ParseInt(f[2], 10, 64); err == nil {
+				sizes[f[0]] = n
+			}
 		}
 	}
-	return r.fetchObjects(ctx, want.String(), n)
+	return sizes, missing, nil
 }
 
-// skillFiles returns the ListSkillDirs folders and the blob ids of their SKILL.md.
+// skillFiles returns the ListSkillDirs folders, sorted, and the blob ids of
+// their SKILL.md in the same order.
 func (r *Repo) skillFiles(commit string, maxDepth int) (dirs, oids []string, err error) {
 	if !hex40.MatchString(commit) {
 		return nil, nil, fmt.Errorf("invalid commit %q", commit)
@@ -563,6 +614,7 @@ func (r *Repo) skillFiles(commit string, maxDepth int) (dirs, oids []string, err
 	if err != nil {
 		return nil, nil, err
 	}
+	var found [][2]string // folder, SKILL.md blob id
 	for _, rec := range bytes.Split(out, []byte{0}) {
 		meta, name, ok := bytes.Cut(rec, []byte{'\t'})
 		if !ok {
@@ -584,40 +636,15 @@ func (r *Repo) skillFiles(commit string, maxDepth int) (dirs, oids []string, err
 		if dir != "" && strings.Count(dir, "/")+1 > maxDepth {
 			continue
 		}
-		dirs = append(dirs, dir)
-		oids = append(oids, fields[2])
+		found = append(found, [2]string{dir, fields[2]})
 	}
-	sort.Strings(dirs)
+	sort.Slice(found, func(i, j int) bool { return found[i][0] < found[j][0] })
+	for _, f := range found {
+		dirs = append(dirs, f[0])
+		oids = append(oids, f[1])
+	}
 	return dirs, oids, nil
 }
 
 // URL returns the source URL the mirror was opened for.
 func (r *Repo) URL() string { return r.url }
-
-// ReadFile returns the regular file at path in commit. The size is taken from
-// the tree listing and a file over the skillfs.MaxFileSize limit is refused
-// before its blob is read.
-func (r *Repo) ReadFile(commit, path string) ([]byte, error) {
-	if !hex40.MatchString(commit) {
-		return nil, fmt.Errorf("invalid commit %q", commit)
-	}
-	ctx := context.Background()
-	out, err := r.git(ctx, r.env, "ls-tree", "-z", "-l", commit, "--", path)
-	if err != nil {
-		return nil, err
-	}
-	meta, name, ok := bytes.Cut(bytes.TrimSuffix(out, []byte{0}), []byte{'\t'})
-	fields := strings.Fields(string(meta))
-	if !ok || len(fields) != 4 || string(name) != path || fields[1] != "blob" ||
-		(fields[0] != "100644" && fields[0] != "100755") {
-		return nil, fmt.Errorf("%q is not a regular file at commit %s", path, commit)
-	}
-	size, err := strconv.ParseInt(fields[3], 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("%q: bad size in tree listing", path)
-	}
-	if size > limits.file {
-		return nil, fmt.Errorf("%q: file is %d bytes, limit is %d", path, size, limits.file)
-	}
-	return r.git(ctx, r.env, "cat-file", "blob", fields[2])
-}
