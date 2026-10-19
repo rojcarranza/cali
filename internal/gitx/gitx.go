@@ -552,15 +552,29 @@ func (r *Repo) ReadSkillFiles(commit string, maxDepth int) (map[string][]byte, e
 			entries = append(entries, entry{path: d, sha: oids[i], size: size})
 		}
 	}
-	t, err := r.readBlobs(ctx, entries)
-	if err != nil {
-		return nil, err
-	}
+	t := r.readEach(ctx, entries)
 	out := make(map[string][]byte, len(t))
 	for _, f := range t {
 		out[f.Path] = f.Data
 	}
 	return out, nil
+}
+
+// readEach reads entries through one git cat-file --batch; if that fails,
+// it reads them one by one and leaves out the ones that fail, so one
+// unreadable SKILL.md does not hide the others.
+func (r *Repo) readEach(ctx context.Context, entries []entry) skillfs.Tree {
+	t, err := r.readBlobs(ctx, entries)
+	if err == nil {
+		return t
+	}
+	t = nil
+	for _, e := range entries {
+		if one, err := r.readBlobs(ctx, []entry{e}); err == nil {
+			t = append(t, one...)
+		}
+	}
+	return t
 }
 
 // blobSizes asks one git cat-file --batch-check for the size of each blob in

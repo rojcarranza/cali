@@ -439,6 +439,31 @@ func TestReadSkillFiles(t *testing.T) {
 	}
 }
 
+func TestReadEachSkipsOnlyTheUnreadableBlob(t *testing.T) {
+	r := openFetched(t, fixture(t))
+	commit, err := r.Resolve("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	dirs, oids, err := r.skillFiles(commit, 4)
+	if err != nil || len(dirs) == 0 {
+		t.Fatalf("skillFiles = %q, %v", dirs, err)
+	}
+	sizes, _, err := r.blobSizes(context.Background(), oids)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bad := entry{path: "bad", sha: strings.Repeat("0", 40), size: 1}
+	entries := []entry{bad}
+	for i, d := range dirs {
+		entries = append(entries, entry{path: d, sha: oids[i], size: sizes[oids[i]]})
+	}
+	got := r.readEach(context.Background(), entries)
+	if len(got) != len(dirs) {
+		t.Fatalf("readEach = %d files, want the %d readable ones", len(got), len(dirs))
+	}
+}
+
 // exportAt exports path at commit, as callers do: TreeSHA, then Export.
 func exportAt(r *Repo, commit, path string) (skillfs.Tree, error) {
 	tree, err := r.TreeSHA(commit, path)

@@ -6,6 +6,8 @@ package loader
 
 import (
 	"io"
+	"os"
+	"os/signal"
 	"strings"
 	"sync"
 	"time"
@@ -39,6 +41,14 @@ var frames = [2][4]string{
 	{".sh", "cdh", "cdd", "cdd"},
 	{".sh", "cdh", "cdd", "dd."},
 }
+
+// notify, stopNotify and exit are signal.Notify, signal.Stop and os.Exit;
+// tests replace them.
+var (
+	notify     = func(c chan<- os.Signal) { signal.Notify(c, os.Interrupt) }
+	stopNotify = signal.Stop
+	exit       = os.Exit
+)
 
 type flake struct{ x, row, age int }
 
@@ -143,6 +153,10 @@ func Start(w io.Writer, msg string, delay time.Duration) *Loader {
 			return
 		case <-time.After(delay):
 		}
+		// Ctrl-C while a frame is drawn: erase it, then exit as the default handler would.
+		intr := make(chan os.Signal, 1)
+		notify(intr)
+		defer stopNotify(intr)
 		var s state
 		t := time.NewTicker(tickEvery)
 		defer t.Stop()
@@ -155,6 +169,13 @@ func Start(w io.Writer, msg string, delay time.Duration) *Loader {
 			s.advance()
 			select {
 			case <-l.done:
+				return
+			case <-intr:
+				l.mu.Lock()
+				_, _ = io.WriteString(l.w, erase)
+				l.drawn = false
+				l.mu.Unlock()
+				exit(130)
 				return
 			case <-t.C:
 			}

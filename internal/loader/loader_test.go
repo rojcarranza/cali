@@ -2,6 +2,7 @@ package loader
 
 import (
 	"bytes"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -92,5 +93,26 @@ func TestFrameWalksAndSnows(t *testing.T) {
 		if s.x > track {
 			t.Fatalf("x = %d walked past the %d-column track", s.x, track)
 		}
+	}
+}
+
+func TestInterruptErasesAndExits(t *testing.T) {
+	reg, code := make(chan chan<- os.Signal, 1), make(chan int, 1)
+	oldNotify, oldStop, oldExit := notify, stopNotify, exit
+	notify = func(c chan<- os.Signal) { reg <- c }
+	stopNotify = func(chan<- os.Signal) {}
+	exit = func(c int) { code <- c }
+	defer func() { notify, stopNotify, exit = oldNotify, oldStop, oldExit }()
+	var w buf
+	l := Start(&w, "fetching", 0)
+	intr := <-reg
+	waitDrawn(t, &w)
+	intr <- os.Interrupt
+	if c := <-code; c != 130 {
+		t.Fatalf("exit code = %d, want 130", c)
+	}
+	l.Stop()
+	if out := w.String(); !strings.HasSuffix(out, erase) || strings.Count(out[strings.LastIndex(out, "▀"):], erase) != 1 {
+		t.Fatalf("frame not erased exactly once after the interrupt: %q", out)
 	}
 }
