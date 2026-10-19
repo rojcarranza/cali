@@ -7,11 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"unicode"
 
 	"charm.land/lipgloss/v2"
 	"charm.land/lipgloss/v2/table"
+	"github.com/charmbracelet/x/term"
 )
 
 // Mode selects the output format.
@@ -32,6 +34,19 @@ func ModeFor(isTTY, jsonFlag bool) Mode {
 		return Styled
 	}
 	return Plain
+}
+
+// termWidth returns the width of the terminal w writes to, or 0 when unknown.
+var termWidth = func(w io.Writer) int {
+	f, ok := w.(*os.File)
+	if !ok {
+		return 0
+	}
+	cols, _, err := term.GetSize(f.Fd())
+	if err != nil {
+		return 0
+	}
+	return cols
 }
 
 // Table is a header plus rows of cells.
@@ -77,6 +92,10 @@ func (t Table) Render(w io.Writer, m Mode) {
 				}
 				return lipgloss.NewStyle().Padding(0, 1)
 			})
+		// A table wider than the terminal gets hard-wrapped line by line; shrink it so cells wrap instead.
+		if cols := termWidth(w); cols > 0 && lipgloss.Width(tb.String()) > cols {
+			tb.Width(cols)
+		}
 		// lipgloss.Fprintln downsamples colors to what the writer supports.
 		_, _ = lipgloss.Fprintln(w, tb.String())
 		return
