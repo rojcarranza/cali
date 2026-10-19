@@ -63,6 +63,14 @@ cali sync --frozen # CI: fail instead of changing cali.lock
 
 `cali sync -g` in a project is short for `cali sync -g --manifest cali.yaml`. Only `sync` makes that switch, so pass `--manifest cali.yaml` to later `-g` commands on those skills, for example `cali update -g --manifest cali.yaml --apply`.
 
+**Default global manifest.** To make plain `-g` commands (`list -g`, `find`, `show`, `status -g`, `update -g`, `remove -g`) use that manifest, set its absolute path once in your shell profile:
+
+```sh
+export CALI_MANIFEST="$HOME/path/to/agent-skills/cali.yaml"   # your clone
+```
+
+`--manifest` still wins over `CALI_MANIFEST`, and `sync -g` in a project still uses that project's `cali.yaml`. Project scope ignores `CALI_MANIFEST`.
+
 **First run.** If there is no `cali.yaml` yet, `sync` offers to install a default skill repo. Set it once in your shell profile:
 
 ```sh
@@ -85,7 +93,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen` |
 | `cali init` | Create an empty `cali.yaml` | |
 
-Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.yaml`; the lock sits next to it).
+Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.yaml`; the lock sits next to it). In global scope, `$CALI_MANIFEST` is the default for `--manifest`.
 
 ## Good to know
 

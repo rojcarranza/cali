@@ -83,8 +83,17 @@ type scope struct {
 // the nearest ancestor of the cwd holding cali.yaml, else the nearest one
 // holding .git, else the cwd. Global scope lives in the config dir.
 // d.Manifest overrides both: the lock sits next to it and, in project scope,
-// its dir is the root; global targets stay under home.
+// its dir is the root; global targets stay under home. In global scope an
+// absolute $CALI_MANIFEST stands in for a missing d.Manifest.
 func resolveScope(d Deps, global bool) (scope, error) {
+	if d.Manifest == "" && global && d.Getenv != nil {
+		if mf := d.Getenv("CALI_MANIFEST"); mf != "" {
+			if !filepath.IsAbs(mf) {
+				return scope{}, fmt.Errorf("CALI_MANIFEST=%s: must be an absolute path", mf)
+			}
+			d.Manifest = mf
+		}
+	}
 	if d.Manifest == "" && global {
 		return scope{
 			scope:    targets.Global,

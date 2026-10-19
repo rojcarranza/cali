@@ -40,6 +40,7 @@ func setup(t *testing.T) (repoURL, project string) {
 	t.Setenv("CALI_CACHE_DIR", filepath.Join(base, "cache"))
 	t.Setenv("GITHUB_TOKEN", "")
 	t.Setenv("GH_TOKEN", "")
+	t.Setenv("CALI_MANIFEST", "")
 
 	r := filepath.Join(base, "repo")
 	if err := os.MkdirAll(filepath.Join(r, "skills", "x"), 0o755); err != nil {

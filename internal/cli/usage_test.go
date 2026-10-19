@@ -191,3 +191,49 @@ func TestRemoveRestoreKeepsRef(t *testing.T) {
 		t.Fatalf("remove: code=%d out=%q err=%q", code, out, errs)
 	}
 }
+
+func TestCaliManifestIsTheDefaultGlobalManifest(t *testing.T) {
+	repoURL, _ := setup(t)
+	mf := filepath.Join(t.TempDir(), "cali.yaml")
+	if code, out, errs := run("add", "-g", "--manifest", mf, repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add -g --manifest: code=%d out=%q err=%q", code, out, errs)
+	}
+	t.Setenv("CALI_MANIFEST", mf)
+	if code, out, errs := run("list", "-g"); code != 0 || !strings.Contains(out, repoURL) {
+		t.Fatalf("list -g: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("status", "-g"); code != 0 || strings.Contains(out, "unmanaged") {
+		t.Fatalf("status -g: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("show", "x"); code != 0 || !strings.Contains(out, repoURL) {
+		t.Fatalf("show: code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Stat(filepath.Join(os.Getenv("CALI_CONFIG_DIR"), "cali.yaml")); err == nil {
+		t.Fatal("the config dir manifest was written")
+	}
+	if code, out, errs := run("list", "-g", "--manifest", filepath.Join(t.TempDir(), "cali.yaml")); code != 0 || strings.Contains(out, repoURL) {
+		t.Fatalf("--manifest must win over CALI_MANIFEST: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("list"); code != 0 || strings.Contains(out, repoURL) {
+		t.Fatalf("project scope must ignore CALI_MANIFEST: code=%d out=%q err=%q", code, out, errs)
+	}
+
+	t.Setenv("CALI_MANIFEST", "cali.yaml")
+	if code, _, errs := run("list", "-g"); code != 1 || !strings.Contains(errs, "CALI_MANIFEST") {
+		t.Fatalf("relative CALI_MANIFEST: code=%d err=%q", code, errs)
+	}
+}
+
+// The agent-skills case: a skills repo's own cali.yaml, named by CALI_MANIFEST,
+// with a same-repo source.
+func TestCaliManifestSameRepoSource(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	t.Setenv("CALI_MANIFEST", filepath.Join(repo, "cali.yaml"))
+	if code, out, errs := run("add", "-g", ".//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if code, out, errs := run("status", "-g", "--exit-code"); code != 0 || !strings.Contains(out, "ok") {
+		t.Fatalf("status: code=%d out=%q err=%q", code, out, errs)
+	}
+}

@@ -66,20 +66,20 @@
     "semantic_hash": "a922c3b7a18f708e1f4dfcc7f13314b8"
   },
   "internal/cli/cli_test.go": {
-    "mtime": 1792331864.8159394,
-    "seen": 1792427484.3808692,
-    "ast_hash": "fd39777c0ce3d2e1dc3fcdd80ea04113",
+    "mtime": 1792432767.1241972,
+    "seen": 1792432823.29646,
+    "ast_hash": "cdec9259c93a34ead3c5ce79a755b7ee",
     "semantic_hash": ""
   },
   "internal/cli/find.go": {
-    "mtime": 1792431568.0925388,
-    "seen": 1792431629.942003,
+    "mtime": 1792432291.0056539,
+    "seen": 1792432823.296461,
     "ast_hash": "7da29a3c67b3b0a05dbc1fca547aacb7",
     "semantic_hash": ""
   },
   "internal/cli/list.go": {
-    "mtime": 1792431568.0923767,
-    "seen": 1792431629.942004,
+    "mtime": 1792432291.0058374,
+    "seen": 1792432823.296462,
     "ast_hash": "027ecef3fe830a57b0f4cad88b2a606b",
     "semantic_hash": ""
   },
@@ -96,8 +96,8 @@
     "semantic_hash": "42f1d042a0768872300412f608b8afcd"
   },
   "internal/cli/show.go": {
-    "mtime": 1792431568.0926554,
-    "seen": 1792431629.942006,
+    "mtime": 1792432291.0059996,
+    "seen": 1792432823.296464,
     "ast_hash": "fc388ce9d37a8b181ca6adfa8c38f3f0",
     "semantic_hash": ""
   },
@@ -108,14 +108,14 @@
     "semantic_hash": ""
   },
   "internal/cli/sync.go": {
-    "mtime": 1792431568.092762,
-    "seen": 1792431629.942008,
+    "mtime": 1792432291.0061464,
+    "seen": 1792432823.2964659,
     "ast_hash": "5db284b8df30eff36f4139c6b51ee426",
     "semantic_hash": ""
   },
   "internal/cli/update.go": {
-    "mtime": 1792427344.319992,
-    "seen": 1792427484.380874,
+    "mtime": 1792432291.006334,
+    "seen": 1792432823.2964668,
     "ast_hash": "66d584379260e157e0d44122e9379c70",
     "semantic_hash": ""
   },
@@ -186,20 +186,20 @@
     "semantic_hash": "9c91ad145b6aea6a394cd11a64f06105"
   },
   "internal/install/add.go": {
-    "mtime": 1792427290.285393,
-    "seen": 1792427484.380885,
-    "ast_hash": "4f3f3951074c2ff060b515ffd54d26d7",
+    "mtime": 1792432774.866879,
+    "seen": 1792432823.296476,
+    "ast_hash": "c15ef4624ff6a99cd899e79c61d04530",
     "semantic_hash": ""
   },
   "internal/install/add_test.go": {
-    "mtime": 1792427400.213179,
-    "seen": 1792427484.380885,
+    "mtime": 1792432291.0068765,
+    "seen": 1792432823.296476,
     "ast_hash": "01ea3ee7992ab96e1a4b01ebe7fa2676",
     "semantic_hash": ""
   },
   "internal/install/remove.go": {
-    "mtime": 1792431567.7454493,
-    "seen": 1792431629.9420202,
+    "mtime": 1792432291.0070686,
+    "seen": 1792432823.2964768,
     "ast_hash": "1a240e4c8d31764d8f29ce75f7f95012",
     "semantic_hash": ""
   },
@@ -312,14 +312,14 @@
     "semantic_hash": "d8f88a38d978401d2300d74581147a7b"
   },
   "internal/source/spec.go": {
-    "mtime": 1792427282.2704008,
-    "seen": 1792427484.3808992,
+    "mtime": 1792432291.0072608,
+    "seen": 1792432823.29649,
     "ast_hash": "f4c73058fd08579908d521dcee7d927b",
     "semantic_hash": ""
   },
   "internal/source/spec_test.go": {
-    "mtime": 1792427275.2108557,
-    "seen": 1792427484.3809001,
+    "mtime": 1792432291.007451,
+    "seen": 1792432823.296491,
     "ast_hash": "0b36ec27037839fefb18fb7aec6559aa",
     "semantic_hash": ""
   },
@@ -426,14 +426,14 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1792431620.0735233,
-    "seen": 1792431629.942048,
-    "ast_hash": "9b4549eebb666c78c2a6c572e8e0394e",
+    "mtime": 1792432812.5972779,
+    "seen": 1792432823.296504,
+    "ast_hash": "ac6921ebc18945890835d42b29f7718a",
     "semantic_hash": ""
   },
   "SETUP.md": {
-    "mtime": 1792427476.9025576,
-    "seen": 1792427484.380912,
+    "mtime": 1792432291.001906,
+    "seen": 1792432823.296505,
     "ast_hash": "9a1c7b28982783752a13248561b1b8de",
     "semantic_hash": ""
   },
@@ -462,10 +462,10 @@
     "semantic_hash": "8b5794696499cc3861921a09a3c0d7c4"
   },
   "docs/adr/0005-on-disk-layout.md": {
-    "mtime": 1792238848.2019386,
-    "seen": 1792427484.3809159,
-    "ast_hash": "1497844b38f15de6a24ddb2027c8ca6b",
-    "semantic_hash": "1497844b38f15de6a24ddb2027c8ca6b"
+    "mtime": 1792432812.6121063,
+    "seen": 1792432823.2965078,
+    "ast_hash": "b302498da35cdafc4f5df1e30ac95484",
+    "semantic_hash": ""
   },
   "docs/adr/0006-copilot-targets.md": {
     "mtime": 1792238848.202208,
@@ -510,9 +510,15 @@
     "semantic_hash": ""
   },
   "internal/cli/usage_test.go": {
-    "mtime": 1792431597.7310967,
-    "seen": 1792431629.942009,
-    "ast_hash": "75e6373e4767310f987e186a521070af",
+    "mtime": 1792432774.8666136,
+    "seen": 1792432823.2964668,
+    "ast_hash": "f9fc310c78030d7d53c008573c533a68",
+    "semantic_hash": ""
+  },
+  "docs/adr/0008-default-global-manifest.md": {
+    "mtime": 1792432812.609003,
+    "seen": 1792432823.296511,
+    "ast_hash": "42ebfc4e1bbfe3329dbbc4faffb7bc29",
     "semantic_hash": ""
   }
 }
