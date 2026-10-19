@@ -20,7 +20,7 @@ macOS uses the XDG-style paths, not `~/Library/...`, so Mac, Linux and WSL follo
 
 Files:
 - Project scope: `<project>/cali.yaml`, `<project>/cali.lock`, installed skills in `<project>/.claude/skills/<name>` and `<project>/.github/skills/<name>`.
-- Global scope: `<config>/cali.yaml`, `<config>/cali.lock`, skills in `~/.claude/skills/<name>` and `~/.copilot/skills/<name>`. `--manifest <path>` overrides the manifest location; the lock sits next to it.
+- Global scope: `<config>/cali.yaml`, `<config>/cali.lock`, skills in `~/.claude/skills/<name>` and `~/.copilot/skills/<name>`. `--manifest <path>` overrides the manifest location (in global scope `$CALI_MANIFEST` is its default, ADR 0008); the lock sits next to it.
 - `<cache>/git/<host>/<owner>/<repo>.git`: one bare mirror per source. Disposable.
 - `<data>/pristine/<tree-sha>/`: plain-file copy of the upstream skill folder for each installed tree SHA, shared across scopes and targets. It lives in `<data>`, not `<cache>`, because it is the merge base and must survive a force-pushed upstream or a deleted mirror. If missing, `sync` rebuilds it from the lock's `commit`; if that commit is gone upstream the skill is reported `base-lost`. A pristine dir is removed only by `remove`, and only when no lock on this machine still references that tree.
 - `<data>/backups/<name>/<UTC-timestamp>/`: copy of the folder taken before any update or remove writes.
