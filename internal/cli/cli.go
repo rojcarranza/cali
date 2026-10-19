@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -109,7 +110,7 @@ func deps(out io.Writer) (install.Deps, error) {
 		return install.Deps{}, err
 	}
 	return install.Deps{
-		Dirs:            dirs.Resolve(runtime.GOOS, os.Getenv, home),
+		Dirs:            dirs.Resolve(runtime.GOOS, os.Getenv, home, dirs.FS{Exists: pathExists, Glob: filepath.Glob}),
 		Stdout:          out,
 		Getenv:          os.Getenv,
 		GhToken:         sync.OnceValues(ghToken), // at most one gh run per command
@@ -126,4 +127,9 @@ var ghToken = func() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(b)), nil
+}
+
+func pathExists(p string) bool {
+	_, err := os.Stat(p)
+	return err == nil
 }

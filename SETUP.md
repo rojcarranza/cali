@@ -35,13 +35,20 @@ Then see [README.md](README.md) for adding, updating and removing skills.
 
 ## Where Cali keeps its files
 
-| Dir | macOS / Linux | Windows | Holds |
+| Dir | macOS / Linux / WSL | Windows | Holds |
 |---|---|---|---|
-| config | `~/.config/cali` | `%APPDATA%\cali` | global `cali.yaml`, `cali.lock` |
+| config | `~/.config/cali` | `%USERPROFILE%\.config\cali` | global `cali.yaml`, `cali.lock` |
 | data | `~/.local/share/cali` | `%LOCALAPPDATA%\cali\data` | pristine copies and backups. Do not delete |
 | cache | `~/.cache/cali` | `%LOCALAPPDATA%\cali\cache` | git mirrors, safe to delete |
 
-`CALI_CONFIG_DIR`, `CALI_DATA_DIR` and `CALI_CACHE_DIR` override them. So do the `XDG_*` variables.
+`CALI_CONFIG_DIR`, `CALI_DATA_DIR` and `CALI_CACHE_DIR` override them. So do the `XDG_*` variables, except on Windows.
+
+Git Bash and WSL can share one global `cali.yaml` ([ADR 0009](docs/adr/0009-home-relative-config-dir.md)):
+
+- **Git Bash and PowerShell** run `cali.exe`, whose `~` is `C:\Users\<you>`. Create the global manifest from there first.
+- **WSL** uses `/mnt/c/Users/<you>/.config/cali/` when its own `~/.config/cali/cali.yaml` does not exist. If several Windows users have one, Cali uses none of them, and `cali list -g` asks you to set `CALI_CONFIG_DIR`.
+- Skills are still installed in each home. After `cali update -g` on one side, run `cali sync -g` on the other.
+- An older `%APPDATA%\cali\cali.yaml` keeps working until `%USERPROFILE%\.config\cali` exists.
 
 ## Work on the code
 
