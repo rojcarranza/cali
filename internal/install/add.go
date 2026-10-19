@@ -47,6 +47,9 @@ type Deps struct {
 	// Manifest is --manifest: the manifest file, relative to Cwd; the lock sits
 	// next to it and, in project scope, its dir is the project root. Empty means the default.
 	Manifest string
+	// GlobalConfig returns the global config dir on first use of the global
+	// scope (ADR 0009's WSL fallback); nil means Dirs.Config.
+	GlobalConfig func() string
 }
 
 // AddRequest is one `cali add` invocation.
@@ -95,10 +98,14 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		}
 	}
 	if d.Manifest == "" && global {
+		cfg := d.Dirs.Config
+		if d.GlobalConfig != nil {
+			cfg = d.GlobalConfig()
+		}
 		return scope{
 			scope:    targets.Global,
-			manifest: filepath.Join(d.Dirs.Config, "cali.yaml"),
-			lockPath: filepath.Join(d.Dirs.Config, "cali.lock"),
+			manifest: filepath.Join(cfg, "cali.yaml"),
+			lockPath: filepath.Join(cfg, "cali.lock"),
 		}, nil
 	}
 	cwd := d.Cwd
@@ -695,7 +702,8 @@ type Location struct {
 	Manifest, LockPath string
 }
 
-// Locate resolves the manifest, lock and project root for the scope without touching disk.
+// Locate resolves the manifest, lock and project root for the scope without
+// touching disk, apart from d.GlobalConfig.
 func Locate(d Deps, global bool) (Location, error) {
 	sc, err := resolveScope(d, global)
 	return Location{sc.scope, sc.root, sc.manifest, sc.lockPath}, err

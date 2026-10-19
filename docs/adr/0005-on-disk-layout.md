@@ -1,6 +1,6 @@
 # ADR 0005: On-disk layout and pristine store
 
-Status: accepted (2026-10-16)
+Status: accepted (2026-10-16). The `<config>` row is superseded by ADR 0009.
 
 ## Context
 
