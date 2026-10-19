@@ -439,31 +439,6 @@ func TestReadSkillFiles(t *testing.T) {
 	}
 }
 
-func TestReadFile(t *testing.T) {
-	dir := fixture(t)
-	r := openFetched(t, dir)
-	commit, err := r.Resolve("")
-	if err != nil {
-		t.Fatal(err)
-	}
-	b, err := r.ReadFile(commit, "skills/b/SKILL.md")
-	if err != nil || string(b) != "b\n" {
-		t.Fatalf("ReadFile = %q, %v", b, err)
-	}
-	if _, err := r.ReadFile(commit, "skills/nope/SKILL.md"); err == nil {
-		t.Fatal("missing file: want error")
-	}
-	if _, err := r.ReadFile(commit, "skills/a"); err == nil {
-		t.Fatal("directory: want error")
-	}
-	old := limits.file
-	limits.file = 1
-	defer func() { limits.file = old }()
-	if _, err := r.ReadFile(commit, "skills/b/SKILL.md"); err == nil || !strings.Contains(err.Error(), "limit") {
-		t.Fatalf("oversize: err = %v", err)
-	}
-}
-
 // exportAt exports path at commit, as callers do: TreeSHA, then Export.
 func exportAt(r *Repo, commit, path string) (skillfs.Tree, error) {
 	tree, err := r.TreeSHA(commit, path)

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 const (
@@ -22,7 +23,6 @@ const (
 const (
 	ice     = "133;183;235"
 	snowNew = "230;241;251"
-	snowOld = ice
 	spinner = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 )
 
@@ -71,6 +71,10 @@ func (s *state) advance() {
 	}
 }
 
+// Width is the column count the loader needs for msg: the walking track,
+// the sprite, the spinner and msg on the second row.
+func Width(msg string) int { return track + 6 + utf8.RuneCountInString(msg) }
+
 func fg(c string) string { return "\x1b[38;2;" + c + "m" }
 
 // cell renders a top and a bottom pixel ('.' is empty) as one glyph.
@@ -100,7 +104,7 @@ func (s *state) rows(msg string) [2]string {
 					if f.age < 5 {
 						glyph = fg(snowNew) + "*\x1b[0m"
 					} else {
-						glyph = fg(snowOld) + "·\x1b[0m"
+						glyph = fg(ice) + "·\x1b[0m"
 					}
 				}
 			}

@@ -26,6 +26,17 @@ func (b *buf) String() string {
 	return b.b.String()
 }
 
+// waitDrawn waits until the loader has drawn a frame on w.
+func waitDrawn(t *testing.T, w *buf) {
+	t.Helper()
+	for end := time.Now().Add(5 * time.Second); time.Now().Before(end); time.Sleep(10 * time.Millisecond) {
+		if strings.ContainsAny(w.String(), "▀▄") {
+			return
+		}
+	}
+	t.Fatal("no frame drawn within 5s")
+}
+
 func TestQuickStopDrawsNothing(t *testing.T) {
 	var w buf
 	l := Start(&w, "fetching", time.Hour)
@@ -38,7 +49,7 @@ func TestQuickStopDrawsNothing(t *testing.T) {
 func TestDrawsTwoRowsThenErases(t *testing.T) {
 	var w buf
 	l := Start(&w, "cali is fetching skills…", 0)
-	time.Sleep(3 * tickEvery)
+	waitDrawn(t, &w)
 	l.Stop()
 	out := w.String()
 	if !strings.Contains(out, "cali is fetching skills…") || !strings.ContainsAny(out, "▀▄") {
@@ -53,7 +64,7 @@ func TestDrawsTwoRowsThenErases(t *testing.T) {
 func TestWriteClearsFrameFirst(t *testing.T) {
 	var w buf
 	l := Start(&w, "fetching", 0)
-	time.Sleep(2 * tickEvery)
+	waitDrawn(t, &w)
 	if _, err := l.Write([]byte("warning: x\n")); err != nil {
 		t.Fatal(err)
 	}

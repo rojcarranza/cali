@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/x/term"
 	"github.com/spf13/cobra"
 
 	"github.com/rojcarranza/cali/internal/find"
@@ -74,8 +76,9 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 
 			warn := cmd.ErrOrStderr()
 			stop := func() {}
-			if !asJSON && isTTY(warn) && os.Getenv("NO_COLOR") == "" {
-				l := loader.Start(warn, "cali is fetching skills…", 200*time.Millisecond)
+			const wait = "cali is fetching skills…"
+			if !asJSON && showLoader(warn, wait) {
+				l := loader.Start(warn, wait, 200*time.Millisecond)
 				stop, warn = l.Stop, l
 			}
 			hits := []find.Hit{}
@@ -140,4 +143,19 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	cmd.Flags().BoolVar(&offline, "offline", false, "do not fetch; search what the mirrors already have")
 	return cmd
+}
+
+// showLoader reports whether w is a color terminal that understands cursor
+// movement and is wide enough that the loader's rows for msg do not wrap.
+func showLoader(w io.Writer, msg string) bool {
+	f, ok := w.(*os.File)
+	if !ok || !isTTY(w) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
+		return false
+	}
+	// shortcut: Windows consoles may lack VT processing, so no loader there; enable VT mode to add it.
+	if runtime.GOOS == "windows" {
+		return false
+	}
+	cols, _, err := term.GetSize(f.Fd())
+	return err == nil && cols > loader.Width(msg)
 }
