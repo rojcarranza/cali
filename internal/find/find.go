@@ -33,12 +33,14 @@ func Search(repos []*gitx.Repo, query string) ([]Hit, error) {
 		if err != nil {
 			return nil, err
 		}
+		if err := r.FetchSkillFiles(commit, maxDepth); err != nil {
+			return nil, err
+		}
 		for _, d := range dirs {
 			p := "SKILL.md"
 			if d != "" {
 				p = d + "/SKILL.md"
 			}
-			// shortcut: one lazy fetch per SKILL.md blob, batch-fetch the listed blob ids if find gets slow
 			data, err := r.ReadFile(commit, p)
 			if err != nil {
 				continue // oversize or unreadable: skip like an unparsable file
