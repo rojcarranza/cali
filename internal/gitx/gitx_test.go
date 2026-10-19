@@ -3,6 +3,7 @@ package gitx
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -390,6 +391,50 @@ func TestListSkillDirs(t *testing.T) {
 		t.Fatalf("ListSkillDirs = %q, want %q", got, want)
 	}
 	if _, err := r.ListSkillDirs("HEAD", 4); err == nil {
+		t.Fatal("want error for a non-SHA commit")
+	}
+}
+
+func TestReadSkillFiles(t *testing.T) {
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	write(t, dir, "SKILL.md", "root\n", 0o644)
+	for i := 0; i < 20; i++ {
+		write(t, dir, fmt.Sprintf("skills/s%02d/SKILL.md", i), fmt.Sprintf("s%02d\n", i), 0o644)
+	}
+	write(t, dir, "skills/big/SKILL.md", "far too big\n", 0o644)
+	write(t, dir, "d1/d2/d3/d4/d5/SKILL.md", "too deep\n", 0o644)
+	git(t, dir, "add", ".")
+	git(t, dir, "commit", "-q", "-m", "one")
+	r := openFetched(t, dir)
+	commit, err := r.Resolve("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	old := limits.file
+	limits.file = 5
+	defer func() { limits.file = old }()
+	trace := filepath.Join(t.TempDir(), "trace")
+	t.Setenv("GIT_TRACE", trace)
+	got, err := r.ReadSkillFiles(commit, 4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 21 || string(got[""]) != "root\n" || string(got["skills/s07"]) != "s07\n" {
+		t.Fatalf("ReadSkillFiles = %d files, root %q, s07 %q", len(got), got[""], got["skills/s07"])
+	}
+	if _, ok := got["skills/big"]; ok {
+		t.Fatal("oversize SKILL.md: want it skipped")
+	}
+	// A fixed number of git processes, not one or two per skill.
+	log, err := os.ReadFile(trace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := strings.Count(string(log), "built-in: git "); n > 4 {
+		t.Errorf("ReadSkillFiles ran %d git commands, want at most 4:\n%s", n, log)
+	}
+	if _, err := r.ReadSkillFiles("HEAD", 4); err == nil {
 		t.Fatal("want error for a non-SHA commit")
 	}
 }
