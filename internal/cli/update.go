@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
+	"sort"
 	"strings"
 
 	"charm.land/huh/v2"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/rojcarranza/cali/internal/merge"
 	"github.com/rojcarranza/cali/internal/render"
+	"github.com/rojcarranza/cali/internal/source"
 	"github.com/rojcarranza/cali/internal/update"
 )
 
@@ -51,10 +54,15 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 	var o update.Options
 	var resolve []string
 	var asJSON bool
+	var skill string
 	cmd := &cobra.Command{
-		Use:   "update [names...]",
+		Use:   "update [names or sources...]",
 		Short: "Show what updating skills from upstream would change (dry run); --apply writes it",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			args, err := expandSources(out, *global, args, skill)
+			if err != nil {
+				return err
+			}
 			o.Names = args
 			if o.TakeUpstream && o.KeepMine {
 				return errors.New("--take-upstream and --keep-mine cannot be used together")
@@ -111,5 +119,49 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 	f.BoolVar(&o.KeepMine, "keep-mine", false, "keep the local file for every conflicting file")
 	f.BoolVar(&o.AcceptRecommended, "accept-recommended", false, "apply the recommendation for every conflict")
 	f.BoolVar(&asJSON, "json", false, "print JSON")
+	f.StringVar(&skill, "skill", "", "update only the skill with this name")
 	return cmd
+}
+
+// expandSources replaces each source spec in args (github:o/r, a URL, .//path)
+// with the manifest skills installed from it, then keeps only skill when set.
+func expandSources(out io.Writer, global bool, args []string, skill string) ([]string, error) {
+	var names []string
+	var s *state
+	for _, a := range args {
+		if a != source.Here && !strings.ContainsAny(a, ":/") {
+			names = append(names, a) // a skill name
+			continue
+		}
+		want, err := source.ParseWith(a, source.Options{AllowFile: allowFileScheme})
+		if err != nil {
+			return nil, err
+		}
+		if s == nil {
+			st, err := load(out, global)
+			if err != nil {
+				return nil, err
+			}
+			s = &st
+		}
+		var hits []string
+		for n, sk := range s.m.Skills {
+			got, err := source.ParseWith(sk.Source, source.Options{AllowFile: allowFileScheme})
+			if err == nil && got.URL == want.URL && (want.Path == "" || got.Path == want.Path) {
+				hits = append(hits, n)
+			}
+		}
+		if len(hits) == 0 {
+			return nil, fmt.Errorf("no installed skill comes from %s", a)
+		}
+		sort.Strings(hits)
+		names = append(names, hits...)
+	}
+	if skill == "" {
+		return names, nil
+	}
+	if len(names) > 0 && !slices.Contains(names, skill) {
+		return nil, fmt.Errorf("--skill %s: not installed from %s", skill, strings.Join(args, ", "))
+	}
+	return []string{skill}, nil
 }

@@ -28,6 +28,13 @@ func newShowCmd(out io.Writer, global *bool) *cobra.Command {
 				return err
 			}
 			sk, ok := s.m.Skills[name]
+			if !ok && !*global && manifestPath == "" { // not in the project: try the global scope
+				if g, err := load(out, true); err == nil {
+					if sk, ok = g.m.Skills[name]; ok {
+						s = g
+					}
+				}
+			}
 			if !ok {
 				return fmt.Errorf("no skill named %s in the manifest", name)
 			}

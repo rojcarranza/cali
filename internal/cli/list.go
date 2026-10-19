@@ -72,56 +72,99 @@ func short(c string) string {
 	return c
 }
 
+type listRow struct {
+	Scope   string   `json:"scope,omitempty"`
+	Name    string   `json:"name"`
+	Source  string   `json:"source"`
+	Commit  string   `json:"commit"`
+	Targets []string `json:"targets"`
+}
+
+// listRows returns the manifest skills of s, then the unmanaged folders.
+func listRows(s state) ([]listRow, error) {
+	names := make([]string, 0, len(s.m.Skills))
+	for n := range s.m.Skills {
+		names = append(names, n)
+	}
+	sort.Strings(names)
+	rows := []listRow{}
+	for _, n := range names {
+		r := listRow{Name: n, Source: s.m.Skills[n].Source, Commit: s.l.Skills[n].Commit, Targets: s.m.TargetsFor(n)}
+		if r.Targets == nil {
+			r.Targets = []string{}
+		}
+		rows = append(rows, r)
+	}
+	um, err := status.UnmanagedRows(s.m, s.loc.Scope, s.loc.Root, s.home)
+	if err != nil {
+		return nil, err
+	}
+	for _, u := range um {
+		rows = append(rows, listRow{Name: u.Skill, Source: "unmanaged", Targets: []string{u.Target}})
+	}
+	return rows, nil
+}
+
+func scopeName(global bool) string {
+	if global {
+		return "global"
+	}
+	return "project"
+}
+
 func newListCmd(out io.Writer, global *bool) *cobra.Command {
-	var asJSON bool
+	var asJSON, all bool
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List installed skills",
 		Args:  cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			s, err := load(out, *global)
-			if err != nil {
-				return err
+			if all && manifestPath != "" {
+				return errors.New("-a lists both scopes and cannot be used with --manifest")
 			}
-			names := make([]string, 0, len(s.m.Skills))
-			for n := range s.m.Skills {
-				names = append(names, n)
+			scopes := []bool{*global}
+			if all {
+				scopes = []bool{false, true}
 			}
-			sort.Strings(names)
-			type row struct {
-				Name    string   `json:"name"`
-				Source  string   `json:"source"`
-				Commit  string   `json:"commit"`
-				Targets []string `json:"targets"`
-			}
-			rows := []row{}
-			t := render.Table{Header: []string{"NAME", "SOURCE", "COMMIT", "TARGETS"}}
-			for _, n := range names {
-				r := row{n, s.m.Skills[n].Source, s.l.Skills[n].Commit, s.m.TargetsFor(n)}
-				if r.Targets == nil {
-					r.Targets = []string{}
+			rows := []listRow{}
+			for _, g := range scopes {
+				s, err := load(out, g)
+				if err != nil {
+					return err
 				}
-				rows = append(rows, r)
-				t.Rows = append(t.Rows, []string{r.Name, r.Source, short(r.Commit), strings.Join(r.Targets, ",")})
-			}
-			um, err := status.UnmanagedRows(s.m, s.loc.Scope, s.loc.Root, s.home)
-			if err != nil {
-				return err
-			}
-			for _, u := range um {
-				rows = append(rows, row{u.Skill, "unmanaged", "", []string{u.Target}})
-				t.Rows = append(t.Rows, []string{u.Skill, "unmanaged", "-", u.Target})
+				rs, err := listRows(s)
+				if err != nil {
+					return err
+				}
+				if all {
+					for i := range rs {
+						rs[i].Scope = scopeName(g)
+					}
+				}
+				rows = append(rows, rs...)
 			}
 			mode := render.ModeFor(isTTY(out), asJSON)
 			if mode == render.JSON {
 				return render.WriteJSON(out, struct {
-					Skills []row `json:"skills"`
+					Skills []listRow `json:"skills"`
 				}{rows})
+			}
+			t := render.Table{Header: []string{"NAME", "SOURCE", "COMMIT", "TARGETS"}}
+			if all {
+				t.Header = append([]string{"SCOPE"}, t.Header...)
+			}
+			for _, r := range rows {
+				cells := []string{r.Name, r.Source, short(r.Commit), strings.Join(r.Targets, ",")}
+				if all {
+					cells = append([]string{r.Scope}, cells...)
+				}
+				t.Rows = append(t.Rows, cells)
 			}
 			t.Render(out, mode)
 			return nil
 		},
 	}
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
+	cmd.Flags().BoolVarP(&all, "all", "a", false, "list project and global skills")
 	return cmd
 }
