@@ -1,15 +1,17 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"sort"
-	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/install"
 	"github.com/rojcarranza/cali/internal/lock"
 	"github.com/rojcarranza/cali/internal/manifest"
@@ -90,26 +92,30 @@ func loadScopes(d install.Deps, scopes []bool, warn io.Writer) ([]state, error) 
 
 func isGlobal(s state) bool { return s.loc.Scope == targets.Global }
 
-func short(c string) string {
-	if c == "" {
+// yesNo is a table cell: "-" for unknown.
+func yesNo(b *bool) string {
+	switch {
+	case b == nil:
 		return "-"
+	case *b:
+		return "yes"
 	}
-	if len(c) > 7 {
-		return c[:7]
-	}
-	return c
+	return "no"
 }
 
 type listRow struct {
 	Scope   string   `json:"scope,omitempty"`
 	Name    string   `json:"name"`
 	Source  string   `json:"source"`
+	Managed bool     `json:"managed"`
 	Commit  string   `json:"commit"`
+	Latest  *bool    `json:"latest"` // null when not checked: unlocked, --offline or the fetch failed
 	Targets []string `json:"targets"`
 }
 
-// listRows returns the manifest skills of s, then the unmanaged folders.
-func listRows(s state) ([]listRow, error) {
+// listRows returns the manifest skills of s, then one row per unmanaged folder
+// name. latest reports whether a manifest skill is at its upstream tree.
+func listRows(s state, latest func(name string) (*bool, error)) ([]listRow, error) {
 	names := make([]string, 0, len(s.m.Skills))
 	for n := range s.m.Skills {
 		names = append(names, n)
@@ -117,7 +123,11 @@ func listRows(s state) ([]listRow, error) {
 	sort.Strings(names)
 	rows := []listRow{}
 	for _, n := range names {
-		r := listRow{Name: n, Source: s.m.Skills[n].Source, Commit: s.l.Skills[n].Commit, Targets: s.m.TargetsFor(n)}
+		r := listRow{Name: n, Source: s.m.Skills[n].Source, Managed: true, Commit: s.l.Skills[n].Commit, Targets: s.m.TargetsFor(n)}
+		var err error
+		if r.Latest, err = latest(n); err != nil {
+			return nil, err
+		}
 		if r.Targets == nil {
 			r.Targets = []string{}
 		}
@@ -127,8 +137,17 @@ func listRows(s state) ([]listRow, error) {
 	if err != nil {
 		return nil, err
 	}
+	byName := map[string][]string{}
 	for _, u := range um {
-		rows = append(rows, listRow{Name: u.Skill, Source: "unmanaged", Targets: []string{u.Target}})
+		byName[u.Skill] = append(byName[u.Skill], u.Target)
+	}
+	unmanaged := make([]string, 0, len(byName))
+	for n := range byName {
+		unmanaged = append(unmanaged, n)
+	}
+	sort.Strings(unmanaged)
+	for _, n := range unmanaged {
+		rows = append(rows, listRow{Name: n, Source: "unmanaged", Targets: byName[n]})
 	}
 	return rows, nil
 }
@@ -141,7 +160,7 @@ func scopeName(global bool) string {
 }
 
 func newListCmd(out io.Writer, global *bool) *cobra.Command {
-	var asJSON, all bool
+	var asJSON, all, offline bool
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List installed skills",
@@ -163,8 +182,26 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 				return err
 			}
 			rows := []listRow{}
+			warned := map[string]bool{} // one fetch warning per URL across scopes
 			for _, s := range states {
-				rs, err := listRows(s)
+				sd := d
+				sd.Global = isGlobal(s) // the fetcher finds a same-repo source through the scope
+				in := status.Input{
+					Manifest: s.m, Lock: s.l, Offline: offline,
+					Fetcher: &status.GitFetcher{Ctx: cmd.Context(), Open: func(ctx context.Context, sp source.Spec) (*gitx.Repo, error) {
+						return install.OpenFetch(ctx, sd, sp)
+					}},
+					SourceOptions: source.Options{AllowFile: allowFileScheme},
+					Warn:          cmd.ErrOrStderr(),
+				}
+				rs, err := listRows(s, func(name string) (*bool, error) {
+					outdated, checked, err := status.CheckLatest(cmd.Context(), in, name, warned)
+					if err != nil || !checked {
+						return nil, err
+					}
+					upToDate := !outdated
+					return &upToDate, nil
+				})
 				if err != nil {
 					return err
 				}
@@ -181,12 +218,22 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 					Skills []listRow `json:"skills"`
 				}{rows})
 			}
-			t := render.Table{Header: []string{"NAME", "SOURCE", "COMMIT", "TARGETS"}}
+			t := render.Table{Header: []string{"NAME", "SOURCE", "MANAGED", "LATEST", "CLAUDE", "COPILOT"}}
 			if all {
 				t.Header = append([]string{"SCOPE"}, t.Header...)
 			}
 			for _, r := range rows {
-				cells := []string{r.Name, r.Source, short(r.Commit), strings.Join(r.Targets, ",")}
+				managed, src := r.Managed, r.Source
+				if !managed {
+					src = "-"
+				}
+				in := func(tg string) string {
+					if slices.Contains(r.Targets, tg) {
+						return "yes"
+					}
+					return "-"
+				}
+				cells := []string{r.Name, src, yesNo(&managed), yesNo(r.Latest), in("claude"), in("copilot")}
 				if all {
 					cells = append([]string{r.Scope}, cells...)
 				}
@@ -198,5 +245,6 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	cmd.Flags().BoolVarP(&all, "all", "a", false, "list project and global skills")
+	cmd.Flags().BoolVar(&offline, "offline", false, "do not fetch; leave LATEST unknown")
 	return cmd
 }

@@ -35,21 +35,18 @@ func TestListOffline(t *testing.T) {
 	writeFixture(t, project)
 	t.Setenv("PATH", t.TempDir())
 
-	code, out, errs := run("list")
+	code, out, errs := run("list", "--offline")
 	if code != 0 {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 	lines := strings.Split(strings.TrimSpace(out), "\n")
-	if len(lines) != 3 || !strings.HasPrefix(lines[0], "NAME") ||
-		!strings.Contains(lines[1], "0123456") || !strings.Contains(lines[1], "claude") ||
-		!strings.HasPrefix(lines[2], "b") || !strings.Contains(lines[2], "claude,copilot") || !strings.Contains(lines[2], " -") {
+	if len(lines) != 3 || fields(lines[0]) != "NAME SOURCE MANAGED LATEST CLAUDE COPILOT" ||
+		fields(lines[1]) != "a github:o/r//skills/a yes - yes -" ||
+		fields(lines[2]) != "b github:o/r//skills/b yes - yes yes" {
 		t.Fatalf("out = %q", out)
 	}
-	if strings.Contains(lines[1], "0123456789") {
-		t.Fatalf("commit not shortened: %q", lines[1])
-	}
 
-	code, out, errs = run("list", "--json")
+	code, out, errs = run("list", "--json", "--offline")
 	if code != 0 {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
@@ -57,13 +54,16 @@ func TestListOffline(t *testing.T) {
 		SchemaVersion int `json:"schema_version"`
 		Skills        []struct {
 			Name, Source, Commit string
+			Managed              bool
+			Latest               *bool
 			Targets              []string
 		} `json:"skills"`
 	}
 	if err := json.Unmarshal([]byte(out), &got); err != nil {
 		t.Fatalf("%v: %q", err, out)
 	}
-	if got.SchemaVersion != 1 || len(got.Skills) != 2 || got.Skills[0].Name != "a" || got.Skills[1].Commit != "" {
+	if got.SchemaVersion != 1 || len(got.Skills) != 2 || got.Skills[0].Name != "a" || got.Skills[0].Commit != "0123456789abcdef" ||
+		!got.Skills[0].Managed || got.Skills[0].Latest != nil || got.Skills[1].Commit != "" {
 		t.Fatalf("got %+v", got)
 	}
 }
@@ -81,22 +81,23 @@ func TestListShowsUnmanaged(t *testing.T) {
 		}
 	}
 
-	code, out, errs := run("list")
+	code, out, errs := run("list", "--offline")
 	if code != 0 {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 	lines := strings.Split(strings.TrimSpace(out), "\n")
-	if len(lines) != 4 || strings.Join(strings.Fields(lines[3]), " ") != "z unmanaged - claude" {
+	if len(lines) != 4 || fields(lines[3]) != "z - no - yes -" {
 		t.Fatalf("out = %q", out)
 	}
 
-	code, out, errs = run("list", "--json")
+	code, out, errs = run("list", "--json", "--offline")
 	if code != 0 {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
 	var got struct {
 		Skills []struct {
 			Name, Source, Commit string
+			Managed              bool
 			Targets              []string
 		} `json:"skills"`
 	}
@@ -106,7 +107,7 @@ func TestListShowsUnmanaged(t *testing.T) {
 	if len(got.Skills) != 3 {
 		t.Fatalf("got %+v", got)
 	}
-	if z := got.Skills[2]; z.Name != "z" || z.Source != "unmanaged" || z.Commit != "" || len(z.Targets) != 1 || z.Targets[0] != "claude" {
+	if z := got.Skills[2]; z.Name != "z" || z.Source != "unmanaged" || z.Managed || z.Commit != "" || len(z.Targets) != 1 || z.Targets[0] != "claude" {
 		t.Fatalf("got %+v", z)
 	}
 }
@@ -224,22 +225,77 @@ func TestFindOfflineNoMirror(t *testing.T) {
 
 func TestListUnmanagedWithoutManifest(t *testing.T) {
 	_, project := setup(t)
-	p := filepath.Join(project, ".claude", "skills", "foo", "SKILL.md")
-	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(p, []byte("---\nname: foo\ndescription: Foo.\n---\n"), 0o644); err != nil {
-		t.Fatal(err)
+	for _, p := range []string{
+		filepath.Join(project, ".claude", "skills", "foo", "SKILL.md"),
+		filepath.Join(project, ".github", "skills", "foo", "SKILL.md"),
+		filepath.Join(project, ".github", "skills", "bar", "SKILL.md"),
+	} {
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte("---\nname: foo\ndescription: Foo.\n---\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
 	}
 	code, out, errs := run("list")
 	if code != 0 {
 		t.Fatalf("code=%d err=%q", code, errs)
 	}
+	// One row per skill: foo is in both targets.
 	lines := strings.Split(strings.TrimSpace(out), "\n")
-	if len(lines) != 2 || strings.Join(strings.Fields(lines[1]), " ") != "foo unmanaged - claude" {
+	if len(lines) != 3 || fields(lines[1]) != "bar - no - - yes" || fields(lines[2]) != "foo - no - yes yes" {
 		t.Fatalf("out = %q", out)
 	}
 }
+
+func TestListLatest(t *testing.T) {
+	repoURL, _ := setup(t)
+	repo := filepath.FromSlash(strings.TrimPrefix(repoURL, "file://"))
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	list := func(want string, args ...string) {
+		t.Helper()
+		code, out, errs := run(append([]string{"list"}, args...)...)
+		lines := strings.Split(strings.TrimSpace(out), "\n")
+		if code != 0 || len(lines) != 2 || fields(lines[1]) != want {
+			t.Fatalf("list %v: code=%d out=%q err=%q", args, code, out, errs)
+		}
+	}
+	list("x " + repoURL + "//skills/x yes yes yes -")
+
+	if err := os.WriteFile(filepath.Join(repo, "skills", "x", "more.md"), []byte("more\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitRun(t, repo, "add", ".")
+	gitRun(t, repo, "commit", "-q", "-m", "more")
+	list("x " + repoURL + "//skills/x yes no yes -")
+	list("x "+repoURL+"//skills/x yes - yes -", "--offline")
+
+	code, out, errs := run("list", "--json")
+	var got struct {
+		Skills []struct{ Latest *bool }
+	}
+	if code != 0 || json.Unmarshal([]byte(out), &got) != nil || len(got.Skills) != 1 || got.Skills[0].Latest == nil || *got.Skills[0].Latest {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+
+	// A source that cannot be fetched is unknown, not up to date.
+	if err := os.RemoveAll(repo); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.RemoveAll(os.Getenv("CALI_CACHE_DIR")); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs = run("list")
+	if lines := strings.Split(strings.TrimSpace(out), "\n"); code != 0 || len(lines) != 2 ||
+		fields(lines[1]) != "x "+repoURL+"//skills/x yes - yes -" || !strings.Contains(errs, "warning: ") {
+		t.Fatalf("code=%d out=%q err=%q", code, out, errs)
+	}
+}
+
+// fields joins the whitespace-separated cells of a plain table line.
+func fields(line string) string { return strings.Join(strings.Fields(line), " ") }
 
 func TestGlobalWarnsOnSeveralWindowsHomes(t *testing.T) {
 	setup(t)

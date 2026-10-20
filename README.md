@@ -85,7 +85,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 |---|---|---|
 | `cali add <source>` | Install skills and record them | `--skill`, `--target`, `--adopt` |
 | `cali update [source\|names]` | Dry run; `--apply` writes | `--skill`, `--keep-mine`, `--take-upstream`, `--resolve`, `--json` |
-| `cali list` | Installed skills | `-a`, `--json` |
+| `cali list` | Installed skills, and whether each is at its latest upstream version | `-a`, `--json`, `--offline` |
 | `cali find <query>` | Search source repos | `--offline`, `--json` |
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
 | `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json` |
