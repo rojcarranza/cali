@@ -77,9 +77,11 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			warn := cmd.ErrOrStderr()
 			stop := func() {}
 			const wait = "cali is fetching skills…"
-			if style, ok := loaderStyle(warn, wait); !asJSON && ok {
-				l := loader.Start(warn, wait, 200*time.Millisecond, style)
-				stop, warn = l.Stop, l
+			if !asJSON {
+				if style, ok := loaderStyle(warn, wait); ok {
+					l := loader.Start(warn, wait, 200*time.Millisecond, style)
+					stop, warn = l.Stop, l
+				}
 			}
 			hits := []find.Hit{}
 			for _, u := range urls {
@@ -147,7 +149,7 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 
 // loaderStyle picks the loader for msg on w; ok is false when w is not a
 // terminal or is too narrow for the loader's line.
-func loaderStyle(w io.Writer, msg string) (style loader.Style, ok bool) {
+func loaderStyle(w io.Writer, msg string) (loader.Style, bool) {
 	f, ok := w.(*os.File)
 	if !ok || !isTTY(w) {
 		return loader.Snowdrift, false
