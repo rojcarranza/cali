@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "internal/cli/find.go": {
-    "mtime": 1792471451.505798,
-    "seen": 1792471488.372572,
-    "ast_hash": "0ed5b40d8eb726a729ebea2785989c59",
+    "mtime": 1792472370.846108,
+    "seen": 1792472685.8791082,
+    "ast_hash": "57746385b9e9040a3c51afe5155ee247",
     "semantic_hash": ""
   },
   "internal/cli/list.go": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "internal/cli/list_test.go": {
-    "mtime": 1792471470.8957314,
-    "seen": 1792471488.3725739,
-    "ast_hash": "5d58ee73d595e1f93def40af505a3cc2",
+    "mtime": 1792472370.8463156,
+    "seen": 1792472685.8791099,
+    "ast_hash": "c5d0ad1b2aac875eb1dab41ebf349315",
     "semantic_hash": ""
   },
   "internal/cli/remove.go": {
@@ -270,15 +270,15 @@
     "semantic_hash": "af4ca65f3cd9edef84197e22e756bddd"
   },
   "internal/render/render.go": {
-    "mtime": 1792436981.7312276,
-    "seen": 1792439353.307873,
-    "ast_hash": "18216c094c1e60775390e138b4293ba6",
+    "mtime": 1792472652.4633179,
+    "seen": 1792472685.879143,
+    "ast_hash": "12b596490120ddb6c51fff227d6c9822",
     "semantic_hash": ""
   },
   "internal/render/render_test.go": {
-    "mtime": 1792436981.7315543,
-    "seen": 1792439353.307874,
-    "ast_hash": "1471d9a9180e36070822d51f934128ca",
+    "mtime": 1792472649.0315397,
+    "seen": 1792472685.879144,
+    "ast_hash": "d1eebf4e2c843b09fb3f6ffd62359738",
     "semantic_hash": ""
   },
   "internal/skillfs/frontmatter.go": {
@@ -426,9 +426,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1792434369.2634907,
-    "seen": 1792439353.307891,
-    "ast_hash": "6d49fe2f9990a56738e3ea5bfc4fac38",
+    "mtime": 1792472370.842535,
+    "seen": 1792472685.879167,
+    "ast_hash": "7b3f21aa9ef88304a72873446148a3ad",
     "semantic_hash": ""
   },
   "SETUP.md": {
@@ -528,15 +528,15 @@
     "semantic_hash": ""
   },
   "internal/loader/loader.go": {
-    "mtime": 1792471440.129951,
-    "seen": 1792471488.3725922,
-    "ast_hash": "305431cb8b6ab7c74435544cd137e4bb",
+    "mtime": 1792472370.8465009,
+    "seen": 1792472685.879133,
+    "ast_hash": "6c8e3d10a4b4132d33dc480bb7376904",
     "semantic_hash": ""
   },
   "internal/loader/loader_test.go": {
-    "mtime": 1792471440.1297328,
-    "seen": 1792471488.372593,
-    "ast_hash": "f013b2ec2d4de5a2cb2101e12185a17d",
+    "mtime": 1792472370.8466685,
+    "seen": 1792472685.879134,
+    "ast_hash": "1f5d15fa4d770afc55b3dfabd72f91b4",
     "semantic_hash": ""
   }
 }
