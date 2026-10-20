@@ -77,9 +77,11 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			warn := cmd.ErrOrStderr()
 			stop := func() {}
 			const wait = "cali is fetching skills…"
-			if !asJSON && showLoader(warn, wait) {
-				l := loader.Start(warn, wait, 200*time.Millisecond)
-				stop, warn = l.Stop, l
+			if !asJSON {
+				if style, ok := loaderStyle(warn, wait); ok {
+					l := loader.Start(warn, wait, 200*time.Millisecond, style)
+					stop, warn = l.Stop, l
+				}
 			}
 			hits := []find.Hit{}
 			for _, u := range urls {
@@ -145,17 +147,34 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 	return cmd
 }
 
-// showLoader reports whether w is a color terminal that understands cursor
-// movement and is wide enough that the loader's rows for msg do not wrap.
-func showLoader(w io.Writer, msg string) bool {
+// loaderStyle picks the loader for msg on w; ok is false when w is not a
+// terminal or is too narrow for the loader's line.
+func loaderStyle(w io.Writer, msg string) (loader.Style, bool) {
 	f, ok := w.(*os.File)
-	if !ok || !isTTY(w) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
-		return false
+	if !ok || !isTTY(w) {
+		return loader.Snowdrift, false
 	}
-	// shortcut: Windows consoles may lack VT processing, so no loader there; enable VT mode to add it.
-	if runtime.GOOS == "windows" {
-		return false
+	if v := os.Getenv("CALI_LOADER"); v != "" && !strings.EqualFold(v, "princess") && !strings.EqualFold(v, "snowdrift") {
+		_, _ = fmt.Fprintf(w, "warning: CALI_LOADER=%q is not princess or snowdrift; using snowdrift\n", v)
 	}
 	cols, _, err := term.GetSize(f.Fd())
-	return err == nil && cols > loader.Width(msg)
+	return pickLoader(cols, err == nil, msg)
+}
+
+// pickLoader is loaderStyle for a terminal cols wide (sized false: width
+// unknown). No loader is drawn when the width is unknown, since a wrapped line
+// cannot be redrawn, or under TERM=dumb, which may print \r literally.
+// CALI_LOADER=princess (any case) asks for the princess; she is drawn only on a
+// color terminal that understands cursor movement and fits her rows, and
+// Snowdrift stands in otherwise.
+func pickLoader(cols int, sized bool, msg string) (loader.Style, bool) {
+	if !sized || os.Getenv("TERM") == "dumb" {
+		return loader.Snowdrift, false
+	}
+	// shortcut: Windows consoles may lack VT processing, so no princess there; enable VT mode to add her.
+	if strings.EqualFold(os.Getenv("CALI_LOADER"), "princess") && os.Getenv("NO_COLOR") == "" &&
+		runtime.GOOS != "windows" && cols > loader.Width(msg, loader.Princess) {
+		return loader.Princess, true
+	}
+	return loader.Snowdrift, cols > loader.Width(msg, loader.Snowdrift)
 }
