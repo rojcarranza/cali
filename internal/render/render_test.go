@@ -117,17 +117,20 @@ func TestStyledTableFitsTerminalWidth(t *testing.T) {
 	}
 }
 
-func TestStyledTableSeparatesRows(t *testing.T) {
-	var b bytes.Buffer
-	Table{Header: []string{"NAME"}, Rows: [][]string{{"a"}, {"b"}}}.Render(&b, Styled)
-	lines := strings.Split(b.String(), "\n")
-	for i, l := range lines {
-		if strings.Contains(l, " a ") {
-			if i+1 >= len(lines) || !strings.Contains(lines[i+1], "─") {
-				t.Fatalf("no separator after row a:\n%s", b.String())
-			}
-			return
-		}
+func TestStyledTableSeparatesWrappedRows(t *testing.T) {
+	defer func(f func(io.Writer) int) { termWidth = f }(termWidth)
+	rows := [][]string{{"a", strings.Repeat("long words ", 20)}, {"b", "short"}}
+	render := func(cols int) string {
+		termWidth = func(io.Writer) int { return cols }
+		var b bytes.Buffer
+		Table{Header: []string{"NAME", "DESCRIPTION"}, Rows: rows}.Render(&b, Styled)
+		return b.String()
 	}
-	t.Fatalf("row a missing:\n%s", b.String())
+	// ├ starts the rule under the header, and one between rows only when cells wrap.
+	if out := render(0); strings.Count(out, "├") != 1 {
+		t.Fatalf("unwrapped table has row separators:\n%s", out)
+	}
+	if out := render(40); strings.Count(out, "├") != 2 {
+		t.Fatalf("wrapped rows not separated:\n%s", out)
+	}
 }
