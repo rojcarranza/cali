@@ -154,22 +154,27 @@ func loaderStyle(w io.Writer, msg string) (loader.Style, bool) {
 	if !ok || !isTTY(w) {
 		return loader.Snowdrift, false
 	}
+	if v := os.Getenv("CALI_LOADER"); v != "" && !strings.EqualFold(v, "princess") && !strings.EqualFold(v, "snowdrift") {
+		_, _ = fmt.Fprintf(w, "warning: CALI_LOADER=%q is not princess or snowdrift; using snowdrift\n", v)
+	}
 	cols, _, err := term.GetSize(f.Fd())
 	return pickLoader(cols, err == nil, msg)
 }
 
 // pickLoader is loaderStyle for a terminal cols wide (sized false: width
-// unknown). CALI_LOADER=princess asks for the princess; she is drawn only on a
+// unknown). No loader is drawn when the width is unknown, since a wrapped line
+// cannot be redrawn, or under TERM=dumb, which may print \r literally.
+// CALI_LOADER=princess (any case) asks for the princess; she is drawn only on a
 // color terminal that understands cursor movement and fits her rows, and
 // Snowdrift stands in otherwise.
 func pickLoader(cols int, sized bool, msg string) (loader.Style, bool) {
-	// shortcut: Windows consoles may lack VT processing, so no princess there; enable VT mode to add her.
-	if os.Getenv("CALI_LOADER") == "princess" && os.Getenv("NO_COLOR") == "" && os.Getenv("TERM") != "dumb" &&
-		runtime.GOOS != "windows" && sized && cols > loader.Width(msg, loader.Princess) {
-		return loader.Princess, true
+	if !sized || os.Getenv("TERM") == "dumb" {
+		return loader.Snowdrift, false
 	}
-	if !sized {
-		cols = 80
+	// shortcut: Windows consoles may lack VT processing, so no princess there; enable VT mode to add her.
+	if strings.EqualFold(os.Getenv("CALI_LOADER"), "princess") && os.Getenv("NO_COLOR") == "" &&
+		runtime.GOOS != "windows" && cols > loader.Width(msg, loader.Princess) {
+		return loader.Princess, true
 	}
 	return loader.Snowdrift, cols > loader.Width(msg, loader.Snowdrift)
 }

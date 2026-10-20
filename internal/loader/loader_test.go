@@ -143,6 +143,15 @@ func TestSnowdriftDrawsOneASCIILineThenErases(t *testing.T) {
 	}
 }
 
+func TestASCII(t *testing.T) {
+	if got := ascii("récupération…"); got != "r?cup?ration..." {
+		t.Fatalf("ascii = %q", got)
+	}
+	if w := Width("é", Snowdrift); w != driftTrack+3+1 {
+		t.Fatalf("Width counts %d columns for one rune, want %d", w, driftTrack+4)
+	}
+}
+
 func TestSnowdriftBounces(t *testing.T) {
 	d := drift{msg: "m"}
 	want := map[int]string{

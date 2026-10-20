@@ -102,8 +102,16 @@ func Width(msg string, style Style) int {
 	return track + 6 + utf8.RuneCountInString(msg)
 }
 
-// ascii spells the ellipsis of msg as three dots, for terminals without Unicode.
-func ascii(msg string) string { return strings.ReplaceAll(msg, "…", "...") }
+// ascii spells the ellipsis of msg as three dots and any other non-ASCII rune
+// as '?', for terminals without Unicode; its length is then its column count.
+func ascii(msg string) string {
+	return strings.Map(func(r rune) rune {
+		if r > 0x7e {
+			return '?'
+		}
+		return r
+	}, strings.ReplaceAll(msg, "…", "..."))
+}
 
 // drift is the Snowdrift animation: a flake bouncing in a bracketed track,
 // a dot in the cell it just left.

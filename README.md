@@ -100,5 +100,5 @@ Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.
 - `sync` installs whatever a repo's `cali.yaml` names. Sync only repos you trust.
 - A skill in the same repo as `cali.yaml` is written `.//skills/<name>`. It is read at the checked-out commit and never fetched.
 - Private repos need `gh auth login` or `GITHUB_TOKEN`. See [SETUP.md](SETUP.md).
-- `find` shows a one-line ASCII loader that works in any terminal. `export CALI_LOADER=princess` brings back the walking ice princess on a color terminal; elsewhere the plain loader stands in.
+- `find` shows a one-line ASCII loader on any terminal of known width except `TERM=dumb`. `export CALI_LOADER=princess` brings back the walking ice princess on a color terminal; elsewhere the plain loader stands in.
 - Copilot paths for JetBrains are unverified (`docs/adr/0006-copilot-targets.md`).

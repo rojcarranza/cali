@@ -275,9 +275,10 @@ func TestPickLoader(t *testing.T) {
 		{"snowdrift by default", "", "", "xterm", 120, true, loader.Snowdrift, true},
 		{"princess on request", "princess", "", "xterm", 120, true, loader.Princess, true},
 		{"princess without color", "princess", "1", "xterm", 120, true, loader.Snowdrift, true},
-		{"princess on a dumb terminal", "princess", "", "dumb", 120, true, loader.Snowdrift, true},
+		{"princess in any case", "Princess", "", "xterm", 120, true, loader.Princess, true},
+		{"none on a dumb terminal", "princess", "", "dumb", 120, true, loader.Snowdrift, false},
 		{"princess too narrow", "princess", "", "xterm", 40, true, loader.Snowdrift, true},
-		{"princess width unknown", "princess", "", "xterm", 0, false, loader.Snowdrift, true},
+		{"none when width unknown", "", "", "xterm", 0, false, loader.Snowdrift, false},
 		{"too narrow for snowdrift", "", "", "xterm", 20, true, loader.Snowdrift, false},
 	} {
 		t.Run(c.name, func(t *testing.T) {
