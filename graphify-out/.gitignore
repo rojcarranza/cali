@@ -1,0 +1,12 @@
+# Local graphify state: cache, dated backup snapshots, per-run scratch
+/cache/
+/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
+/.graphify_python
+/.graphify_detect.json
+/.graphify_ast.json
+/.graphify_semantic*.json
+/.graphify_cached.json
+/.graphify_uncached.txt
+/.graphify_chunk_*.json
+# Full builds write an absolute path here
+/.graphify_root
