@@ -60,8 +60,8 @@
     "semantic_hash": ""
   },
   "internal/cli/cli.go": {
-    "mtime": 1792439292.703407,
-    "seen": 1792439353.307848,
+    "mtime": 1792439543.4834998,
+    "seen": 1792471488.37257,
     "ast_hash": "e9a78f84e096a43baff72bd9f11796cb",
     "semantic_hash": ""
   },
@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "internal/cli/find.go": {
-    "mtime": 1792439155.7151952,
-    "seen": 1792439353.307849,
-    "ast_hash": "7da29a3c67b3b0a05dbc1fca547aacb7",
+    "mtime": 1792471451.505798,
+    "seen": 1792471488.372572,
+    "ast_hash": "0ed5b40d8eb726a729ebea2785989c59",
     "semantic_hash": ""
   },
   "internal/cli/list.go": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "internal/cli/list_test.go": {
-    "mtime": 1792439311.230531,
-    "seen": 1792439353.307851,
-    "ast_hash": "d3824afabb19c645427952b37225de0d",
+    "mtime": 1792471470.8957314,
+    "seen": 1792471488.3725739,
+    "ast_hash": "5d58ee73d595e1f93def40af505a3cc2",
     "semantic_hash": ""
   },
   "internal/cli/remove.go": {
@@ -132,21 +132,21 @@
     "semantic_hash": "f9bdfee6a9f905602d28b4f22e7ecdd3"
   },
   "internal/dirs/dirs.go": {
-    "mtime": 1792439272.7200077,
-    "seen": 1792439353.3078568,
+    "mtime": 1792439543.484393,
+    "seen": 1792471488.372581,
     "ast_hash": "6bc56e263e2dac4d3cc6e090bd8f1745",
     "semantic_hash": ""
   },
   "internal/dirs/dirs_test.go": {
-    "mtime": 1792439272.7201886,
-    "seen": 1792439353.307858,
+    "mtime": 1792439543.4846861,
+    "seen": 1792471488.372581,
     "ast_hash": "6102ec83d63ea9de3784a49154053447",
     "semantic_hash": ""
   },
   "internal/find/find.go": {
-    "mtime": 1792439155.7155368,
-    "seen": 1792439353.307858,
-    "ast_hash": "7db648c5fdc8207cc213149135f8f36e",
+    "mtime": 1792439543.4849763,
+    "seen": 1792471488.372582,
+    "ast_hash": "de3e15ee22b27e6e4a6be681c16be646",
     "semantic_hash": ""
   },
   "internal/find/find_test.go": {
@@ -168,15 +168,15 @@
     "semantic_hash": "1a34c0b2fb0e45654794f6f1aad2602b"
   },
   "internal/gitx/gitx.go": {
-    "mtime": 1792439155.715821,
-    "seen": 1792439353.307861,
-    "ast_hash": "d77fdc97dec83862ba1efdd2ff79b0bb",
+    "mtime": 1792439543.485362,
+    "seen": 1792471488.372585,
+    "ast_hash": "f71f13b9476e79324dc76a73fb68cb70",
     "semantic_hash": ""
   },
   "internal/gitx/gitx_test.go": {
-    "mtime": 1792439155.7161438,
-    "seen": 1792439353.307862,
-    "ast_hash": "fa5a82a49e0801fd8a1d1235df31b4c6",
+    "mtime": 1792439543.485716,
+    "seen": 1792471488.372586,
+    "ast_hash": "c09b3d713e8ca0425ea71c0720749348",
     "semantic_hash": ""
   },
   "internal/golden/golden_test.go": {
@@ -186,8 +186,8 @@
     "semantic_hash": "9c91ad145b6aea6a394cd11a64f06105"
   },
   "internal/install/add.go": {
-    "mtime": 1792439292.7032158,
-    "seen": 1792439353.307863,
+    "mtime": 1792439543.486104,
+    "seen": 1792471488.372587,
     "ast_hash": "b92b3c1b22ff1bf171d957696c31cb62",
     "semantic_hash": ""
   },
@@ -432,8 +432,8 @@
     "semantic_hash": ""
   },
   "SETUP.md": {
-    "mtime": 1792439346.9913561,
-    "seen": 1792439353.307891,
+    "mtime": 1792439543.4780347,
+    "seen": 1792471488.37262,
     "ast_hash": "d56b7bf93a0ebbf5d4308981793696e7",
     "semantic_hash": ""
   },
@@ -462,8 +462,8 @@
     "semantic_hash": "8b5794696499cc3861921a09a3c0d7c4"
   },
   "docs/adr/0005-on-disk-layout.md": {
-    "mtime": 1792437418.5910776,
-    "seen": 1792439353.307895,
+    "mtime": 1792439543.478366,
+    "seen": 1792471488.372624,
     "ast_hash": "05146aa71e7a07db6bda651be7534ac2",
     "semantic_hash": ""
   },
@@ -522,9 +522,21 @@
     "semantic_hash": ""
   },
   "docs/adr/0009-home-relative-config-dir.md": {
-    "mtime": 1792439351.4520872,
-    "seen": 1792439353.307898,
+    "mtime": 1792439543.4786165,
+    "seen": 1792471488.372627,
     "ast_hash": "93a6c0863dfd7153156f5f52e17c7d38",
+    "semantic_hash": ""
+  },
+  "internal/loader/loader.go": {
+    "mtime": 1792471440.129951,
+    "seen": 1792471488.3725922,
+    "ast_hash": "305431cb8b6ab7c74435544cd137e4bb",
+    "semantic_hash": ""
+  },
+  "internal/loader/loader_test.go": {
+    "mtime": 1792471440.1297328,
+    "seen": 1792471488.372593,
+    "ast_hash": "f013b2ec2d4de5a2cb2101e12185a17d",
     "semantic_hash": ""
   }
 }
