@@ -204,6 +204,9 @@ func render(path string, m Manifest) ([]byte, error) {
 		if err := update(&root, m); err != nil {
 			return nil, err
 		}
+		if out, ok := splice(existing, &root, m); ok {
+			return out, nil
+		}
 	}
 	var buf bytes.Buffer
 	enc := yaml.NewEncoder(&buf)

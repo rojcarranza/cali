@@ -249,3 +249,90 @@ func TestReadRejectsRefOnSameRepoSource(t *testing.T) {
 		t.Fatalf("err = %v, want one saying a same-repo source takes no ref", err)
 	}
 }
+
+// handEdited mirrors a real hand-edited manifest: two spaces before inline
+// comments, odd spacing in a flow list and a trailing block of commented-out
+// entries. Writes must leave every line they do not change byte for byte.
+const handEdited = `# Skills for this machine.
+version: 1
+targets: [claude, copilot]
+skills:
+  # Own skills.
+  own:
+    source: .//skills/own
+  caveman:  # Claude: caveman plugin
+    source: https://github.com/juliusbrussee/caveman//skills/caveman
+    ref: 2e08b9177c07bb7249a8a2d1a6758e5db281d002
+    targets: [copilot]
+  debugging:  # Claude: superpowers:systematic-debugging
+    source: github:addyosmani/agent-skills//skills/debugging
+    targets:    [copilot]
+  # Optional, uncomment to enable:
+  # extra:
+  #   source: github:x/y//skills/extra
+`
+
+func writeHandEdited(t *testing.T, edit func(m *Manifest)) string {
+	t.Helper()
+	p := writeFile(t, handEdited)
+	m, err := Read(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	edit(&m)
+	if err := Write(p, m); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := Read(p)
+	if err != nil {
+		t.Fatalf("read back: %v\n%s", err, raw)
+	}
+	if !reflect.DeepEqual(got, m) {
+		t.Errorf("mismatch:\n got %+v\nwant %+v", got, m)
+	}
+	return string(raw)
+}
+
+func TestWriteAddKeepsExistingLines(t *testing.T) {
+	got := writeHandEdited(t, func(m *Manifest) {
+		m.Skills["impeccable"] = Skill{Source: "github:pbakaus/impeccable//skills/impeccable", Ref: "abc123", Targets: []string{"claude"}}
+	})
+	want := strings.Replace(handEdited, "  # Optional,",
+		"  impeccable:\n    source: github:pbakaus/impeccable//skills/impeccable\n    ref: abc123\n    targets: [claude]\n  # Optional,", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestWriteChangeTouchesOnlyChangedLine(t *testing.T) {
+	got := writeHandEdited(t, func(m *Manifest) {
+		s := m.Skills["caveman"]
+		s.Ref = "ffffffffffffffffffffffffffffffffffffffff"
+		m.Skills["caveman"] = s
+	})
+	want := strings.Replace(handEdited, "2e08b9177c07bb7249a8a2d1a6758e5db281d002", "ffffffffffffffffffffffffffffffffffffffff", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestWriteRemoveKeepsOtherLines(t *testing.T) {
+	got := writeHandEdited(t, func(m *Manifest) { delete(m.Skills, "debugging") })
+	want := strings.Replace(handEdited,
+		"  debugging:  # Claude: superpowers:systematic-debugging\n    source: github:addyosmani/agent-skills//skills/debugging\n    targets:    [copilot]\n", "", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestWriteRemoveDropsHeadComment(t *testing.T) {
+	got := writeHandEdited(t, func(m *Manifest) { delete(m.Skills, "own") })
+	want := strings.Replace(handEdited, "  # Own skills.\n  own:\n    source: .//skills/own\n", "", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
