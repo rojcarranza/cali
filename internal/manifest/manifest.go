@@ -204,6 +204,9 @@ func render(path string, m Manifest) ([]byte, error) {
 		if err := update(&root, m); err != nil {
 			return nil, err
 		}
+		if out, ok := splice(existing, &root, m); ok {
+			return out, nil
+		}
 	}
 	var buf bytes.Buffer
 	enc := yaml.NewEncoder(&buf)
@@ -332,9 +335,17 @@ func setScalar(mapping *yaml.Node, key, val, tag string) {
 		copyComments(v, &old)
 		return
 	}
-	mapping.Content = append(mapping.Content,
-		&yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key},
+	appendPair(mapping, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key},
 		&yaml.Node{Kind: yaml.ScalarNode, Tag: tag, Value: val})
+}
+
+// appendPair adds key: val at the end of mapping. A foot comment on the
+// previous last key (a trailing note) moves to key so it stays last.
+func appendPair(mapping, key, val *yaml.Node) {
+	if n := len(mapping.Content); n >= 2 {
+		key.FootComment, mapping.Content[n-2].FootComment = mapping.Content[n-2].FootComment, ""
+	}
+	mapping.Content = append(mapping.Content, key, val)
 }
 
 // setList sets key to vals, or removes it when vals is empty. An unchanged
@@ -365,7 +376,7 @@ func setList(mapping *yaml.Node, key string, vals []string, flow bool) {
 		seq.Content = append(seq.Content, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: s})
 	}
 	if v == nil {
-		mapping.Content = append(mapping.Content, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key}, seq)
+		appendPair(mapping, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key}, seq)
 		return
 	}
 	if v.Kind == yaml.SequenceNode {
