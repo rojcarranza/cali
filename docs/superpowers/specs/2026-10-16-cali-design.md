@@ -218,7 +218,7 @@ Semantics: names only, no versions. A dependency is satisfied when a skill with 
 |---|---|
 | `init [-g]` | Create `cali.yaml` with `version: 1` and the detected targets. No network. |
 | `add <spec> [--skill n] [--all] [-g] [--target t]` | Fetch source; if no `//path`, scan for `SKILL.md` folders (max depth 4) and ask, or use `--skill/--all`. Writes manifest, lock, pristine, installed copies. |
-| `list [-g]` | Installed skills, source, short commit, targets. Offline. |
+| `list [-g] [--offline]` | One row per skill: source, managed, latest (at its upstream tree: yes, no, or `-` when unknown), and one column per target. Fetches by default, like `status`; `--offline` skips it. `--json` keeps the locked commit. |
 | `show <name>` | Resolved source, locked commit/tree, paths per target, requires. Offline. |
 | `find <text>` | Search `name` + `description` of skills in repos listed under `sources:` and in already installed sources, using the local mirrors (fetched if stale). There is no registry (non-goal 5). |
 | `status [--offline] [--exit-code]` | One row per skill x target: `ok`, `modified`, `outdated`, `missing`, `base-lost`, `unlocked` (in the manifest, not yet in the lock), `unmanaged`, `shadowed`, plus dependency warnings. Fetches by default (needed to see new upstream commits); `--offline` skips it. Exit 0 unless `--exit-code` is given. |
