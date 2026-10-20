@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/rojcarranza/cali/internal/dirs"
+	"github.com/rojcarranza/cali/internal/loader"
 )
 
 func writeFixture(t *testing.T, project string) {
@@ -258,5 +260,37 @@ func TestGlobalWarnsOnSeveralWindowsHomes(t *testing.T) {
 	}
 	if code, _, errs := run("list"); code != 0 || errs != "" {
 		t.Fatalf("list: code=%d err=%q, want no warning in project scope", code, errs)
+	}
+}
+
+func TestPickLoader(t *testing.T) {
+	const msg = "cali is fetching skills…"
+	for _, c := range []struct {
+		name, env, noColor, term string
+		cols                     int
+		sized                    bool
+		want                     loader.Style
+		ok                       bool
+	}{
+		{"snowdrift by default", "", "", "xterm", 120, true, loader.Snowdrift, true},
+		{"princess on request", "princess", "", "xterm", 120, true, loader.Princess, true},
+		{"princess without color", "princess", "1", "xterm", 120, true, loader.Snowdrift, true},
+		{"princess on a dumb terminal", "princess", "", "dumb", 120, true, loader.Snowdrift, true},
+		{"princess too narrow", "princess", "", "xterm", 40, true, loader.Snowdrift, true},
+		{"princess width unknown", "princess", "", "xterm", 0, false, loader.Snowdrift, true},
+		{"too narrow for snowdrift", "", "", "xterm", 20, true, loader.Snowdrift, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			t.Setenv("CALI_LOADER", c.env)
+			t.Setenv("NO_COLOR", c.noColor)
+			t.Setenv("TERM", c.term)
+			if c.want == loader.Princess && runtime.GOOS == "windows" {
+				c.want = loader.Snowdrift // no princess on Windows consoles
+			}
+			style, ok := pickLoader(c.cols, c.sized, msg)
+			if style != c.want || ok != c.ok {
+				t.Fatalf("pickLoader(%d, %v) = %v, %v; want %v, %v", c.cols, c.sized, style, ok, c.want, c.ok)
+			}
+		})
 	}
 }

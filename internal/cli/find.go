@@ -77,8 +77,8 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 			warn := cmd.ErrOrStderr()
 			stop := func() {}
 			const wait = "cali is fetching skills…"
-			if !asJSON && showLoader(warn, wait) {
-				l := loader.Start(warn, wait, 200*time.Millisecond)
+			if style, ok := loaderStyle(warn, wait); !asJSON && ok {
+				l := loader.Start(warn, wait, 200*time.Millisecond, style)
 				stop, warn = l.Stop, l
 			}
 			hits := []find.Hit{}
@@ -145,17 +145,29 @@ func newFindCmd(out io.Writer, global *bool) *cobra.Command {
 	return cmd
 }
 
-// showLoader reports whether w is a color terminal that understands cursor
-// movement and is wide enough that the loader's rows for msg do not wrap.
-func showLoader(w io.Writer, msg string) bool {
+// loaderStyle picks the loader for msg on w; ok is false when w is not a
+// terminal or is too narrow for the loader's line.
+func loaderStyle(w io.Writer, msg string) (style loader.Style, ok bool) {
 	f, ok := w.(*os.File)
-	if !ok || !isTTY(w) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
-		return false
-	}
-	// shortcut: Windows consoles may lack VT processing, so no loader there; enable VT mode to add it.
-	if runtime.GOOS == "windows" {
-		return false
+	if !ok || !isTTY(w) {
+		return loader.Snowdrift, false
 	}
 	cols, _, err := term.GetSize(f.Fd())
-	return err == nil && cols > loader.Width(msg)
+	return pickLoader(cols, err == nil, msg)
+}
+
+// pickLoader is loaderStyle for a terminal cols wide (sized false: width
+// unknown). CALI_LOADER=princess asks for the princess; she is drawn only on a
+// color terminal that understands cursor movement and fits her rows, and
+// Snowdrift stands in otherwise.
+func pickLoader(cols int, sized bool, msg string) (loader.Style, bool) {
+	// shortcut: Windows consoles may lack VT processing, so no princess there; enable VT mode to add her.
+	if os.Getenv("CALI_LOADER") == "princess" && os.Getenv("NO_COLOR") == "" && os.Getenv("TERM") != "dumb" &&
+		runtime.GOOS != "windows" && sized && cols > loader.Width(msg, loader.Princess) {
+		return loader.Princess, true
+	}
+	if !sized {
+		cols = 80
+	}
+	return loader.Snowdrift, cols > loader.Width(msg, loader.Snowdrift)
 }

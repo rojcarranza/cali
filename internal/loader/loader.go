@@ -1,6 +1,8 @@
-// Package loader draws the wait animation of slow commands: a 3x4-pixel ice
-// princess walking across two terminal rows, leaving a snow trail, beside a
-// spinner and a message. It uses half-block glyphs and 24-bit color, so the
+// Package loader draws the wait animation of slow commands in one of two
+// styles. Snowdrift is one line of plain ASCII redrawn with a carriage return,
+// so it works on any terminal. Princess is a 3x4-pixel ice princess walking
+// across two terminal rows, leaving a snow trail, beside a spinner and a
+// message; it uses half-block glyphs, 24-bit color and cursor movement, so the
 // caller shows it only on a color terminal.
 package loader
 
@@ -14,11 +16,20 @@ import (
 	"unicode/utf8"
 )
 
+// Style is the look of the loader.
+type Style int
+
+const (
+	Snowdrift Style = iota
+	Princess
+)
+
 const (
 	tickEvery = 90 * time.Millisecond
 	track     = 12 // columns she walks before starting over
-	// erase clears both rows and leaves the cursor at the start of the first.
-	erase = "\r\x1b[2K\n\x1b[2K\x1b[1A\r"
+	// erase clears both Princess rows and leaves the cursor at the start of the first.
+	erase      = "\r\x1b[2K\n\x1b[2K\x1b[1A\r"
+	driftTrack = 7 // cells the Snowdrift flake bounces across
 )
 
 // Colors as "r;g;b" for the 24-bit SGR sequences.
@@ -81,9 +92,58 @@ func (s *state) advance() {
 	}
 }
 
-// Width is the column count the loader needs for msg: the walking track,
-// the sprite, the spinner and msg on the second row.
-func Width(msg string) int { return track + 6 + utf8.RuneCountInString(msg) }
+// Width is the column count the loader needs for msg in style: for Princess
+// the walking track, the sprite, the spinner and msg on the second row; for
+// Snowdrift the bracketed track and msg spelled in ASCII.
+func Width(msg string, style Style) int {
+	if style == Snowdrift {
+		return driftTrack + 3 + len(ascii(msg))
+	}
+	return track + 6 + utf8.RuneCountInString(msg)
+}
+
+// ascii spells the ellipsis of msg as three dots, for terminals without Unicode.
+func ascii(msg string) string { return strings.ReplaceAll(msg, "…", "...") }
+
+// drift is the Snowdrift animation: a flake bouncing in a bracketed track,
+// a dot in the cell it just left.
+type drift struct {
+	tick int
+	msg  string
+}
+
+// at is the flake's cell at tick t, going back and forth between the track ends.
+func at(t int) int {
+	m := t % (2*driftTrack - 2)
+	if m < driftTrack {
+		return m
+	}
+	return 2*driftTrack - 2 - m
+}
+
+func (d *drift) line() string {
+	cells := []byte(strings.Repeat(" ", driftTrack))
+	if d.tick > 0 {
+		cells[at(d.tick-1)] = '.'
+	}
+	cells[at(d.tick)] = '*'
+	return "[" + string(cells) + "] " + d.msg
+}
+
+func (d *drift) frame() string { return "\r" + d.line() }
+func (d *drift) advance()      { d.tick++ }
+
+// princess adapts state to the frame and advance of an animation.
+type princess struct {
+	s   state
+	msg string
+}
+
+func (p *princess) frame() string {
+	rows := p.s.rows(p.msg)
+	return "\r\x1b[2K" + rows[0] + "\n\x1b[2K" + rows[1] + "\x1b[1A\r"
+}
+func (p *princess) advance() { p.s.advance() }
 
 func fg(c string) string { return "\x1b[38;2;" + c + "m" }
 
@@ -135,16 +195,25 @@ func (s *state) rows(msg string) [2]string {
 type Loader struct {
 	mu    sync.Mutex
 	w     io.Writer
+	wipe  string // clears a drawn frame and returns the cursor to its start
 	drawn bool
 	done  chan struct{}
 	wg    sync.WaitGroup
 	once  sync.Once
 }
 
-// Start draws msg and the animation on w every tick, beginning after delay so
-// a quick command never flickers, until Stop.
-func Start(w io.Writer, msg string, delay time.Duration) *Loader {
-	l := &Loader{w: w, done: make(chan struct{})}
+// Start draws msg and the animation in style on w every tick, beginning after
+// delay so a quick command never flickers, until Stop.
+func Start(w io.Writer, msg string, delay time.Duration, style Style) *Loader {
+	l := &Loader{w: w, wipe: erase, done: make(chan struct{})}
+	var a interface {
+		frame() string
+		advance()
+	} = &princess{msg: msg}
+	if style == Snowdrift {
+		a = &drift{msg: ascii(msg)}
+		l.wipe = "\r" + strings.Repeat(" ", Width(msg, Snowdrift)) + "\r"
+	}
 	l.wg.Add(1)
 	go func() {
 		defer l.wg.Done()
@@ -157,22 +226,20 @@ func Start(w io.Writer, msg string, delay time.Duration) *Loader {
 		intr := make(chan os.Signal, 1)
 		notify(intr)
 		defer stopNotify(intr)
-		var s state
 		t := time.NewTicker(tickEvery)
 		defer t.Stop()
 		for {
 			l.mu.Lock()
-			rows := s.rows(msg)
-			_, _ = io.WriteString(l.w, "\r\x1b[2K"+rows[0]+"\n\x1b[2K"+rows[1]+"\x1b[1A\r")
+			_, _ = io.WriteString(l.w, a.frame())
 			l.drawn = true
 			l.mu.Unlock()
-			s.advance()
+			a.advance()
 			select {
 			case <-l.done:
 				return
 			case <-intr:
 				l.mu.Lock()
-				_, _ = io.WriteString(l.w, erase)
+				_, _ = io.WriteString(l.w, l.wipe)
 				l.drawn = false
 				l.mu.Unlock()
 				exit(130)
@@ -189,7 +256,7 @@ func (l *Loader) Write(p []byte) (int, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if l.drawn {
-		_, _ = io.WriteString(l.w, erase)
+		_, _ = io.WriteString(l.w, l.wipe)
 		l.drawn = false
 	}
 	return l.w.Write(p)
@@ -201,7 +268,7 @@ func (l *Loader) Stop() {
 		close(l.done)
 		l.wg.Wait()
 		if l.drawn {
-			_, _ = io.WriteString(l.w, erase)
+			_, _ = io.WriteString(l.w, l.wipe)
 		}
 	})
 }

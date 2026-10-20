@@ -27,11 +27,13 @@ func (b *buf) String() string {
 	return b.b.String()
 }
 
-// waitDrawn waits until the loader has drawn a frame on w.
-func waitDrawn(t *testing.T, w *buf) {
+// waitDrawn waits until the loader has drawn a frame on w, after the last
+// line written: any of glyphs on the last line.
+func waitDrawn(t *testing.T, w *buf, glyphs string) {
 	t.Helper()
 	for end := time.Now().Add(5 * time.Second); time.Now().Before(end); time.Sleep(10 * time.Millisecond) {
-		if strings.ContainsAny(w.String(), "▀▄") {
+		out := w.String()
+		if strings.ContainsAny(out[strings.LastIndex(out, "\n")+1:], glyphs) {
 			return
 		}
 	}
@@ -40,7 +42,7 @@ func waitDrawn(t *testing.T, w *buf) {
 
 func TestQuickStopDrawsNothing(t *testing.T) {
 	var w buf
-	l := Start(&w, "fetching", time.Hour)
+	l := Start(&w, "fetching", time.Hour, Princess)
 	l.Stop()
 	if w.String() != "" {
 		t.Fatalf("drew %q before the delay", w.String())
@@ -49,8 +51,8 @@ func TestQuickStopDrawsNothing(t *testing.T) {
 
 func TestDrawsTwoRowsThenErases(t *testing.T) {
 	var w buf
-	l := Start(&w, "cali is fetching skills…", 0)
-	waitDrawn(t, &w)
+	l := Start(&w, "cali is fetching skills…", 0, Princess)
+	waitDrawn(t, &w, "▀▄")
 	l.Stop()
 	out := w.String()
 	if !strings.Contains(out, "cali is fetching skills…") || !strings.ContainsAny(out, "▀▄") {
@@ -64,8 +66,8 @@ func TestDrawsTwoRowsThenErases(t *testing.T) {
 
 func TestWriteClearsFrameFirst(t *testing.T) {
 	var w buf
-	l := Start(&w, "fetching", 0)
-	waitDrawn(t, &w)
+	l := Start(&w, "fetching", 0, Princess)
+	waitDrawn(t, &w, "▀▄")
 	if _, err := l.Write([]byte("warning: x\n")); err != nil {
 		t.Fatal(err)
 	}
@@ -104,9 +106,9 @@ func TestInterruptErasesAndExits(t *testing.T) {
 	exit = func(c int) { code <- c }
 	defer func() { notify, stopNotify, exit = oldNotify, oldStop, oldExit }()
 	var w buf
-	l := Start(&w, "fetching", 0)
+	l := Start(&w, "fetching", 0, Princess)
 	intr := <-reg
-	waitDrawn(t, &w)
+	waitDrawn(t, &w, "▀▄")
 	intr <- os.Interrupt
 	if c := <-code; c != 130 {
 		t.Fatalf("exit code = %d, want 130", c)
@@ -114,5 +116,51 @@ func TestInterruptErasesAndExits(t *testing.T) {
 	l.Stop()
 	if out := w.String(); !strings.HasSuffix(out, erase) || strings.Count(out[strings.LastIndex(out, "▀"):], erase) != 1 {
 		t.Fatalf("frame not erased exactly once after the interrupt: %q", out)
+	}
+}
+
+func TestSnowdriftDrawsOneASCIILineThenErases(t *testing.T) {
+	var w buf
+	l := Start(&w, "cali is fetching skills…", 0, Snowdrift)
+	waitDrawn(t, &w, "*")
+	if _, err := l.Write([]byte("warning: x\n")); err != nil {
+		t.Fatal(err)
+	}
+	waitDrawn(t, &w, "*") // a frame after the warning, so Stop has one to wipe
+	l.Stop()
+	out := w.String()
+	wipe := "\r" + strings.Repeat(" ", Width("cali is fetching skills…", Snowdrift)) + "\r"
+	if !strings.Contains(out, "] cali is fetching skills...") {
+		t.Fatalf("no ASCII message in %q", out)
+	}
+	if !strings.Contains(out, wipe+"warning: x\n") || !strings.HasSuffix(out, wipe) {
+		t.Fatalf("frame not wiped before the warning and at Stop: %q", out)
+	}
+	for _, r := range strings.ReplaceAll(out, "warning: x\n", "") {
+		if r == '\n' || r == '\x1b' || r > 0x7e {
+			t.Fatalf("non-plain byte %q in %q", r, out)
+		}
+	}
+}
+
+func TestSnowdriftBounces(t *testing.T) {
+	d := drift{msg: "m"}
+	want := map[int]string{
+		0:  "[*      ] m",
+		1:  "[.*     ] m",
+		6:  "[     .*] m",
+		7:  "[     *.] m",
+		12: "[*.     ] m",
+		13: "[.*     ] m",
+	}
+	for i := 0; i <= 13; i++ {
+		got := d.line()
+		if len(got) != Width("m", Snowdrift) {
+			t.Fatalf("tick %d: %q is %d wide, Width says %d", i, got, len(got), Width("m", Snowdrift))
+		}
+		if w, ok := want[i]; ok && got != w {
+			t.Fatalf("tick %d: got %q, want %q", i, got, w)
+		}
+		d.advance()
 	}
 }
