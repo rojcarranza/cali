@@ -56,8 +56,10 @@ func splice(existing []byte, updated *yaml.Node, m Manifest) ([]byte, bool) {
 		s, ok := m.Skills[key.Value]
 		switch {
 		case !ok:
-			// Drop the head comment with the entry, as the yaml.Node writer does.
-			if n := strings.Count(key.HeadComment, "\n") + 1; key.HeadComment != "" && start >= n && allComments(lines[start-n:start]) {
+			// Drop the head comment with the entry, as the yaml.Node writer does,
+			// unless it heads a group: the next entry has no comment of its own.
+			grouped := i+2 < len(oldSkills.Content) && oldSkills.Content[i+2].HeadComment == ""
+			if n := strings.Count(key.HeadComment, "\n") + 1; key.HeadComment != "" && !grouped && start >= n && allComments(lines[start-n:start]) {
 				start -= n
 			}
 			edits = append(edits, edit{start, end, nil})
@@ -117,14 +119,14 @@ func skillsMapping(doc *yaml.Node) *yaml.Node {
 }
 
 // entryEnd returns the 0-based line after the last line of the skill entry
-// key: val. Comment lines after its last value belong to what follows.
+// key: val. Lines indented deeper than key after its last value (block scalar
+// or flow list continuations, trailing notes) belong to it; comment lines at
+// key indent belong to what follows.
 func entryEnd(lines []string, key, val *yaml.Node) int {
 	end := maxLine(val)
-	// Continuation lines of a block scalar or multi-line flow list.
 	for end < len(lines) {
 		l := lines[end]
-		t := strings.TrimSpace(l)
-		if t == "" || strings.HasPrefix(t, "#") || len(l)-len(strings.TrimLeft(l, " ")) < key.Column {
+		if strings.TrimSpace(l) == "" || len(l)-len(strings.TrimLeft(l, " ")) < key.Column {
 			break
 		}
 		end++
@@ -149,13 +151,13 @@ func allComments(lines []string) bool {
 	return true
 }
 
-// encodeEntry encodes key: val as lines indented by indent. The key's head
-// comment and all foot comments lie outside the entry's lines in the file, so
-// they are left out.
+// encodeEntry encodes key: val as lines indented by indent. The key's head and
+// foot comments lie outside the entry's lines in the file (above it, and at key
+// indent after it), so they are left out; comments inside the entry are kept.
 func encodeEntry(key, val *yaml.Node, indent, nl string) []string {
-	k := *key
-	k.HeadComment = ""
-	pair := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map", Content: []*yaml.Node{&k, withoutFoot(val)}}
+	k, v := *key, *val
+	k.HeadComment, k.FootComment, v.FootComment = "", "", ""
+	pair := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map", Content: []*yaml.Node{&k, &v}}
 	var buf bytes.Buffer
 	enc := yaml.NewEncoder(&buf)
 	enc.SetIndent(2)
@@ -168,16 +170,6 @@ func encodeEntry(key, val *yaml.Node, indent, nl string) []string {
 		lines[i] = indent + strings.TrimSuffix(l, "\n") + nl
 	}
 	return lines
-}
-
-func withoutFoot(n *yaml.Node) *yaml.Node {
-	c := *n
-	c.FootComment = ""
-	c.Content = make([]*yaml.Node, len(n.Content))
-	for i, x := range n.Content {
-		c.Content[i] = withoutFoot(x)
-	}
-	return &c
 }
 
 func sameSkill(a, b Skill) bool {

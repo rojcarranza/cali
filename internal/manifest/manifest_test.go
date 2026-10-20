@@ -274,7 +274,12 @@ skills:
 
 func writeHandEdited(t *testing.T, edit func(m *Manifest)) string {
 	t.Helper()
-	p := writeFile(t, handEdited)
+	return writeFixture(t, handEdited, edit)
+}
+
+func writeFixture(t *testing.T, src string, edit func(m *Manifest)) string {
+	t.Helper()
+	p := writeFile(t, src)
 	m, err := Read(p)
 	if err != nil {
 		t.Fatal(err)
@@ -329,9 +334,45 @@ func TestWriteRemoveKeepsOtherLines(t *testing.T) {
 	}
 }
 
-func TestWriteRemoveDropsHeadComment(t *testing.T) {
+func TestWriteRemoveKeepsGroupHeader(t *testing.T) {
+	// "# Own skills." heads a group: the next entry has no comment of its own.
 	got := writeHandEdited(t, func(m *Manifest) { delete(m.Skills, "own") })
-	want := strings.Replace(handEdited, "  # Own skills.\n  own:\n    source: .//skills/own\n", "", 1)
+	want := strings.Replace(handEdited, "  own:\n    source: .//skills/own\n", "", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestWriteRemoveDropsHeadComment(t *testing.T) {
+	src := strings.Replace(handEdited, "  debugging:", "  # Debugging, for Copilot.\n  debugging:", 1)
+	got := writeFixture(t, src, func(m *Manifest) { delete(m.Skills, "debugging") })
+	want := strings.Replace(handEdited,
+		"  debugging:  # Claude: superpowers:systematic-debugging\n    source: github:addyosmani/agent-skills//skills/debugging\n    targets:    [copilot]\n", "", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+// noted adds a trailing note inside the last entry.
+var noted = strings.Replace(handEdited, "    targets:    [copilot]\n", "    targets:    [copilot]\n    # pinned until X\n", 1)
+
+func TestWriteAddKeepsTrailingNoteWithItsEntry(t *testing.T) {
+	got := writeFixture(t, noted, func(m *Manifest) {
+		m.Skills["impeccable"] = Skill{Source: "github:pbakaus/impeccable//skills/impeccable"}
+	})
+	want := strings.Replace(noted, "  # Optional,", "  impeccable:\n    source: github:pbakaus/impeccable//skills/impeccable\n  # Optional,", 1)
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestWriteChangeKeepsTrailingNote(t *testing.T) {
+	got := writeFixture(t, noted, func(m *Manifest) {
+		s := m.Skills["debugging"]
+		s.Ref = "abc123"
+		m.Skills["debugging"] = s
+	})
+	want := strings.Replace(noted, "[copilot]\n    # pinned", "[copilot]\n    ref: abc123\n    # pinned", 1)
 	if got != want {
 		t.Errorf("got:\n%s\nwant:\n%s", got, want)
 	}
