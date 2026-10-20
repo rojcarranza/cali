@@ -72,10 +72,6 @@ var fullSHA = regexp.MustCompile(`^[0-9a-f]{40}$`)
 // Compute returns one row per manifest skill x target (sorted by skill, then
 // target), plus unmanaged and shadowed rows, and the dependency warnings.
 func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
-	warn := in.Warn
-	if warn == nil {
-		warn = io.Discard
-	}
 	rows := []Row{}
 	installed := map[string][]string{}
 	requires := map[string][]string{}
@@ -84,27 +80,9 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 	for _, name := range sortedKeys(in.Manifest.Skills) {
 		sk := in.Manifest.Skills[name]
 		e, locked := in.Lock.Skills[name]
-		outdated := false
-		if locked && !in.Offline && in.Fetcher != nil {
-			spec, err := source.ParseWith(sk.Source, in.SourceOptions)
-			if err != nil {
-				return nil, nil, fmt.Errorf("skill %s: %w", name, err)
-			}
-			ref := sk.EffectiveRef(spec)
-			spec.Ref, spec.Path = ref, e.Path
-			if !fullSHA.MatchString(ref) { // a commit pin is never outdated: nothing to fetch
-				if err := ctx.Err(); err != nil {
-					return nil, nil, err
-				}
-				if _, tree, err := in.Fetcher.Latest(spec); err != nil {
-					if !warned[spec.URL] {
-						warned[spec.URL] = true
-						_, _ = fmt.Fprintf(warn, "warning: %s: %v\n", spec.URL, err)
-					}
-				} else {
-					outdated = tree != e.Tree
-				}
-			}
+		outdated, _, err := CheckLatest(ctx, in, name, warned)
+		if err != nil {
+			return nil, nil, err
 		}
 
 		var fm skillfs.Frontmatter
@@ -185,6 +163,42 @@ func Compute(ctx context.Context, in Input) ([]Row, []deps.Warning, error) {
 		return rows[i].Target < rows[j].Target
 	})
 	return rows, deps.Check(installed, requires), nil
+}
+
+// CheckLatest reports whether upstream has a newer tree for the manifest skill
+// name. checked is false when the skill is not locked, in.Offline is set, or
+// the fetch fails; a failure warns on in.Warn once per URL not yet in warned.
+func CheckLatest(ctx context.Context, in Input, name string, warned map[string]bool) (outdated, checked bool, err error) {
+	sk := in.Manifest.Skills[name]
+	e, locked := in.Lock.Skills[name]
+	if !locked || in.Offline || in.Fetcher == nil {
+		return false, false, nil
+	}
+	spec, err := source.ParseWith(sk.Source, in.SourceOptions)
+	if err != nil {
+		return false, false, fmt.Errorf("skill %s: %w", name, err)
+	}
+	ref := sk.EffectiveRef(spec)
+	spec.Ref, spec.Path = ref, e.Path
+	if fullSHA.MatchString(ref) { // a commit pin is never outdated: nothing to fetch
+		return false, true, nil
+	}
+	if err := ctx.Err(); err != nil {
+		return false, false, err
+	}
+	_, tree, err := in.Fetcher.Latest(spec)
+	if err != nil {
+		if !warned[spec.URL] {
+			warned[spec.URL] = true
+			warn := in.Warn
+			if warn == nil {
+				warn = io.Discard
+			}
+			_, _ = fmt.Fprintf(warn, "warning: %s: %v\n", spec.URL, err)
+		}
+		return false, false, nil
+	}
+	return tree != e.Tree, true, nil
 }
 
 // UnmanagedRows returns an Unmanaged row for every folder holding a regular
