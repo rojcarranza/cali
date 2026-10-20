@@ -92,9 +92,10 @@ func (t Table) Render(w io.Writer, m Mode) {
 				}
 				return lipgloss.NewStyle().Padding(0, 1)
 			})
-		// A table wider than the terminal gets hard-wrapped line by line; shrink it so cells wrap instead.
+		// A table wider than the terminal gets hard-wrapped line by line; shrink it so cells wrap instead,
+		// with a line between rows so a wrapped cell does not run into the next row.
 		if cols := termWidth(w); cols > 0 && lipgloss.Width(tb.String()) > cols {
-			tb.Width(cols)
+			tb.Width(cols).BorderRow(true)
 		}
 		// lipgloss.Fprintln downsamples colors to what the writer supports.
 		_, _ = lipgloss.Fprintln(w, tb.String())
