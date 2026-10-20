@@ -1,16 +1,16 @@
 # Graph Report - cali  (2026-10-20)
 
 ## Corpus Check
-- 88 files · ~78,500 words
+- 88 files · ~78,540 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 919 nodes · 3137 edges · 30 communities (26 shown, 4 thin omitted)
-- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 579 edges (avg confidence: 0.85)
+- 919 nodes · 3138 edges · 30 communities (26 shown, 4 thin omitted)
+- Extraction: 82% EXTRACTED · 18% INFERRED · 0% AMBIGUOUS · INFERRED: 580 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `10a25a34`
+- Built from commit: `074c96a6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -63,12 +63,12 @@
   .claude/agents/test-auditor.md → SETUP.md
 - `Scratch HOME / CALI_*_DIR isolated try-out` --conceptually_related_to--> `ADR 0005: On-disk layout (config/data/cache)`  [INFERRED]
   SETUP.md → docs/adr/0005-on-disk-layout.md
-- `main()` --calls--> `Execute()`  [EXTRACTED]
-  cmd/cali/main.go → internal/cli/cli.go
 - `CI workflow (vet, lint, test, install script on 3 OSes)` --references--> `golangci-lint v2 config (standard linters)`  [INFERRED]
   .github/workflows/ci.yml → .golangci.yml
 - `CI workflow (vet, lint, test, install script on 3 OSes)` --implements--> `Cross-platform constraint (macOS, Windows Git Bash, WSL)`  [INFERRED]
   .github/workflows/ci.yml → docs/brief.md
+- `architecture-guardian agent` --references--> `ADR 0001: Shell out to system git`  [EXTRACTED]
+  .claude/agents/architecture-guardian.md → docs/adr/0001-system-git.md
 
 ## Import Cycles
 - None detected.
@@ -184,7 +184,7 @@ Cohesion: 0.40
 Nodes (4): ADR 0009: Home-relative config directory on every OS, Consequences, Context, Decision
 
 ## Knowledge Gaps
-- **68 isolated node(s):** `block-protected.sh script`, `post-edit-go.sh script`, `stop-tests.sh script`, `github.com/rojcarranza/cali`, `Context` (+63 more)
+- **68 isolated node(s):** `golangci-lint v2 config (standard linters)`, `Skill source spec <repo>//<folder>@<ref>`, `11. Anti-goals, deferred, and ADRs`, `12. Left to the builder`, `13. How the brief's questions were closed` (+63 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -194,7 +194,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `Repo` connect `Repo` to `Add`, `gitx_test.go`, `Search`?**
   _High betweenness centrality (0.035) - this node is a cross-community bridge._
 - **Why does `Add()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ParseWith`, `Get`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Why does `Sync()` connect `Add` to `Repo`, `setup`, `fixture`, `io.Writer`, `manifest.go`, `ReadDir`, `ParseWith`, `Apply`, `Get`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Are the 31 inferred relationships involving `Add()` (e.g. with `TestAddAdoptsIdenticalFolder()` and `TestAddDefaultTargetsWritesBoth()`) actually correct?**

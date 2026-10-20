@@ -270,15 +270,15 @@
     "semantic_hash": "af4ca65f3cd9edef84197e22e756bddd"
   },
   "internal/render/render.go": {
-    "mtime": 1792472652.4633179,
-    "seen": 1792472685.879143,
-    "ast_hash": "12b596490120ddb6c51fff227d6c9822",
+    "mtime": 1792472737.611861,
+    "seen": 1792472755.482356,
+    "ast_hash": "ce286af232410212e688d62e016d62fe",
     "semantic_hash": ""
   },
   "internal/render/render_test.go": {
-    "mtime": 1792472649.0315397,
-    "seen": 1792472685.879144,
-    "ast_hash": "d1eebf4e2c843b09fb3f6ffd62359738",
+    "mtime": 1792472743.7298727,
+    "seen": 1792472755.482357,
+    "ast_hash": "37b87932e781af56a1d1d867830e14f9",
     "semantic_hash": ""
   },
   "internal/skillfs/frontmatter.go": {
