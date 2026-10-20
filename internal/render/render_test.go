@@ -116,3 +116,18 @@ func TestStyledTableFitsTerminalWidth(t *testing.T) {
 		t.Fatalf("cell lost:\n%s", b.String())
 	}
 }
+
+func TestStyledTableSeparatesRows(t *testing.T) {
+	var b bytes.Buffer
+	Table{Header: []string{"NAME"}, Rows: [][]string{{"a"}, {"b"}}}.Render(&b, Styled)
+	lines := strings.Split(b.String(), "\n")
+	for i, l := range lines {
+		if strings.Contains(l, " a ") {
+			if i+1 >= len(lines) || !strings.Contains(lines[i+1], "─") {
+				t.Fatalf("no separator after row a:\n%s", b.String())
+			}
+			return
+		}
+	}
+	t.Fatalf("row a missing:\n%s", b.String())
+}

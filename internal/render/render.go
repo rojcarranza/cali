@@ -85,7 +85,8 @@ func (t Table) Render(w io.Writer, m Mode) {
 		rows[i] = clean(r)
 	}
 	if m == Styled {
-		tb := table.New().Headers(header...).Rows(rows...).
+		// BorderRow: a line between rows, so a cell wrapped over many lines does not run into the next row.
+		tb := table.New().Headers(header...).Rows(rows...).BorderRow(true).
 			StyleFunc(func(row, _ int) lipgloss.Style {
 				if row == table.HeaderRow {
 					return lipgloss.NewStyle().Bold(true).Padding(0, 1)
