@@ -336,3 +336,28 @@ func TestWriteRemoveDropsHeadComment(t *testing.T) {
 		t.Errorf("got:\n%s\nwant:\n%s", got, want)
 	}
 }
+
+func TestWriteSpliceKeepsCRLF(t *testing.T) {
+	crlf := strings.ReplaceAll(strings.TrimSuffix(handEdited, "\n"), "\n", "\r\n") // no final newline
+	p := writeFile(t, crlf)
+	m, err := Read(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m.Skills["impeccable"] = Skill{Source: "github:pbakaus/impeccable//skills/impeccable"}
+	if err := Write(p, m); err != nil {
+		t.Fatal(err)
+	}
+	raw, _ := os.ReadFile(p)
+	want := strings.Replace(crlf, "  # Optional,", "  impeccable:\r\n    source: github:pbakaus/impeccable//skills/impeccable\r\n  # Optional,", 1) + "\r\n"
+	if string(raw) != want {
+		t.Errorf("got %q\nwant %q", raw, want)
+	}
+}
+
+func TestWriteHeaderChangeFallsBackToFullEncode(t *testing.T) {
+	got := writeHandEdited(t, func(m *Manifest) { m.Targets = []string{"claude"} })
+	if !strings.Contains(got, "targets: [claude]\n") || !strings.Contains(got, "# Claude: caveman plugin") {
+		t.Errorf("got:\n%s", got)
+	}
+}

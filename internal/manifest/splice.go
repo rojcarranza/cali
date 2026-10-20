@@ -20,7 +20,7 @@ import (
 func splice(existing []byte, updated *yaml.Node, m Manifest) ([]byte, bool) {
 	var old Manifest
 	var orig yaml.Node
-	if yaml.Unmarshal(existing, &old) != nil || yaml.Unmarshal(existing, &orig) != nil {
+	if yaml.Unmarshal(existing, &orig) != nil || orig.Decode(&old) != nil {
 		return nil, false
 	}
 	if old.Version != m.Version || !slices.Equal(old.Targets, m.Targets) || !slices.Equal(old.Sources, m.Sources) {
@@ -32,12 +32,12 @@ func splice(existing []byte, updated *yaml.Node, m Manifest) ([]byte, bool) {
 		return nil, false
 	}
 	text := string(existing)
-	if !strings.HasSuffix(text, "\n") {
-		text += "\n"
-	}
 	nl := "\n"
 	if strings.Contains(text, "\r\n") {
 		nl = "\r\n"
+	}
+	if !strings.HasSuffix(text, "\n") {
+		text += nl
 	}
 	lines := strings.SplitAfter(text, "\n")
 	lines = lines[:len(lines)-1] // SplitAfter leaves an empty string after the final newline
