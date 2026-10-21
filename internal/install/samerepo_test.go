@@ -199,3 +199,39 @@ func TestAddSameRepoOnlyInstalledCopies(t *testing.T) {
 		t.Fatalf("err = %v", err)
 	}
 }
+
+// A global manifest symlinked into a skills repo resolves same-repo sources
+// and its lock against the link target's repo, not the link's folder.
+func TestSyncSameRepoGlobalManifestSymlink(t *testing.T) {
+	for _, viaEnv := range []bool{false, true} {
+		e := selfRepo(t)
+		link := filepath.Join(e.deps.Dirs.Config, "cali.yaml")
+		if err := os.MkdirAll(e.deps.Dirs.Config, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Symlink(filepath.Join(e.project, "cali.yaml"), link); err != nil {
+			t.Fatal(err)
+		}
+		if viaEnv {
+			e.deps.Getenv = func(k string) string {
+				if k == "CALI_MANIFEST" {
+					return link
+				}
+				return ""
+			}
+		}
+		e.deps.Global = true
+		if _, err := Sync(context.Background(), e.deps, false); err != nil {
+			t.Fatalf("viaEnv=%v: %v", viaEnv, err)
+		}
+		if readLock(t, e).Skills["x"].Tree == "" {
+			t.Fatalf("viaEnv=%v: lock not written next to the link target", viaEnv)
+		}
+		if exists(filepath.Join(e.deps.Dirs.Config, "cali.lock")) {
+			t.Fatalf("viaEnv=%v: lock written next to the link", viaEnv)
+		}
+		if !exists(filepath.Join(e.deps.Dirs.Home, ".claude", "skills", "x", "SKILL.md")) {
+			t.Fatalf("viaEnv=%v: x not installed globally", viaEnv)
+		}
+	}
+}

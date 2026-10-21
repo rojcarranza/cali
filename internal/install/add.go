@@ -102,11 +102,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		if d.GlobalConfig != nil {
 			cfg = d.GlobalConfig()
 		}
-		return scope{
-			scope:    targets.Global,
-			manifest: filepath.Join(cfg, "cali.yaml"),
-			lockPath: filepath.Join(cfg, "cali.lock"),
-		}, nil
+		return globalScope(filepath.Join(cfg, "cali.yaml")), nil
 	}
 	cwd := d.Cwd
 	if cwd == "" {
@@ -126,14 +122,13 @@ func resolveScope(d Deps, global bool) (scope, error) {
 			mf = filepath.Join(cwd, mf)
 		}
 		mf = filepath.Clean(mf)
-		if !global && sameDir(filepath.Dir(mf), d.Dirs.Home) {
+		if global {
+			return globalScope(mf), nil
+		}
+		if sameDir(filepath.Dir(mf), d.Dirs.Home) {
 			return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", mf)
 		}
-		sc := scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
-		if global {
-			sc.scope, sc.root = targets.Global, ""
-		}
-		return sc, nil
+		return scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}, nil
 	}
 	root := findRoot(cwd, d.Dirs.Home)
 	if sameDir(root, d.Dirs.Home) {
@@ -145,6 +140,15 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		manifest: filepath.Join(root, "cali.yaml"),
 		lockPath: filepath.Join(root, "cali.lock"),
 	}, nil
+}
+
+// globalScope follows a symlinked global manifest to its real file, so the
+// lock and a same-repo source's repo sit next to the target, not the link
+// (a global cali.yaml linked into a skills repo). Project scope keeps the
+// link: it refuses to write through one.
+func globalScope(mf string) scope {
+	mf = resolve(mf)
+	return scope{scope: targets.Global, manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
 }
 
 // sameDir compares two paths after symlink resolution, so HOME and the cwd
