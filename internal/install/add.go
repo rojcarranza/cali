@@ -85,8 +85,8 @@ type scope struct {
 // resolveScope finds the manifest and lock paths. Project scope is rooted at
 // the nearest ancestor of the cwd holding cali.yaml, else the nearest one
 // holding .git, else the cwd. Global scope lives in the config dir.
-// d.Manifest overrides both: the lock sits next to it and, in project scope,
-// its dir is the root; global targets stay under home. In global scope an
+// d.Manifest overrides both: the lock sits next to it (next to its target if
+// it is a symlink in global scope) and, in project scope, its dir is the root; global targets stay under home. In global scope an
 // absolute $CALI_MANIFEST stands in for a missing d.Manifest.
 func resolveScope(d Deps, global bool) (scope, error) {
 	if d.Manifest == "" && global && d.Getenv != nil {

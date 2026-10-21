@@ -203,7 +203,7 @@ func TestAddSameRepoOnlyInstalledCopies(t *testing.T) {
 // A global manifest symlinked into a skills repo resolves same-repo sources
 // and its lock against the link target's repo, not the link's folder.
 func TestSyncSameRepoGlobalManifestSymlink(t *testing.T) {
-	for _, viaEnv := range []bool{false, true} {
+	for _, via := range []string{"default", "env", "flag"} {
 		e := selfRepo(t)
 		link := filepath.Join(e.deps.Dirs.Config, "cali.yaml")
 		if err := os.MkdirAll(e.deps.Dirs.Config, 0o755); err != nil {
@@ -212,7 +212,10 @@ func TestSyncSameRepoGlobalManifestSymlink(t *testing.T) {
 		if err := os.Symlink(filepath.Join(e.project, "cali.yaml"), link); err != nil {
 			t.Fatal(err)
 		}
-		if viaEnv {
+		switch via {
+		case "flag":
+			e.deps.Manifest = link
+		case "env":
 			e.deps.Getenv = func(k string) string {
 				if k == "CALI_MANIFEST" {
 					return link
@@ -222,16 +225,16 @@ func TestSyncSameRepoGlobalManifestSymlink(t *testing.T) {
 		}
 		e.deps.Global = true
 		if _, err := Sync(context.Background(), e.deps, false); err != nil {
-			t.Fatalf("viaEnv=%v: %v", viaEnv, err)
+			t.Fatalf("via=%s: %v", via, err)
 		}
 		if readLock(t, e).Skills["x"].Tree == "" {
-			t.Fatalf("viaEnv=%v: lock not written next to the link target", viaEnv)
+			t.Fatalf("via=%s: lock not written next to the link target", via)
 		}
 		if exists(filepath.Join(e.deps.Dirs.Config, "cali.lock")) {
-			t.Fatalf("viaEnv=%v: lock written next to the link", viaEnv)
+			t.Fatalf("via=%s: lock written next to the link", via)
 		}
 		if !exists(filepath.Join(e.deps.Dirs.Home, ".claude", "skills", "x", "SKILL.md")) {
-			t.Fatalf("viaEnv=%v: x not installed globally", viaEnv)
+			t.Fatalf("via=%s: x not installed globally", via)
 		}
 	}
 }
