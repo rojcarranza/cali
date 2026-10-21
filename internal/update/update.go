@@ -97,6 +97,8 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	if err != nil {
 		return Proposal{}, err
 	}
+	fd := d
+	fd.Manifest = loc.Manifest // OpenFetch reuses this scope, not a second symlink lookup
 	m, err := manifest.ReadWith(loc.Manifest, opts)
 	noManifest := errors.Is(err, os.ErrNotExist)
 	if noManifest {
@@ -165,7 +167,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 		ref := s.EffectiveRef(spec)
 		repo, ok := repos[spec.URL]
 		if !ok {
-			if repo, err = install.OpenFetch(ctx, d, spec); err != nil {
+			if repo, err = install.OpenFetch(ctx, fd, spec); err != nil {
 				return Proposal{}, err
 			}
 			repos[spec.URL] = repo

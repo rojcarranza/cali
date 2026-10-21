@@ -85,8 +85,8 @@ type scope struct {
 // resolveScope finds the manifest and lock paths. Project scope is rooted at
 // the nearest ancestor of the cwd holding cali.yaml, else the nearest one
 // holding .git, else the cwd. Global scope lives in the config dir.
-// d.Manifest overrides both: the lock sits next to it and, in project scope,
-// its dir is the root; global targets stay under home. In global scope an
+// d.Manifest overrides both: the lock sits next to it (next to its target if
+// it is a symlink in global scope) and, in project scope, its dir is the root; global targets stay under home. In global scope an
 // absolute $CALI_MANIFEST stands in for a missing d.Manifest.
 func resolveScope(d Deps, global bool) (scope, error) {
 	if d.Manifest == "" && global && d.Getenv != nil {
@@ -102,11 +102,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		if d.GlobalConfig != nil {
 			cfg = d.GlobalConfig()
 		}
-		return scope{
-			scope:    targets.Global,
-			manifest: filepath.Join(cfg, "cali.yaml"),
-			lockPath: filepath.Join(cfg, "cali.lock"),
-		}, nil
+		return globalScope(filepath.Join(cfg, "cali.yaml"))
 	}
 	cwd := d.Cwd
 	if cwd == "" {
@@ -126,14 +122,13 @@ func resolveScope(d Deps, global bool) (scope, error) {
 			mf = filepath.Join(cwd, mf)
 		}
 		mf = filepath.Clean(mf)
-		if !global && sameDir(filepath.Dir(mf), d.Dirs.Home) {
+		if global {
+			return globalScope(mf)
+		}
+		if sameDir(filepath.Dir(mf), d.Dirs.Home) {
 			return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", mf)
 		}
-		sc := scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
-		if global {
-			sc.scope, sc.root = targets.Global, ""
-		}
-		return sc, nil
+		return scope{scope: targets.Project, root: filepath.Dir(mf), manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}, nil
 	}
 	root := findRoot(cwd, d.Dirs.Home)
 	if sameDir(root, d.Dirs.Home) {
@@ -145,6 +140,22 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		manifest: filepath.Join(root, "cali.yaml"),
 		lockPath: filepath.Join(root, "cali.lock"),
 	}, nil
+}
+
+// globalScope follows a symlinked global manifest to its real file, so the
+// lock and a same-repo source's repo sit next to the target, not the link
+// (a global cali.yaml linked into a skills repo). Project scope keeps the
+// link: it refuses to write through one. A link to a missing file is refused
+// rather than replaced by a fresh manifest on the next write.
+func globalScope(mf string) (scope, error) {
+	r, err := filepath.EvalSymlinks(mf)
+	if err != nil {
+		if fi, lerr := os.Lstat(mf); lerr == nil && fi.Mode()&os.ModeSymlink != 0 {
+			return scope{}, fmt.Errorf("%s is a symlink to a missing file: %w", mf, err)
+		}
+		r = filepath.Clean(mf)
+	}
+	return scope{scope: targets.Global, manifest: r, lockPath: filepath.Join(filepath.Dir(r), "cali.lock")}, nil
 }
 
 // sameDir compares two paths after symlink resolution, so HOME and the cwd
@@ -271,6 +282,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
+	d.Manifest = sc.manifest // openFetch reuses this scope, not a second symlink lookup
 	if err := checkScopeFiles(sc); err != nil {
 		return Result{}, err
 	}
