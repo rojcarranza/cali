@@ -70,6 +70,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	if err != nil {
 		return Report{}, err
 	}
+	d.Manifest = sc.manifest // openFetch reuses this scope, not a second symlink lookup
 	if err := checkScopeFiles(sc); err != nil {
 		return Report{}, err
 	}

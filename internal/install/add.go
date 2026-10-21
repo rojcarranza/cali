@@ -102,7 +102,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		if d.GlobalConfig != nil {
 			cfg = d.GlobalConfig()
 		}
-		return globalScope(filepath.Join(cfg, "cali.yaml")), nil
+		return globalScope(filepath.Join(cfg, "cali.yaml"))
 	}
 	cwd := d.Cwd
 	if cwd == "" {
@@ -123,7 +123,7 @@ func resolveScope(d Deps, global bool) (scope, error) {
 		}
 		mf = filepath.Clean(mf)
 		if global {
-			return globalScope(mf), nil
+			return globalScope(mf)
 		}
 		if sameDir(filepath.Dir(mf), d.Dirs.Home) {
 			return scope{}, fmt.Errorf("%s: a project manifest cannot sit in your home folder (its skills dirs are the global ones); use -g", mf)
@@ -145,10 +145,17 @@ func resolveScope(d Deps, global bool) (scope, error) {
 // globalScope follows a symlinked global manifest to its real file, so the
 // lock and a same-repo source's repo sit next to the target, not the link
 // (a global cali.yaml linked into a skills repo). Project scope keeps the
-// link: it refuses to write through one.
-func globalScope(mf string) scope {
-	mf = resolve(mf)
-	return scope{scope: targets.Global, manifest: mf, lockPath: filepath.Join(filepath.Dir(mf), "cali.lock")}
+// link: it refuses to write through one. A link to a missing file is refused
+// rather than replaced by a fresh manifest on the next write.
+func globalScope(mf string) (scope, error) {
+	r, err := filepath.EvalSymlinks(mf)
+	if err != nil {
+		if fi, lerr := os.Lstat(mf); lerr == nil && fi.Mode()&os.ModeSymlink != 0 {
+			return scope{}, fmt.Errorf("%s is a symlink to a missing file: %w", mf, err)
+		}
+		r = filepath.Clean(mf)
+	}
+	return scope{scope: targets.Global, manifest: r, lockPath: filepath.Join(filepath.Dir(r), "cali.lock")}, nil
 }
 
 // sameDir compares two paths after symlink resolution, so HOME and the cwd
@@ -275,6 +282,7 @@ func Add(ctx context.Context, d Deps, req AddRequest) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
+	d.Manifest = sc.manifest // openFetch reuses this scope, not a second symlink lookup
 	if err := checkScopeFiles(sc); err != nil {
 		return Result{}, err
 	}

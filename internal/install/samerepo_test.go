@@ -238,3 +238,23 @@ func TestSyncSameRepoGlobalManifestSymlink(t *testing.T) {
 		}
 	}
 }
+
+// A global manifest linked to a file that does not exist yet (the repo is not
+// cloned) is refused, so a write never replaces the link with a fresh file.
+func TestGlobalManifestDanglingSymlinkRefused(t *testing.T) {
+	e := newEnv(t)
+	link := filepath.Join(e.deps.Dirs.Config, "cali.yaml")
+	if err := os.MkdirAll(e.deps.Dirs.Config, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(filepath.Join(e.project, "missing", "cali.yaml"), link); err != nil {
+		t.Fatal(err)
+	}
+	e.deps.Global = true
+	if _, err := Sync(context.Background(), e.deps, false); err == nil || !strings.Contains(err.Error(), "symlink to a missing file") {
+		t.Fatalf("err = %v", err)
+	}
+	if fi, err := os.Lstat(link); err != nil || fi.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("link replaced: %v", err)
+	}
+}
