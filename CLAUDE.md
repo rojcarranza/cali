@@ -20,7 +20,9 @@ Status: pre-build. Phases tracked in `docs/` (brief, design, requirements, archi
 
 ## Pull requests
 - No PR without a GitHub issue or user story. Link it in the PR body (`Closes #<n>` for an issue, or the user story ID). If none exists, create or ask for one before opening the PR.
-- Right after opening a PR, run `/code-review` on it. Fix every confirmed finding on the PR branch, re-run the tests, and push before asking for merge.
+- Push through `git push no-mistakes`, never `origin`.
+- Use `gh-axi` for GitHub, not raw `gh`.
+- Right after opening a PR that did not go through no-mistakes, run `/code-review` on it (changes pushed through `git push no-mistakes` are reviewed by its Review step instead). Fix every confirmed finding on the PR branch, re-run the tests, and push before asking for merge.
 
 ## When compacting, keep
 - Current phase or task, and its requirement IDs

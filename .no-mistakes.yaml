@@ -1,0 +1,17 @@
+no_ci: true
+allow_repo_commands: false
+commands:
+  lint: GOTOOLCHAIN=local make lint
+gates:
+  - name: full-suite
+    after: test
+    command: "GOTOOLCHAIN=local make lint test"
+  - name: install-script
+    after: test
+    command: 'GOTOOLCHAIN=local sh -c ''d=$(mktemp -d) && trap "rm -rf $d" EXIT && BINDIR=$d/bin sh scripts/install.sh && BINDIR=$d/bin sh scripts/install.sh --uninstall'''
+  - name: cross-linux
+    after: test
+    command: "GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=linux go vet ./... && GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=linux go test -run '^$' -exec true ./..."
+  - name: cross-windows
+    after: test
+    command: "GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=windows go vet ./... && GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=windows go test -run '^$' -exec true ./..."
