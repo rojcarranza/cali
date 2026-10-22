@@ -95,7 +95,8 @@ JSON, not YAML: the standard library can write it, so it adds no dependency and 
 - Files are materialized from git blobs (`git cat-file`/`git archive`), never from a working-tree checkout, so `core.autocrlf` cannot alter them. Bytes written = bytes in the commit.
 - Only the executable bit is carried over (ignored on Windows). Timestamps are not part of the contract.
 - Symlinks, submodules, paths containing `..`, absolute paths, and Windows-reserved names (`CON`, `NUL`, trailing dot/space, `:`) inside a skill folder make `add`/`sync` fail with the offending path. (Security: nothing in a skill is ever executed by Cali.)
-- CI runs a golden test on a macOS/Windows/Ubuntu matrix: one fixture lock, hash of the resulting folder must match. WSL is covered by the Ubuntu job, since a WSL binary is a Linux binary.
+- A golden test checks this: one fixture lock, hash of the resulting folder must match. WSL counts as Linux, since a WSL binary is a Linux binary.
+- Note (2026-10-22, #52): there is no hosted CI. Checks run locally through the no-mistakes gate: `full-suite` (lint and tests on the macOS host), `install-script`, and `cross-linux` and `cross-windows` (`go vet` plus test-compile). Windows and Linux tests, the golden test included, are compiled but not run there. A full Ubuntu run is done by hand before a release.
 
 ## 5. Pristine copies and the 3-way merge
 
