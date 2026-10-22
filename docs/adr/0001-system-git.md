@@ -19,5 +19,5 @@ Cali fetches skills from git repos (GitHub first, HTTPS only), reads blobs and t
 - Credential helpers, SSH config and proxies behave as they do on the command line.
 - `git` must be installed and on `PATH`. Cali reports a clear error when it is missing.
 - Behavior depends on the installed git version. Cali relies only on long-standing features (`merge-file --diff3`, `cat-file`, `archive`, `GIT_CONFIG_COUNT` from git 2.31).
-- Tests that touch git need a `git` binary; CI runners on all three OSes have one.
+- Tests that touch git need a `git` binary on the machine that runs them. Note (2026-10-22, #52): checks run locally through the no-mistakes gate (`full-suite`, `install-script`, and `cross-linux` and `cross-windows` vet plus test-compile), so tests run only on the macOS host; Windows and Linux tests are compiled but not run. A full Ubuntu run is done by hand before a release.
 - Alternative rejected: go-git (pure Go) adds a large dependency, lags on partial-clone and credential-helper support, and its merge story is weaker.
