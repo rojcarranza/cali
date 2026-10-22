@@ -8,7 +8,7 @@ gates:
     command: "GOTOOLCHAIN=local make lint test"
   - name: install-script
     after: test
-    command: 'GOTOOLCHAIN=local sh -c ''d=$(mktemp -d) && trap "rm -rf $d" EXIT && BINDIR=$d/bin sh scripts/install.sh && BINDIR=$d/bin sh scripts/install.sh --uninstall'''
+    command: 'GOTOOLCHAIN=local sh -c ''d=$(mktemp -d) && trap "rm -rf $d" EXIT && export PATH=$d/bin:$PATH BINDIR=$d/bin && sh scripts/install.sh && sh scripts/install.sh --uninstall'''
   - name: cross-linux
     after: test
     command: "GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=linux go vet ./... && GOTOOLCHAIN=local CGO_ENABLED=0 GOOS=linux go test -run '^$' -exec true ./..."
