@@ -55,7 +55,7 @@ Git Bash and WSL can share one global `cali.yaml` ([ADR 0009](docs/adr/0009-home
 ```sh
 go build -o bin/cali ./cmd/cali     # build
 go test -v ./...                    # test
-go vet ./... && golangci-lint run   # lint (golangci-lint v2.15.0, same as CI)
+go vet ./... && golangci-lint run   # lint (golangci-lint v2.15.0 or later, the one on PATH is what the no-mistakes gate runs)
 ```
 
 Try a build without touching your real skills. Point `HOME` and the Cali dirs at a scratch folder:
