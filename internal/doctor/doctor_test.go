@@ -114,3 +114,40 @@ func TestDoctorListsFoldersPerApp(t *testing.T) {
 		t.Fatalf("jetbrains folders = %+v", f)
 	}
 }
+
+// SCR-15 answer 8: cali-tools "python3|python" passes when any name is on PATH;
+// a WindowsApps Store stub for python or python3 does not count.
+func TestDoctorToolAlternatives(t *testing.T) {
+	home := t.TempDir()
+	skill(t, home, ".copilot/skills", "py", std("py")+"metadata:\n  cali-tools: python3|python\n")
+	run := func(paths map[string]string) []string {
+		r := Run(Input{Home: home, LookPath: func(n string) (string, error) {
+			if p, ok := paths[n]; ok {
+				return p, nil
+			}
+			return "", errors.New("no")
+		}})
+		var d []string
+		for _, f := range r.Findings {
+			if f.Kind == "needs" {
+				d = append(d, f.Detail)
+			}
+		}
+		return d
+	}
+	stub := `C:\Users\r\AppData\Local\Microsoft\WindowsApps\python3.exe`
+	for name, c := range map[string]struct {
+		paths map[string]string
+		fails bool
+	}{
+		"second name only":  {map[string]string{"python": "/usr/bin/python"}, false},
+		"first name only":   {map[string]string{"python3": "/usr/bin/python3"}, false},
+		"neither":           {nil, true},
+		"stub only":         {map[string]string{"python3": stub, "python": stub}, true},
+		"stub and real one": {map[string]string{"python3": stub, "python": `C:\Python312\python.exe`}, false},
+	} {
+		if got := run(c.paths); (len(got) > 0) != c.fails {
+			t.Errorf("%s: findings %v", name, got)
+		}
+	}
+}

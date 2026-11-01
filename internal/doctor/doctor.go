@@ -138,8 +138,20 @@ func Run(in Input) Report {
 				if in.LookPath == nil {
 					continue
 				}
-				if _, err := in.LookPath(t); err != nil {
-					add("needs", name, "tool "+t+" is not on PATH")
+				alts := strings.Split(t, "|") // python3|python: any one on PATH passes
+				ok := false
+				for i, a := range alts {
+					alts[i] = strings.TrimSpace(a)
+					if onPath(in.LookPath, alts[i]) {
+						ok = true
+					}
+				}
+				if !ok {
+					if len(alts) == 1 {
+						add("needs", name, "tool "+t+" is not on PATH")
+					} else {
+						add("needs", name, "none of the tools "+strings.Join(alts, ", ")+" is on PATH")
+					}
 				}
 			}
 		}
@@ -182,4 +194,19 @@ func split(s string) []string {
 		}
 	}
 	return out
+}
+
+// onPath reports whether program t is on PATH. Windows ships python and python3
+// stubs in the WindowsApps folder that open the Store; they are not Python.
+func onPath(lookPath func(string) (string, error), t string) bool {
+	p, err := lookPath(t)
+	if err != nil {
+		return false
+	}
+	low := strings.ToLower(strings.ReplaceAll(p, "/", "\\"))
+	if strings.Contains(low, "\\windowsapps\\") {
+		base := strings.TrimSuffix(strings.ToLower(t), ".exe")
+		return base != "python" && base != "python3"
+	}
+	return true
 }

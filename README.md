@@ -104,7 +104,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
 | `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json`, `--target` |
 | `cali remove <name>` | Back up and remove | `--force`, `--target` |
-| `cali doctor` | Folders each app reads; duplicates, leftovers, skipped names, Claude-only skills, unmet `cali-env` and `cali-tools` needs | `--exit-code`, `--json` |
+| `cali doctor` | Folders each app reads; duplicates, leftovers, skipped names, Claude-only skills, unmet `cali-env` and `cali-tools` needs (`cali-tools: python3|python` accepts either) | `--exit-code`, `--json` |
 | `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen`, `--prune`, `--target` |
 | `cali init` | Create an empty `cali.yaml` | |
 
