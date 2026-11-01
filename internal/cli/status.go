@@ -78,6 +78,12 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 					Warnings []warning    `json:"warnings"`
 				}{rows, jw})
 			} else {
+				next := ""
+				if agentMode {
+					var line string
+					line, next = statusTotals(rows)
+					_, _ = io.WriteString(out, line)
+				}
 				t := render.Table{Header: []string{"SKILL", "TARGET", "STATE", "DETAIL"}}
 				for _, r := range rows {
 					st := make([]string, len(r.States))
@@ -96,6 +102,7 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 						_, err = io.WriteString(out, line)
 					}
 				}
+				writeNext(out, next)
 			}
 			if err != nil {
 				return err

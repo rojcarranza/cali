@@ -223,6 +223,12 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 					Skills []listRow `json:"skills"`
 				}{rows})
 			}
+			if agentMode && mode != render.JSON {
+				_, _ = io.WriteString(out, listTotals(len(rows)))
+				if len(rows) == 0 {
+					return nil
+				}
+			}
 			t := render.Table{Header: []string{"NAME", "SOURCE", "MANAGED", "LATEST", "CLAUDE", "COPILOT"}}
 			if all {
 				t.Header = append([]string{"SCOPE"}, t.Header...)
