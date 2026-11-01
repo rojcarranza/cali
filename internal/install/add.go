@@ -742,3 +742,42 @@ func NoSymlinks(root, dir string) error { return noSymlinks(root, dir) }
 func ExportTree(repo *gitx.Repo, tree, name string) (skillfs.Tree, error) {
 	return exportTree(repo, tree, name)
 }
+
+// Record writes entries into the scope's manifest without installing them
+// (`cali sync` does that); an entry whose name is already there is left alone
+// and returned in kept. A missing manifest is created.
+func Record(d Deps, global bool, entries map[string]manifest.Skill) (path string, added, kept []string, err error) {
+	opts := source.Options{AllowFile: d.AllowFileScheme}
+	sc, err := resolveScope(d, global)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	if err := checkScopeFiles(sc); err != nil {
+		return "", nil, nil, err
+	}
+	m, err := manifest.ReadWith(sc.manifest, opts)
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		m = manifest.Manifest{Version: 1, Targets: slices.Clone(defaultTargets), Skills: map[string]manifest.Skill{}}
+	case err != nil:
+		return "", nil, nil, err
+	}
+	if m.Skills == nil {
+		m.Skills = map[string]manifest.Skill{}
+	}
+	for _, name := range slices.Sorted(maps.Keys(entries)) {
+		if _, ok := m.Skills[name]; ok {
+			kept = append(kept, name)
+			continue
+		}
+		m.Skills[name] = entries[name]
+		added = append(added, name)
+	}
+	if len(added) == 0 {
+		return sc.manifest, nil, kept, nil
+	}
+	if err := os.MkdirAll(filepath.Dir(sc.manifest), 0o755); err != nil {
+		return "", nil, nil, err
+	}
+	return sc.manifest, added, kept, manifest.WriteWith(sc.manifest, m, opts)
+}
