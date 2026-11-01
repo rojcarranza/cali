@@ -38,6 +38,7 @@ var manifestPath string
 // Execute runs cali with args (without the program name) and returns the exit code.
 func Execute(args []string, out, errw io.Writer) int {
 	warnOut = errw
+	agentMode, ranCommand = wantsAgent(args), false
 	root := newRoot(out)
 	root.SetArgs(args)
 	root.SetOut(out)
@@ -46,13 +47,16 @@ func Execute(args []string, out, errw io.Writer) int {
 		if !errors.Is(err, errFindings) && !errors.Is(err, install.ErrSkipped) { // already reported on stdout
 			_, _ = fmt.Fprintln(errw, "cali: "+err.Error())
 		}
+		if agentMode && !ranCommand {
+			return exitUsage
+		}
 		return 1
 	}
 	return 0
 }
 
 func newRoot(out io.Writer) *cobra.Command {
-	var global bool
+	var global, agent bool
 	root := &cobra.Command{
 		Use:           "cali",
 		Short:         "Install and manage AI agent skills from git repositories",
@@ -60,8 +64,10 @@ func newRoot(out io.Writer) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	root.PersistentPreRunE = agentPreRun(&agent)
 	root.SetVersionTemplate("cali {{.Version}}\n")
 	root.PersistentFlags().BoolVarP(&global, "global", "g", false, "use the global scope (your home folder) instead of the project")
+	root.PersistentFlags().BoolVar(&agent, agentFlagName, false, "agent mode: never prompt, exit 2 on usage errors, print totals and next steps (or set CALI_AGENT=1)")
 	root.PersistentFlags().StringVar(&manifestPath, "manifest", "", "use this manifest file; the lock sits next to it (in project scope its folder is the project root)")
 
 	root.AddCommand(&cobra.Command{

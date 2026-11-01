@@ -81,7 +81,7 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 // every skill of $CALI_DEFAULT_SOURCE, otherwise it prints how to start.
 func firstRun(cmd *cobra.Command, d install.Deps, manifest string, frozen bool) error {
 	src := os.Getenv("CALI_DEFAULT_SOURCE")
-	if src != "" && !frozen && interactive(d.Stdout) {
+	if src != "" && !frozen && !agentMode && interactive(d.Stdout) {
 		ok, err := confirm(fmt.Sprintf("No %s yet. Install every skill from %s?", manifest, src))
 		if err != nil {
 			return err

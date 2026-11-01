@@ -95,6 +95,16 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 
 Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.yaml`; the lock sits next to it). In global scope, `$CALI_MANIFEST` is the default for `--manifest`.
 
+## Agent mode
+
+For AI agents that run cali in a terminal (Copilot Chat, Claude Code). Pass `--agent` or set `CALI_AGENT=1`:
+
+- Cali never prompts. `cali sync` with no `cali.yaml` prints the `cali add` command instead of asking.
+- A usage error (unknown flag or command, wrong arguments) exits 2; other failures exit 1.
+- `cali list` and `cali status` open with a total (`27 skills: 25 ok, 2 outdated`, or `0 skills`) and end with a `next:` line naming the command to run.
+
+The repo ships a skill that teaches an agent this: `cali add github:rojcarranza/cali --skill cali -g`.
+
 ## Good to know
 
 - `sync` installs whatever a repo's `cali.yaml` names. Sync only repos you trust.
