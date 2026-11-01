@@ -33,7 +33,7 @@ func exists(p string) (bool, error) {
 }
 
 func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
-	var frozen bool
+	var frozen, prune bool
 	var only []string
 	cmd := &cobra.Command{
 		Use:   "sync",
@@ -49,6 +49,7 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 			}
 			d.Targets = only
 			d.Global = *global
+			d.Prune = prune
 			// -g in a project installs the project's cali.yaml into your home folder.
 			if *global && d.Manifest == "" {
 				if p, err := install.Locate(d, false); err == nil {
@@ -80,6 +81,7 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 	}
 	targetFlag(cmd, &only)
 	cmd.Flags().BoolVar(&frozen, "frozen", false, "fail instead of changing cali.lock")
+	cmd.Flags().BoolVar(&prune, "prune", false, "delete installed skills no longer in cali.yaml (unmodified ones only, after a backup)")
 	return cmd
 }
 

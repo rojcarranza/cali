@@ -46,6 +46,8 @@ type Deps struct {
 	Global bool
 	// Targets is --target for Sync, Update, Remove: act on just these targets; nil means all.
 	Targets []string
+	// Prune makes Sync delete the installed folders of skills no longer in the manifest.
+	Prune bool
 	// Manifest is --manifest: the manifest file, relative to Cwd; the lock sits
 	// next to it and, in project scope, its dir is the project root. Empty means the default.
 	Manifest string

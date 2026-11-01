@@ -545,3 +545,22 @@ func TestSameRepoGlobalConfigStatus(t *testing.T) {
 		t.Fatalf("status: code=%d out=%q err=%q", code, out, errs)
 	}
 }
+
+// SCR-14 piece 2: the --prune flag reaches Sync.
+func TestSyncPruneFlag(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	dir := filepath.Join(project, ".claude", "skills", "x")
+	code, out, errs := run("sync", "--prune")
+	if code != 0 || !strings.HasPrefix(out, "pruned x (claude)") {
+		t.Fatalf("prune: code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Lstat(dir); !os.IsNotExist(err) {
+		t.Fatalf("folder still there: %v", err)
+	}
+}
