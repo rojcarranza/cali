@@ -621,6 +621,9 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 		return nil, err
 	}
 	scanned := len(found)
+	if roots, ok := pluginSkillRoots(repo, commit); ok {
+		found = onlyPluginSkills(found, roots) // a plugin repo's own skills, not copies of them
+	}
 	if repo.Local() {
 		// Installed copies a project commits (<root>/.claude/skills, .github/skills) are not sources.
 		found = slices.DeleteFunc(found, func(p string) bool {

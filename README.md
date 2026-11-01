@@ -20,6 +20,8 @@ cali add -g github:rojcarranza/agent-skills                             # global
 
 A source is `github:<owner>/<repo>`, `github.com/<owner>/<repo>` or an `https://` URL, including a Bitbucket Data Center clone address such as `https://bitbucket.example.com/scm/PROJ/repo.git` (or `scm/~user/repo` for a personal repository). You can also add `//<folder>` to name one skill folder, and `@<ref>` to pin a branch, tag or commit: `github:obra/superpowers//skills/brainstorming@v1.2.0`.
 
+If the repository is a Claude plugin or marketplace (it has `.claude-plugin/plugin.json` or `marketplace.json`), Cali installs only the skills the plugin names, so a repo that keeps a second copy of each skill still installs cleanly.
+
 `--target claude` or `--target copilot` installs for one IDE only.
 
 ## Update skills
