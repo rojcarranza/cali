@@ -28,7 +28,8 @@ func Parse(s string) (Spec, error) { return ParseWith(s, Options{}) }
 
 // ParseWith parses a source spec. Accepted forms are
 // github:owner/repo[//path][@ref] and https://host/owner/repo[.git][//path][@ref]
-// (plus file:///abs/path[//path][@ref] when o.AllowFile is set), and
+// (including Bitbucket Data Center https://host/scm/PROJECT/repo[.git], PROJECT
+// or ~user) (plus file:///abs/path[//path][@ref] when o.AllowFile is set), and
 // .[//path] for the repository that holds the manifest, which takes no ref.
 func ParseWith(s string, o Options) (Spec, error) {
 	var scheme, rest string
@@ -105,11 +106,26 @@ func ParseWith(s string, o Options) (Spec, error) {
 		if !validPart(parts[0], true) {
 			return Spec{}, reject("host is invalid")
 		}
-		owner, repo, err := ownerRepo(parts[1:])
+		host := strings.ToLower(parts[0])
+		// Bitbucket Data Center clones from https://host/scm/PROJECT/repo.git,
+		// where PROJECT is ~user for a personal repository. The scm segment
+		// stays in the URL so it remains cloneable.
+		prefix, personal, rest := "", false, parts[1:]
+		if len(parts) > 1 && parts[1] == "scm" {
+			prefix, rest = "scm/", parts[2:]
+			if len(rest) > 0 && strings.HasPrefix(rest[0], "~") {
+				personal = true
+				rest = append([]string{rest[0][1:]}, rest[1:]...)
+			}
+		}
+		owner, repo, err := ownerRepo(rest)
 		if err != nil {
 			return Spec{}, err
 		}
-		host := strings.ToLower(parts[0])
+		if personal {
+			owner = "~" + owner
+		}
+		owner = prefix + owner
 		if host == "github.com" {
 			owner, repo = strings.ToLower(owner), strings.ToLower(repo)
 		}

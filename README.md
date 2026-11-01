@@ -18,7 +18,7 @@ cali add github.com/addyosmani/agent-skills --skill code-simplification # someon
 cali add -g github:rojcarranza/agent-skills                             # global: every project
 ```
 
-A source is `github:<owner>/<repo>`, `github.com/<owner>/<repo>` or an `https://` URL. You can also add `//<folder>` to name one skill folder, and `@<ref>` to pin a branch, tag or commit: `github:obra/superpowers//skills/brainstorming@v1.2.0`.
+A source is `github:<owner>/<repo>`, `github.com/<owner>/<repo>` or an `https://` URL, including a Bitbucket Data Center clone address such as `https://bitbucket.example.com/scm/PROJ/repo.git` (or `scm/~user/repo` for a personal repository). You can also add `//<folder>` to name one skill folder, and `@<ref>` to pin a branch, tag or commit: `github:obra/superpowers//skills/brainstorming@v1.2.0`.
 
 `--target claude` or `--target copilot` installs for one IDE only.
 

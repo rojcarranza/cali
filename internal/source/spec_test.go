@@ -260,3 +260,40 @@ func TestParseSameRepo(t *testing.T) {
 		}
 	}
 }
+
+// SCR-14 piece 7: Bitbucket Data Center clone URLs (/scm/PROJECT/repo.git).
+func TestParseBitbucketDataCenter(t *testing.T) {
+	cases := []struct {
+		in      string
+		want    Spec
+		wantKey string
+	}{
+		{"https://bitbucket.corp.example/scm/PROJ/skills.git", Spec{URL: "https://bitbucket.corp.example/scm/PROJ/skills"}, "bitbucket.corp.example/scm/PROJ/skills"},
+		{"https://bitbucket.corp.example:7990/scm/PROJ/skills//tools/x@v1", Spec{URL: "https://bitbucket.corp.example:7990/scm/PROJ/skills", Path: "tools/x", Ref: "v1"}, "bitbucket.corp.example:7990/scm/PROJ/skills"},
+		{"https://bitbucket.corp.example/scm/~jdoe/mine.git", Spec{URL: "https://bitbucket.corp.example/scm/~jdoe/mine"}, "bitbucket.corp.example/scm/~jdoe/mine"},
+	}
+	for _, c := range cases {
+		got, err := Parse(c.in)
+		if err != nil {
+			t.Errorf("Parse(%q) error: %v", c.in, err)
+			continue
+		}
+		if got != c.want || got.Key() != c.wantKey {
+			t.Errorf("Parse(%q) = %+v key %q, want %+v key %q", c.in, got, got.Key(), c.want, c.wantKey)
+		}
+		again, err := Parse(got.String())
+		if err != nil || again != got {
+			t.Errorf("round trip of %q = %+v, %v", got.String(), again, err)
+		}
+	}
+	for _, bad := range []string{
+		"https://b.example/scm/PROJ",
+		"https://b.example/scm/PROJ/r/extra",
+		"https://b.example/scm/~/r",
+		"https://b.example/scm/~~x/r",
+	} {
+		if _, err := Parse(bad); err == nil {
+			t.Errorf("Parse(%q) accepted", bad)
+		}
+	}
+}
