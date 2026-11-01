@@ -45,6 +45,16 @@ cali show roj-explain-logic  # source, commit and install paths (falls back to g
 cali status                # ok, modified (you edited it), or a newer upstream commit
 ```
 
+## Import the skills your Claude uses
+
+```bash
+cali import claude                                   # list skills of your installed, switched-on Claude plugins
+cali import claude --manifest ~/agent-skills/cali.yaml -g --skill brainstorming
+cali import claude --all
+```
+
+Writes each skill to `cali.yaml` pinned to the commit Claude installed, and installs nothing; run `cali sync` after, on this or another computer. Skills already in `cali.yaml` are kept. Without `--skill` or `--all` it asks on a terminal and otherwise only lists.
+
 ## Remove a skill
 
 ```sh
@@ -88,6 +98,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | `cali add <source>` | Install skills and record them | `--skill`, `--target`, `--adopt` |
 | `cali update [source\|names]` | Dry run; `--apply` writes | `--skill`, `--keep-mine`, `--take-upstream`, `--resolve`, `--json`, `--target` |
 | `cali list` | Installed skills, and whether each is at its latest upstream version | `-a`, `--json`, `--offline`, `--target` |
+| `cali import claude` | Write Claude plugin skills into `cali.yaml`, pinned | `--skill`, `--all`, `--claude-dir` |
 | `cali find <query>` | Search source repos | `--offline`, `--json` |
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
 | `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json`, `--target` |
