@@ -177,3 +177,31 @@ func TestResolveWindowsIgnoresXDG(t *testing.T) {
 		t.Errorf("Config = %s, want home config", got)
 	}
 }
+
+// SCR-14 piece 4: WindowsHome picks the Windows profile cali installs into from WSL.
+func TestWindowsHome(t *testing.T) {
+	glob := func(m ...string) FS {
+		return FS{Glob: func(p string) ([]string, error) {
+			if p == "/mnt/*/Users/*" {
+				return m, nil
+			}
+			return nil, nil
+		}}
+	}
+	wsl := map[string]string{"WSL_DISTRO_NAME": "Ubuntu"}
+	if got, err := WindowsHome(envOf(wsl), glob("/mnt/c/Users/Public", "/mnt/c/Users/Default", "/mnt/c/Users/me")); err != nil || got != "/mnt/c/Users/me" {
+		t.Errorf("one profile: got %q, %v", got, err)
+	}
+	if _, err := WindowsHome(envOf(wsl), glob("/mnt/c/Users/a", "/mnt/c/Users/b")); err == nil || !strings.Contains(err.Error(), "CALI_WINDOWS_HOME") {
+		t.Errorf("several: %v", err)
+	}
+	if _, err := WindowsHome(envOf(wsl), glob("/mnt/c/Users/Public")); err == nil {
+		t.Error("none: want error")
+	}
+	if _, err := WindowsHome(envOf(nil), glob("/mnt/c/Users/me")); err == nil {
+		t.Error("outside WSL: want error")
+	}
+	if got, err := WindowsHome(envOf(map[string]string{"CALI_WINDOWS_HOME": "/x"}), FS{}); err != nil || got != "/x" {
+		t.Errorf("override: got %q, %v", got, err)
+	}
+}

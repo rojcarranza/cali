@@ -98,6 +98,8 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 
 `--target claude|copilot` on sync, update, status, list and remove acts on that target only (`cali sync -g --target copilot` installs for Copilot only). `remove --target` keeps the skill in `cali.yaml` for its other targets.
 
+`--windows-home` (with `-g`, in WSL) installs into your Windows home, where Windows editors read skills: `cali sync -g --windows-home --target copilot`. Cali finds the one Windows profile, or use `CALI_WINDOWS_HOME`. Git Bash already uses the Windows home (`docs/adr/0010-wsl-installs-into-windows-home.md`).
+
 Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.yaml`; the lock sits next to it). In global scope, `$CALI_MANIFEST` is the default for `--manifest`.
 
 ## Agent mode

@@ -36,6 +36,9 @@ var dirsFS = dirs.FS{Exists: pathExists, Glob: filepath.Glob}
 // manifestPath is the persistent --manifest flag; newRoot resets it to "" for each run.
 var manifestPath string
 
+// windowsHome is the persistent --windows-home flag; newRoot resets it for each run.
+var windowsHome bool
+
 // Execute runs cali with args (without the program name) and returns the exit code.
 func Execute(args []string, out, errw io.Writer) int {
 	warnOut = errw
@@ -57,6 +60,7 @@ func Execute(args []string, out, errw io.Writer) int {
 }
 
 func newRoot(out io.Writer) *cobra.Command {
+	windowsHome = false
 	var global, agent bool
 	root := &cobra.Command{
 		Use:           "cali",
@@ -65,7 +69,17 @@ func newRoot(out io.Writer) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.PersistentPreRunE = agentPreRun(&agent)
+	agentRun := agentPreRun(&agent)
+	root.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if err := agentRun(cmd, args); err != nil {
+			return err
+		}
+		if windowsHome && !global {
+			return errors.New("--windows-home needs -g")
+		}
+		return nil
+	}
+	root.PersistentFlags().BoolVar(&windowsHome, "windows-home", false, "with -g in WSL, install into your Windows home instead of the WSL one")
 	root.SetVersionTemplate("cali {{.Version}}\n")
 	root.PersistentFlags().BoolVarP(&global, "global", "g", false, "use the global scope (your home folder) instead of the project")
 	root.PersistentFlags().BoolVar(&agent, agentFlagName, false, "agent mode: never prompt, exit 2 on usage errors, print totals and next steps (or set CALI_AGENT=1)")
@@ -138,6 +152,13 @@ func deps(out io.Writer) (install.Deps, error) {
 		return install.Deps{}, err
 	}
 	ds := dirs.Resolve(runtime.GOOS, os.Getenv, home, dirsFS)
+	if windowsHome && runtime.GOOS != "windows" { // cali.exe already uses the Windows home
+		wh, err := dirs.WindowsHome(os.Getenv, dirsFS)
+		if err != nil {
+			return install.Deps{}, err
+		}
+		ds.Home = wh
+	}
 	warn := warnOut
 	return install.Deps{
 		Dirs: ds,
