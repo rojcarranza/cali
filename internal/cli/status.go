@@ -20,15 +20,20 @@ var errFindings = errors.New("status found problems")
 
 func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 	var asJSON, offline, exitCode bool
+	var only []string
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Show local edits, newer upstream versions and missing skills",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if err := validTargets(only); err != nil {
+				return err
+			}
 			d, err := deps(out)
 			if err != nil {
 				return err
 			}
+			d.Targets = only
 			d.Global = *global // the fetcher finds a same-repo source through the scope
 			s, err := loadFrom(d, *global)
 			if err != nil {
@@ -110,6 +115,7 @@ func newStatusCmd(out io.Writer, global *bool) *cobra.Command {
 			return nil
 		},
 	}
+	targetFlag(cmd, &only)
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	cmd.Flags().BoolVar(&offline, "offline", false, "do not fetch; skip the check for newer upstream versions")
 	cmd.Flags().BoolVar(&exitCode, "exit-code", false, "exit 1 when any skill is not ok or a dependency is missing")

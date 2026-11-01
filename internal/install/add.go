@@ -44,6 +44,8 @@ type Deps struct {
 	Cwd string
 	// Global selects the global scope for Sync and Remove.
 	Global bool
+	// Targets is --target for Sync, Update, Remove: act on just these targets; nil means all.
+	Targets []string
 	// Manifest is --manifest: the manifest file, relative to Cwd; the lock sits
 	// next to it and, in project scope, its dir is the project root. Empty means the default.
 	Manifest string

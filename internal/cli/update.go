@@ -55,6 +55,7 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 	var resolve []string
 	var asJSON bool
 	var skill string
+	var only []string
 	cmd := &cobra.Command{
 		Use:   "update [names or sources...]",
 		Short: "Show what updating skills from upstream would change (dry run); --apply writes it",
@@ -83,10 +84,14 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 					o.Resolve[args[0]+":"+r[:i]] = r[i+1:]
 				}
 			}
+			if err := validTargets(only); err != nil {
+				return err
+			}
 			d, err := deps(out)
 			if err != nil {
 				return err
 			}
+			d.Targets = only
 			d.Global = *global
 			d.Stdout = cmd.ErrOrStderr() // notes stay off stdout so --json output parses
 			p, err := update.Plan(cmd.Context(), d, o)
@@ -119,6 +124,7 @@ func newUpdateCmd(out io.Writer, global *bool) *cobra.Command {
 	f.BoolVar(&o.KeepMine, "keep-mine", false, "keep the local file for every conflicting file")
 	f.BoolVar(&o.AcceptRecommended, "accept-recommended", false, "apply the recommendation for every conflict")
 	f.BoolVar(&asJSON, "json", false, "print JSON")
+	targetFlag(cmd, &only)
 	f.StringVar(&skill, "skill", "", "update only the skill with this name")
 	return cmd
 }

@@ -18,6 +18,7 @@ import (
 
 	"github.com/rojcarranza/cali/internal/dirs"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/targets"
 )
 
 // version is printed by --version.
@@ -105,6 +106,20 @@ func newRoot(out io.Writer) *cobra.Command {
 	root.AddCommand(add, newListCmd(out, &global), newShowCmd(out, &global), newStatusCmd(out, &global),
 		newSyncCmd(out, &global), newRemoveCmd(out, &global), newFindCmd(out, &global), newUpdateCmd(out, &global))
 	return root
+}
+
+// targetFlag adds --target to cmd; targetsOf validates it.
+func targetFlag(cmd *cobra.Command, v *[]string) {
+	cmd.Flags().StringSliceVar(v, "target", nil, "act on this target only: claude or copilot (repeatable)")
+}
+
+func validTargets(ts []string) error {
+	for _, t := range ts {
+		if _, err := targets.Dir(t, targets.Global, "", ""); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func deps(out io.Writer) (install.Deps, error) {

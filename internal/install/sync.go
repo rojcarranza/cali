@@ -82,6 +82,7 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 	if err != nil {
 		return Report{}, err
 	}
+	m = m.Restrict(d.Targets)
 	l, err := lock.Read(sc.lockPath)
 	if err != nil {
 		return Report{}, err
@@ -285,6 +286,9 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		}
 		fresh := slices.Contains(missing, n)
 		tgs := m.TargetsFor(n)
+		if len(tgs) == 0 && d.Targets != nil {
+			continue // not installed for the chosen --target
+		}
 		if len(tgs) == 0 {
 			return Report{}, fmt.Errorf("skill %s: no targets: set targets in %s", n, sc.manifest)
 		}

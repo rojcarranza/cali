@@ -63,7 +63,7 @@ func loadFrom(d install.Deps, global bool) (state, error) {
 	if err != nil {
 		return state{}, err
 	}
-	return state{loc, d.Dirs.Home, m, l}, nil
+	return state{loc, d.Dirs.Home, m.Restrict(d.Targets), l}, nil
 }
 
 // loadScopes loads each scope (false = project, true = global). With more than
@@ -161,6 +161,7 @@ func scopeName(global bool) string {
 
 func newListCmd(out io.Writer, global *bool) *cobra.Command {
 	var asJSON, all, offline bool
+	var only []string
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List installed skills",
@@ -173,10 +174,14 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 			if all {
 				scopes = []bool{false, true}
 			}
+			if err := validTargets(only); err != nil {
+				return err
+			}
 			d, err := deps(out)
 			if err != nil {
 				return err
 			}
+			d.Targets = only
 			states, err := loadScopes(d, scopes, cmd.ErrOrStderr())
 			if err != nil {
 				return err
@@ -243,6 +248,7 @@ func newListCmd(out io.Writer, global *bool) *cobra.Command {
 			return nil
 		},
 	}
+	targetFlag(cmd, &only)
 	cmd.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	cmd.Flags().BoolVarP(&all, "all", "a", false, "list project and global skills")
 	cmd.Flags().BoolVar(&offline, "offline", false, "do not fetch; leave LATEST unknown")

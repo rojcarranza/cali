@@ -84,14 +84,16 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | Command | Does | Flags |
 |---|---|---|
 | `cali add <source>` | Install skills and record them | `--skill`, `--target`, `--adopt` |
-| `cali update [source\|names]` | Dry run; `--apply` writes | `--skill`, `--keep-mine`, `--take-upstream`, `--resolve`, `--json` |
-| `cali list` | Installed skills, and whether each is at its latest upstream version | `-a`, `--json`, `--offline` |
+| `cali update [source\|names]` | Dry run; `--apply` writes | `--skill`, `--keep-mine`, `--take-upstream`, `--resolve`, `--json`, `--target` |
+| `cali list` | Installed skills, and whether each is at its latest upstream version | `-a`, `--json`, `--offline`, `--target` |
 | `cali find <query>` | Search source repos | `--offline`, `--json` |
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
-| `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json` |
-| `cali remove <name>` | Back up and remove | `--force` |
-| `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen` |
+| `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json`, `--target` |
+| `cali remove <name>` | Back up and remove | `--force`, `--target` |
+| `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen`, `--target` |
 | `cali init` | Create an empty `cali.yaml` | |
+
+`--target claude|copilot` on sync, update, status, list and remove acts on that target only (`cali sync -g --target copilot` installs for Copilot only). `remove --target` keeps the skill in `cali.yaml` for its other targets.
 
 Every command takes `-g` (global scope) and `--manifest <path>` (use that `cali.yaml`; the lock sits next to it). In global scope, `$CALI_MANIFEST` is the default for `--manifest`.
 
