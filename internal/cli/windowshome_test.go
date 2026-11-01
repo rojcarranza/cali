@@ -48,6 +48,17 @@ func TestWindowsHomeFlag(t *testing.T) {
 		t.Fatal("also installed in the WSL home")
 	}
 
+	// SCR-14 piece 2 with piece 4: --prune removes the skill from the Windows home.
+	if err := os.WriteFile(filepath.Join(project, "g.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code, out, errs := run("sync", "-g", "--windows-home", "--prune", "--manifest", filepath.Join(project, "g.yaml")); code != 0 || !strings.Contains(out, "pruned x") {
+		t.Fatalf("prune: code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Lstat(filepath.Join(winHome, ".copilot", "skills", "x")); !os.IsNotExist(err) {
+		t.Fatalf("skill still in the Windows home: %v", err)
+	}
+
 	// Two profiles: cali refuses and names CALI_WINDOWS_HOME.
 	dirsFS.Glob = func(string) ([]string, error) { return []string{"/mnt/c/Users/a", "/mnt/c/Users/b"}, nil }
 	if code, _, errs := run("list", "-g", "--windows-home"); code != 1 || !strings.Contains(errs, "CALI_WINDOWS_HOME") {
