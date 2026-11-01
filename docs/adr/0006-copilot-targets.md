@@ -1,6 +1,6 @@
 # ADR 0006: Copilot target paths
 
-Status: proposed — unverified, awaiting manual check by Roj
+Status: accepted — V1 and V2 are answered on each machine by `cali doctor`, not decided here
 
 ## Context
 
@@ -14,6 +14,12 @@ Cali writes the `copilot` target to `<project>/.github/skills/<name>/` (project 
 
 ## Findings
 
+No client was opened for this ADR. What is known:
+
+- **V1 (JetBrains):** the agent-skills guide says the JetBrains Copilot plugin reads `~/.copilot/skills`. `cali doctor` lists only that folder for JetBrains. JetBrains skills are a preview feature, so under Copilot Business an admin must allow them.
+- **V2 (duplicates):** VS Code documents reading `.github/skills`, `.claude/skills` and `.agents/skills` (project) and the matching personal folders. A skill installed for both targets sits in two of them. Nobody has confirmed whether VS Code lists it twice.
+- **Windows form of `~/.claude/skills`:** still from third-party guides.
+
 ## Decision
 
-Pending the findings above.
+Cali keeps the two targets of design spec section 6 and does not wait for V1 or V2. `cali doctor` closes the question in practice: it lists the folders each app reads, flags every skill an app can see in more than one folder (V2), and reports JetBrains per the guide (V1). A user who sees a real duplicate in their client sets `targets: [copilot]` in cali.yaml. Doctor also flags names VS Code skips, Claude-only skills (SKILL.md keys `allowed-tools`, `model`, `effort`, `context`, `agent`, `hooks`, `shell`, `paths`), leftovers not in cali.yaml, and unmet needs declared in `metadata.cali-env` and `metadata.cali-tools`.

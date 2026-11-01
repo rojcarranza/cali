@@ -78,3 +78,28 @@ func mustRead(t *testing.T, p string) []byte {
 	}
 	return b
 }
+
+// SCR-14 piece 3 with piece 4: `doctor -g --windows-home` lists the Windows home's folders, not the project's.
+func TestDoctorWindowsHome(t *testing.T) {
+	_, _ = setup(t)
+	winHome := filepath.Join(t.TempDir(), "Users", "me")
+	if err := os.MkdirAll(filepath.Join(winHome, ".copilot", "skills", "w"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(winHome, ".copilot", "skills", "w", "SKILL.md"), []byte("---\nname: w\ndescription: W.\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("WSL_DISTRO_NAME", "Ubuntu")
+	old := dirsFS
+	dirsFS = dirs.FS{Exists: pathExists, Glob: func(p string) ([]string, error) {
+		if p == "/mnt/*/Users/*" {
+			return []string{winHome}, nil
+		}
+		return nil, nil
+	}}
+	t.Cleanup(func() { dirsFS = old })
+	code, out, errs := run("doctor", "-g", "--windows-home")
+	if code != 0 || !strings.Contains(out, filepath.Join(winHome, ".copilot", "skills")+" (personal): 1 skills") || strings.Contains(out, "(project): 1") || !strings.Contains(out, "(no project)") {
+		t.Fatalf("doctor: code=%d out=%q err=%q", code, out, errs)
+	}
+}

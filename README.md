@@ -104,6 +104,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
 | `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json`, `--target` |
 | `cali remove <name>` | Back up and remove | `--force`, `--target` |
+| `cali doctor` | Folders each app reads; duplicates, leftovers, skipped names, Claude-only skills, unmet `cali-env` and `cali-tools` needs | `--exit-code`, `--json` |
 | `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen`, `--prune`, `--target` |
 | `cali init` | Create an empty `cali.yaml` | |
 
@@ -129,4 +130,4 @@ The repo ships a skill that teaches an agent this: `cali add github:rojcarranza/
 - A skill in the same repo as `cali.yaml` is written `.//skills/<name>`. It is read at the checked-out commit and never fetched.
 - Private repos need `gh auth login` or `GITHUB_TOKEN`. See [SETUP.md](SETUP.md).
 - `find` shows a one-line ASCII loader on any terminal of known width except `TERM=dumb`. `export CALI_LOADER=princess` brings back the walking ice princess on a color terminal; elsewhere the plain loader stands in.
-- Copilot paths for JetBrains are unverified (`docs/adr/0006-copilot-targets.md`).
+- Copilot paths for JetBrains are unverified (`docs/adr/0006-copilot-targets.md`). Run `cali doctor` to see the folders each app reads and any duplicate, leftover, skipped or Claude-only skill.

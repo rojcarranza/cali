@@ -14,6 +14,7 @@ type Frontmatter struct {
 	Name        string
 	Description string
 	Metadata    map[string]string
+	Keys        []string // top-level keys, in file order
 }
 
 // ParseFrontmatter reads the YAML block delimited by "---" lines at the very
@@ -60,6 +61,10 @@ func ParseFrontmatter(data []byte) (Frontmatter, error) {
 		return Frontmatter{}, errors.New("SKILL.md frontmatter has a field of the wrong type (name and description must be strings, metadata a mapping)")
 	}
 	fm.Name, fm.Description = raw.Name, raw.Description
+	m := node.Content[0].Content
+	for i := 0; i+1 < len(m); i += 2 {
+		fm.Keys = append(fm.Keys, m[i].Value)
+	}
 	for k, v := range raw.Metadata {
 		// Decode follows aliases and tags as the old map[string]string decode did;
 		// a list or map fails it and is skipped. Null stays absent.
