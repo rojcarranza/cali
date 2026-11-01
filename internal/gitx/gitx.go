@@ -646,5 +646,26 @@ func (r *Repo) skillFiles(commit string, maxDepth int) (dirs, oids []string, err
 	return dirs, oids, nil
 }
 
+// ReadFile returns the bytes of the regular file at path in commit, or an
+// error wrapping ErrNotFound when there is none. A file over the
+// skillfs.MaxFileSize limit is an error.
+func (r *Repo) ReadFile(commit, path string) ([]byte, error) {
+	if !hex40.MatchString(commit) {
+		return nil, fmt.Errorf("invalid commit %q", commit)
+	}
+	ctx := context.Background()
+	rev := commit + ":" + strings.Trim(path, "/")
+	out, err := r.git(ctx, r.env, "ls-tree", "-l", "-z", "--full-tree", commit, "--", strings.Trim(path, "/"))
+	meta, _, _ := bytes.Cut(out, []byte{'\t'})
+	f := strings.Fields(string(meta))
+	if err != nil || len(f) != 4 || f[1] != "blob" || (f[0] != "100644" && f[0] != "100755") {
+		return nil, fmt.Errorf("file %q not found at commit %s: %w", path, commit, ErrNotFound)
+	}
+	if n, err := strconv.ParseInt(f[3], 10, 64); err != nil || n > limits.file {
+		return nil, fmt.Errorf("file %q is larger than %d bytes", path, limits.file)
+	}
+	return r.git(ctx, r.env, "cat-file", "blob", rev)
+}
+
 // URL returns the source URL the mirror was opened for.
 func (r *Repo) URL() string { return r.url }
