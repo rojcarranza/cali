@@ -107,6 +107,7 @@ func Plan(ctx context.Context, d install.Deps, o Options) (Proposal, error) {
 	if err != nil {
 		return Proposal{}, err
 	}
+	m = m.Restrict(d.Targets)
 	l, err := lock.Read(loc.LockPath)
 	if err != nil {
 		return Proposal{}, err

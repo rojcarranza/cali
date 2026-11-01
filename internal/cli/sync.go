@@ -34,15 +34,20 @@ func exists(p string) (bool, error) {
 
 func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 	var frozen bool
+	var only []string
 	cmd := &cobra.Command{
 		Use:   "sync",
 		Short: "Install every skill in cali.lock; lock manifest skills that are not locked yet",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if err := validTargets(only); err != nil {
+				return err
+			}
 			d, err := deps(out)
 			if err != nil {
 				return err
 			}
+			d.Targets = only
 			d.Global = *global
 			// -g in a project installs the project's cali.yaml into your home folder.
 			if *global && d.Manifest == "" {
@@ -73,6 +78,7 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 			return err
 		},
 	}
+	targetFlag(cmd, &only)
 	cmd.Flags().BoolVar(&frozen, "frozen", false, "fail instead of changing cali.lock")
 	return cmd
 }

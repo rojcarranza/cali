@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/rojcarranza/cali/internal/backup"
@@ -48,6 +49,16 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 	}
 	if _, ok := m.Skills[name]; !ok {
 		return fmt.Errorf("skill %q is not in %s", name, sc.manifest)
+	}
+	// With --target the skill stays for the targets not named.
+	var remaining []string
+	if d.Targets != nil {
+		for _, t := range m.TargetsFor(name) {
+			if !slices.Contains(d.Targets, t) {
+				remaining = append(remaining, t)
+			}
+		}
+		m = m.Restrict(d.Targets)
 	}
 	l, err := lock.Read(sc.lockPath)
 	if err != nil {
@@ -160,6 +171,16 @@ func Remove(_ context.Context, d Deps, name string, force bool) error {
 	restoreCmd = append(restoreCmd, src)
 	for _, tg := range m.TargetsFor(name) {
 		restoreCmd = append(restoreCmd, "--target", tg)
+	}
+	if len(remaining) > 0 {
+		sk := m.Skills[name]
+		sk.Targets = remaining
+		m.Skills[name] = sk
+		if err := manifest.WriteWith(sc.manifest, m, opts); err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintf(out, "to restore: %s (installs upstream; your old copy is in the backup above)\n", strings.Join(restoreCmd, " "))
+		return nil
 	}
 	delete(m.Skills, name)
 	if err := manifest.WriteWith(sc.manifest, m, opts); err != nil {
