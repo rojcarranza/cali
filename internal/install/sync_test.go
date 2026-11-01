@@ -550,3 +550,87 @@ func TestSyncSkipsUnlockedSkillGoneUpstream(t *testing.T) {
 		})
 	}
 }
+
+// SCR-14 piece 2: sync --prune removes installed skills dropped from cali.yaml.
+func TestSyncPrune(t *testing.T) {
+	setup := func(t *testing.T) (env, string, string) {
+		r := monorepo(t)
+		e := newEnv(t)
+		addX(t, e, r)
+		mPath := filepath.Join(e.project, "cali.yaml")
+		m := readManifest(t, mPath)
+		delete(m.Skills, "x")
+		writeManifest(t, mPath, m)
+		return e, filepath.Join(e.project, ".claude", "skills", "x"), filepath.Join(e.project, "cali.lock")
+	}
+	ctx := context.Background()
+
+	t.Run("off by default keeps the folder", func(t *testing.T) {
+		e, folder, _ := setup(t)
+		if _, err := Sync(ctx, e.deps, false); err != nil || !exists(folder) {
+			t.Fatalf("err=%v, folder exists=%v", err, exists(folder))
+		}
+	})
+	t.Run("removes an unmodified folder after a backup", func(t *testing.T) {
+		e, folder, lockPath := setup(t)
+		e.deps.Prune = true
+		rep, err := Sync(ctx, e.deps, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if exists(folder) {
+			t.Fatal("folder not pruned")
+		}
+		found := false
+		for _, a := range rep.Actions {
+			found = found || (a.Kind == "pruned" && a.Name == "x" && a.Target == "claude")
+		}
+		if !found {
+			t.Fatalf("no pruned action: %v", rep.Actions)
+		}
+		if l, _ := lock.Read(lockPath); len(l.Skills) != 0 {
+			t.Fatal("lock entry kept")
+		}
+		if ents, _ := os.ReadDir(filepath.Join(e.deps.Dirs.Data, "backups")); len(ents) == 0 {
+			t.Fatal("no backup written")
+		}
+	})
+	t.Run("keeps a modified folder", func(t *testing.T) {
+		e, folder, _ := setup(t)
+		md := filepath.Join(folder, "SKILL.md")
+		if err := os.WriteFile(md, []byte(readFile(t, md)+"mine\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		e.deps.Prune = true
+		rep, err := Sync(ctx, e.deps, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !exists(md) || !hasAction(rep, "kept", "x", "claude", "modified") {
+			t.Fatalf("modified folder not kept: %v", rep.Actions)
+		}
+	})
+}
+
+// Task brief: --prune must respect --target.
+func TestSyncPruneRespectsTarget(t *testing.T) {
+	r := monorepo(t)
+	e := newEnv(t)
+	if _, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r) + "//skills/x", Targets: []string{"claude", "copilot"}}); err != nil {
+		t.Fatal(err)
+	}
+	mPath := filepath.Join(e.project, "cali.yaml")
+	m := readManifest(t, mPath)
+	delete(m.Skills, "x")
+	writeManifest(t, mPath, m)
+	e.deps.Prune, e.deps.Targets = true, []string{"copilot"}
+	if _, err := Sync(context.Background(), e.deps, false); err != nil {
+		t.Fatal(err)
+	}
+	if exists(filepath.Join(e.project, ".github", "skills", "x")) {
+		t.Fatal("copilot folder not pruned")
+	}
+	if !exists(filepath.Join(e.project, ".claude", "skills", "x")) {
+		t.Fatal("prune touched the claude target despite --target copilot")
+	}
+}

@@ -61,6 +61,7 @@ Commit `cali.yaml` and `cali.lock`. On another machine or a fresh clone:
 cali sync          # install everything in cali.yaml at the commits in cali.lock
 cali sync -g       # install this project's cali.yaml into your home folder, for every project
 cali sync --frozen # CI: fail instead of changing cali.lock
+cali sync --prune  # also delete installed skills you just dropped from cali.yaml (unmodified only, backed up first); plain sync forgets them, so prune on the same run
 ```
 
 `cali sync -g` in a project is short for `cali sync -g --manifest cali.yaml`. Only `sync` makes that switch, so pass `--manifest cali.yaml` to later `-g` commands on those skills, for example `cali update -g --manifest cali.yaml --apply`.
@@ -92,7 +93,7 @@ export CALI_DEFAULT_SOURCE=github:rojcarranza/agent-skills
 | `cali show <name>` | One skill's source, commit, paths | `--json` |
 | `cali status` | Edits, newer commits, missing skills | `--exit-code`, `--offline`, `--json`, `--target` |
 | `cali remove <name>` | Back up and remove | `--force`, `--target` |
-| `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen`, `--target` |
+| `cali sync` | Install from `cali.yaml` / `cali.lock` | `--frozen`, `--prune`, `--target` |
 | `cali init` | Create an empty `cali.yaml` | |
 
 `--target claude|copilot` on sync, update, status, list and remove acts on that target only (`cali sync -g --target copilot` installs for Copilot only). `remove --target` keeps the skill in `cali.yaml` for its other targets.

@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/rojcarranza/cali/internal/backup"
 	"github.com/rojcarranza/cali/internal/gitx"
 	"github.com/rojcarranza/cali/internal/lock"
 	"github.com/rojcarranza/cali/internal/manifest"
@@ -49,13 +50,74 @@ func (a Action) String() string {
 // because it is not locked).
 var ErrSkipped = errors.New("one or more skills were skipped")
 
+// pruneStale removes, in every target of the scope, the folder of each skill
+// that cali.lock still has but the manifest dropped. A folder is removed only
+// when it is a real directory identical to the locked pristine copy, and only
+// after a backup; anything else is reported as kept.
+func pruneStale(d Deps, sc scope, l lock.Lock, stale []string, rep *Report) error {
+	for _, n := range stale {
+		base, haveBase, err := store.Get(d.Dirs.Data, l.Skills[n].Tree)
+		if err != nil {
+			return err
+		}
+		for _, tg := range targets.Names() {
+			if d.Targets != nil && !slices.Contains(d.Targets, tg) {
+				continue // --target limits prune too
+			}
+			dir, err := targets.Dir(tg, sc.scope, sc.root, d.Dirs.Home)
+			if err != nil {
+				return err
+			}
+			if sc.scope == targets.Project {
+				if err := noSymlinks(sc.root, dir); err != nil {
+					return err
+				}
+			}
+			final := filepath.Join(dir, n)
+			fi, err := os.Lstat(final)
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+			if !fi.IsDir() { // a symlink or file is never ours to delete
+				rep.Actions = append(rep.Actions, Action{Kind: "kept", Name: n, Target: tg, Detail: "not a folder"})
+				continue
+			}
+			have, err := skillfs.ReadDir(final)
+			if err != nil || !haveBase || !skillfs.Equal(have, base) {
+				rep.Actions = append(rep.Actions, Action{Kind: "kept", Name: n, Target: tg, Detail: "modified"})
+				continue
+			}
+			p, err := backup.Save(d.Dirs.Data, n, have, nil)
+			if err != nil {
+				return fmt.Errorf("back up %s: %w", final, err)
+			}
+			old, err := MoveAside(final, os.Rename)
+			if err != nil {
+				return err
+			}
+			if now, err := skillfs.ReadDir(old); err != nil || !skillfs.SameBytes(now, have) {
+				_ = os.Rename(old, final)
+				return fmt.Errorf("%s changed while it was being pruned; not removing it", final)
+			}
+			if err := os.RemoveAll(old); err != nil {
+				return fmt.Errorf("remove %s (moved to %s): %w", final, old, err)
+			}
+			rep.Actions = append(rep.Actions, Action{Kind: "pruned", Name: n, Target: tg, Detail: "backup " + p})
+		}
+	}
+	return nil
+}
+
 // Report is what Sync did.
 type Report struct{ Actions []Action }
 
 // Sync makes the scope's target folders match cali.lock (d.Global picks the
 // scope). Manifest skills missing from the lock are resolved and locked; lock
 // entries no longer in the manifest are dropped. With frozen, either case is
-// an error and nothing is written. Sync never deletes or overwrites a folder:
+// an error and nothing is written. Apart from prune, Sync never deletes or overwrites a folder:
 // a folder that differs is reported and left alone. A skill whose upstream folder
 // fails validation, or whose ref or folder is gone upstream before it is locked,
 // is reported as skipped, with its lock entry and folders left as they were;
@@ -357,6 +419,13 @@ func Sync(ctx context.Context, d Deps, frozen bool) (Report, error) {
 		}
 		made = append(made, j.final)
 		rep.Actions = append(rep.Actions, Action{Kind: "installed", Name: j.name, Target: j.target})
+	}
+
+	if d.Prune {
+		if err := pruneStale(d, sc, l, stale, &rep); err != nil {
+			rollback()
+			return Report{}, err
+		}
 	}
 
 	if !bytes.Equal(newL.Marshal(), l.Marshal()) {
