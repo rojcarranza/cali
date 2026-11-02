@@ -545,3 +545,64 @@ func TestSameRepoGlobalConfigStatus(t *testing.T) {
 		t.Fatalf("status: code=%d out=%q err=%q", code, out, errs)
 	}
 }
+
+// SCR-14 piece 2: the --prune flag reaches Sync.
+func TestSyncPruneFlag(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL+"//skills/x", "--target", "claude"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	dir := filepath.Join(project, ".claude", "skills", "x")
+	code, out, errs := run("sync", "--prune")
+	if code != 0 || !strings.HasPrefix(out, "pruned x (claude)") {
+		t.Fatalf("prune: code=%d out=%q err=%q", code, out, errs)
+	}
+	if _, err := os.Lstat(dir); !os.IsNotExist(err) {
+		t.Fatalf("folder still there: %v", err)
+	}
+}
+
+// Intent: SCR-14 piece 3. After adding x for both targets, doctor lists the
+// folders and flags the duplicate VS Code sees; dropping x from cali.yaml makes it a leftover.
+func TestDoctorFlagsDuplicateAndLeftover(t *testing.T) {
+	repoURL, project := setup(t)
+	if code, out, errs := run("add", repoURL, "--target", "claude", "--target", "copilot"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	code, out, errs := run("doctor", "--exit-code")
+	if code != 1 || !strings.Contains(out, "duplicate   x: VS Code Copilot Chat reads it in") || !strings.Contains(out, "1 problems") {
+		t.Fatalf("doctor: code=%d out=%q err=%q", code, out, errs)
+	}
+	if !strings.Contains(out, filepath.Join(project, ".github", "skills")+" (project): 1 skills") {
+		t.Fatalf("folder list missing: %q", out)
+	}
+	if err := os.WriteFile(filepath.Join(project, "cali.yaml"), []byte("version: 1\nskills: {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, out, _ = run("doctor")
+	if code != 0 || !strings.Contains(out, "leftover    x:") {
+		t.Fatalf("doctor leftover: code=%d out=%q", code, out)
+	}
+}
+
+// Intent: agent mode (AXI rules 5 and 6) puts the totals first; --json is valid JSON.
+func TestDoctorAgentModeAndJSON(t *testing.T) {
+	repoURL, _ := setup(t)
+	if code, out, errs := run("add", repoURL, "--target", "claude", "--target", "copilot"); code != 0 {
+		t.Fatalf("add: code=%d out=%q err=%q", code, out, errs)
+	}
+	_, out, _ := run("doctor", "--agent")
+	if !strings.HasPrefix(out, "1 problems\nVS Code Copilot Chat\n") {
+		t.Fatalf("agent output: %q", out)
+	}
+	_, out, _ = run("doctor", "--json")
+	var j struct {
+		Findings []struct{ Kind string } `json:"findings"`
+	}
+	if err := json.Unmarshal([]byte(out), &j); err != nil || len(j.Findings) != 1 || j.Findings[0].Kind != "duplicate" {
+		t.Fatalf("json: %v %q", err, out)
+	}
+}

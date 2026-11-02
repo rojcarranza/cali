@@ -44,6 +44,10 @@ type Deps struct {
 	Cwd string
 	// Global selects the global scope for Sync and Remove.
 	Global bool
+	// Targets is --target for Sync, Update, Remove: act on just these targets; nil means all.
+	Targets []string
+	// Prune makes Sync delete the installed folders of skills no longer in the manifest.
+	Prune bool
 	// Manifest is --manifest: the manifest file, relative to Cwd; the lock sits
 	// next to it and, in project scope, its dir is the project root. Empty means the default.
 	Manifest string
@@ -619,6 +623,9 @@ func pickPaths(repo *gitx.Repo, commit string, spec source.Spec, req AddRequest)
 		return nil, err
 	}
 	scanned := len(found)
+	if roots, ok := pluginSkillRoots(repo, commit); ok {
+		found = onlyPluginSkills(found, roots) // a plugin repo's own skills, not copies of them
+	}
 	if repo.Local() {
 		// Installed copies a project commits (<root>/.claude/skills, .github/skills) are not sources.
 		found = slices.DeleteFunc(found, func(p string) bool {
@@ -734,4 +741,43 @@ func NoSymlinks(root, dir string) error { return noSymlinks(root, dir) }
 // SKILL.md must name the skill name.
 func ExportTree(repo *gitx.Repo, tree, name string) (skillfs.Tree, error) {
 	return exportTree(repo, tree, name)
+}
+
+// Record writes entries into the scope's manifest without installing them
+// (`cali sync` does that); an entry whose name is already there is left alone
+// and returned in kept. A missing manifest is created.
+func Record(d Deps, global bool, entries map[string]manifest.Skill) (path string, added, kept []string, err error) {
+	opts := source.Options{AllowFile: d.AllowFileScheme}
+	sc, err := resolveScope(d, global)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	if err := checkScopeFiles(sc); err != nil {
+		return "", nil, nil, err
+	}
+	m, err := manifest.ReadWith(sc.manifest, opts)
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		m = manifest.Manifest{Version: 1, Targets: slices.Clone(defaultTargets), Skills: map[string]manifest.Skill{}}
+	case err != nil:
+		return "", nil, nil, err
+	}
+	if m.Skills == nil {
+		m.Skills = map[string]manifest.Skill{}
+	}
+	for _, name := range slices.Sorted(maps.Keys(entries)) {
+		if _, ok := m.Skills[name]; ok {
+			kept = append(kept, name)
+			continue
+		}
+		m.Skills[name] = entries[name]
+		added = append(added, name)
+	}
+	if len(added) == 0 {
+		return sc.manifest, nil, kept, nil
+	}
+	if err := os.MkdirAll(filepath.Dir(sc.manifest), 0o755); err != nil {
+		return "", nil, nil, err
+	}
+	return sc.manifest, added, kept, manifest.WriteWith(sc.manifest, m, opts)
 }

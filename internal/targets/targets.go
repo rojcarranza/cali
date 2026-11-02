@@ -3,7 +3,9 @@ package targets
 
 import (
 	"fmt"
+	"maps"
 	"path/filepath"
+	"slices"
 )
 
 // Scope is where a skill is installed: in a project or in the user's home.
@@ -39,3 +41,6 @@ func Dir(target string, scope Scope, projectRoot, home string) (string, error) {
 	}
 	return filepath.Join(base, filepath.FromSlash(rel)), nil
 }
+
+// Names returns every known target, sorted.
+func Names() []string { return slices.Sorted(maps.Keys(table)) }

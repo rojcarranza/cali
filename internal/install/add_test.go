@@ -617,3 +617,42 @@ func TestInitWritesDefaultManifest(t *testing.T) {
 		t.Fatalf("global init = %s, %v", g, err)
 	}
 }
+
+// SCR-14 piece 5: a Claude plugin repo installs the skills its .claude-plugin
+// manifest names, not the second copy caveman-style repos keep elsewhere.
+func TestAddReadsClaudePluginSkills(t *testing.T) {
+	copyOf := skillMD("a") + "copy\n"
+	cases := map[string]map[string]string{
+		"plugin.json": {
+			".claude-plugin/plugin.json": `{"name":"p","skills":"./plugin-skills"}`,
+			"plugin-skills/a/SKILL.md":   skillMD("a"),
+			"plugin-skills/b/SKILL.md":   skillMD("b"),
+			"mirror/a/SKILL.md":          copyOf,
+		},
+		"plugin.json default skills dir": {
+			".claude-plugin/plugin.json": `{"name":"p"}`,
+			"skills/a/SKILL.md":          skillMD("a"),
+			"skills/b/SKILL.md":          skillMD("b"),
+			"mirror/a/SKILL.md":          copyOf,
+		},
+		"marketplace.json": {
+			".claude-plugin/marketplace.json": `{"plugins":[{"name":"p","source":"./plugins/p"},{"name":"far","source":{"source":"github","repo":"o/r"}}]}`,
+			"plugins/p/skills/a/SKILL.md":     skillMD("a"),
+			"plugins/p/skills/b/SKILL.md":     skillMD("b"),
+			"mirror/a/SKILL.md":               copyOf,
+		},
+	}
+	for name, files := range cases {
+		t.Run(name, func(t *testing.T) {
+			r := repo(t, "plug", files)
+			e := newEnv(t)
+			res, err := Add(context.Background(), e.deps, AddRequest{Spec: fileURL(r)})
+			if err != nil || len(res.Skills) != 2 {
+				t.Fatalf("res = %+v, err = %v; want a and b once each", res, err)
+			}
+			if _, err := Add(context.Background(), newEnv(t).deps, AddRequest{Spec: fileURL(r), Skill: "a"}); err != nil {
+				t.Fatalf("named skill a: %v", err)
+			}
+		})
+	}
+}

@@ -2,7 +2,10 @@
 // (ADR 0005, ADR 0009).
 package dirs
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 // Dirs holds the resolved per-user directories and the home directory.
 type Dirs struct {
@@ -60,6 +63,40 @@ func WSLConfig(env func(string) string, config string, fs FS) (dir, note string)
 	}
 	return config, "several Windows homes hold a global cali.yaml (" + strings.Join(m, ", ") +
 		"); set CALI_CONFIG_DIR to the one to use"
+}
+
+// windowsHomeGlobs find Windows profile folders from WSL (ADR 0010), under the
+// same automount roots as wslConfigGlobs.
+var windowsHomeGlobs = []string{"/mnt/*/Users/*", "/*/Users/*"}
+
+// windowsSystemProfiles are folders under Users that are not a person's home.
+var windowsSystemProfiles = map[string]bool{"public": true, "default": true, "default user": true, "all users": true}
+
+// WindowsHome returns the Windows home that global installs target from WSL
+// (ADR 0010): $CALI_WINDOWS_HOME, else the one profile under the Windows
+// Users folder. With none or several it returns an error naming how to choose.
+func WindowsHome(env func(string) string, fs FS) (string, error) {
+	if v := env("CALI_WINDOWS_HOME"); v != "" {
+		return v, nil
+	}
+	if env("WSL_DISTRO_NAME") == "" {
+		return "", errors.New("--windows-home works only in WSL; set CALI_WINDOWS_HOME to use another folder")
+	}
+	var m []string
+	for _, g := range windowsHomeGlobs {
+		for _, p := range fs.glob(g) {
+			if !windowsSystemProfiles[strings.ToLower(p[strings.LastIndex(p, "/")+1:])] {
+				m = append(m, p)
+			}
+		}
+	}
+	switch len(m) {
+	case 1:
+		return m[0], nil
+	case 0:
+		return "", errors.New("no Windows home found under /mnt/*/Users; set CALI_WINDOWS_HOME to it")
+	}
+	return "", errors.New("several Windows homes found (" + strings.Join(m, ", ") + "); set CALI_WINDOWS_HOME to the one to use")
 }
 
 func (fs FS) exists(p string) bool { return fs.Exists != nil && fs.Exists(p) }

@@ -33,17 +33,23 @@ func exists(p string) (bool, error) {
 }
 
 func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
-	var frozen bool
+	var frozen, prune bool
+	var only []string
 	cmd := &cobra.Command{
 		Use:   "sync",
 		Short: "Install every skill in cali.lock; lock manifest skills that are not locked yet",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if err := validTargets(only); err != nil {
+				return err
+			}
 			d, err := deps(out)
 			if err != nil {
 				return err
 			}
+			d.Targets = only
 			d.Global = *global
+			d.Prune = prune
 			// -g in a project installs the project's cali.yaml into your home folder.
 			if *global && d.Manifest == "" {
 				if p, err := install.Locate(d, false); err == nil {
@@ -73,7 +79,9 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 			return err
 		},
 	}
+	targetFlag(cmd, &only)
 	cmd.Flags().BoolVar(&frozen, "frozen", false, "fail instead of changing cali.lock")
+	cmd.Flags().BoolVar(&prune, "prune", false, "delete installed skills no longer in cali.yaml (unmodified ones only, after a backup)")
 	return cmd
 }
 
@@ -81,7 +89,7 @@ func newSyncCmd(out io.Writer, global *bool) *cobra.Command {
 // every skill of $CALI_DEFAULT_SOURCE, otherwise it prints how to start.
 func firstRun(cmd *cobra.Command, d install.Deps, manifest string, frozen bool) error {
 	src := os.Getenv("CALI_DEFAULT_SOURCE")
-	if src != "" && !frozen && interactive(d.Stdout) {
+	if src != "" && !frozen && !agentMode && interactive(d.Stdout) {
 		ok, err := confirm(fmt.Sprintf("No %s yet. Install every skill from %s?", manifest, src))
 		if err != nil {
 			return err

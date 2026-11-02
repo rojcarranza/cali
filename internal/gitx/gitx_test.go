@@ -575,3 +575,25 @@ func TestOpenLocalReadsCheckedOutHead(t *testing.T) {
 		t.Fatalf("OpenLocal outside a repo: err = %v", err)
 	}
 }
+
+func TestReadFile(t *testing.T) {
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	write(t, dir, ".claude-plugin/plugin.json", `{"name":"p"}`, 0o644)
+	write(t, dir, "d/x.txt", "x\n", 0o644)
+	git(t, dir, "add", ".")
+	git(t, dir, "commit", "-q", "-m", "one")
+	r := openFetched(t, dir)
+	commit, err := r.Resolve("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := r.ReadFile(commit, ".claude-plugin/plugin.json"); err != nil || string(got) != `{"name":"p"}` {
+		t.Fatalf("ReadFile = %q, %v", got, err)
+	}
+	for _, p := range []string{"missing.json", "d", ".claude-plugin"} {
+		if _, err := r.ReadFile(commit, p); !errors.Is(err, ErrNotFound) {
+			t.Fatalf("ReadFile(%q) err = %v, want ErrNotFound", p, err)
+		}
+	}
+}

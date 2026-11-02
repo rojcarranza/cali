@@ -44,6 +44,14 @@ type Manifest struct {
 	Targets []string         `yaml:"targets,omitempty"`
 	Sources []string         `yaml:"sources,omitempty"`
 	Skills  map[string]Skill `yaml:"skills"`
+
+	only []string // --target: when set, TargetsFor keeps just these; never written
+}
+
+// Restrict returns m limited to targets for TargetsFor; nil lifts the limit.
+func (m Manifest) Restrict(targets []string) Manifest {
+	m.only = targets
+	return m
 }
 
 var (
@@ -58,10 +66,20 @@ func SkillNameValid(name string) bool { return nameRe.MatchString(name) && !devi
 
 // TargetsFor returns the skill's own targets if set, else the default targets.
 func (m Manifest) TargetsFor(name string) []string {
+	all := m.Targets
 	if s, ok := m.Skills[name]; ok && len(s.Targets) > 0 {
-		return s.Targets
+		all = s.Targets
 	}
-	return m.Targets
+	if m.only == nil {
+		return all
+	}
+	var kept []string
+	for _, t := range all {
+		if slices.Contains(m.only, t) {
+			kept = append(kept, t)
+		}
+	}
+	return kept
 }
 
 // Read loads and validates the manifest at path. Unknown keys are errors.

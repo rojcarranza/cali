@@ -18,6 +18,7 @@ import (
 
 	"github.com/rojcarranza/cali/internal/dirs"
 	"github.com/rojcarranza/cali/internal/install"
+	"github.com/rojcarranza/cali/internal/targets"
 )
 
 // version is printed by --version.
@@ -35,9 +36,13 @@ var dirsFS = dirs.FS{Exists: pathExists, Glob: filepath.Glob}
 // manifestPath is the persistent --manifest flag; newRoot resets it to "" for each run.
 var manifestPath string
 
+// windowsHome is the persistent --windows-home flag; newRoot resets it for each run.
+var windowsHome bool
+
 // Execute runs cali with args (without the program name) and returns the exit code.
 func Execute(args []string, out, errw io.Writer) int {
 	warnOut = errw
+	agentMode, ranCommand = wantsAgent(args), false
 	root := newRoot(out)
 	root.SetArgs(args)
 	root.SetOut(out)
@@ -46,13 +51,17 @@ func Execute(args []string, out, errw io.Writer) int {
 		if !errors.Is(err, errFindings) && !errors.Is(err, install.ErrSkipped) { // already reported on stdout
 			_, _ = fmt.Fprintln(errw, "cali: "+err.Error())
 		}
+		if agentMode && !ranCommand {
+			return exitUsage
+		}
 		return 1
 	}
 	return 0
 }
 
 func newRoot(out io.Writer) *cobra.Command {
-	var global bool
+	windowsHome = false
+	var global, agent bool
 	root := &cobra.Command{
 		Use:           "cali",
 		Short:         "Install and manage AI agent skills from git repositories",
@@ -60,8 +69,20 @@ func newRoot(out io.Writer) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	agentRun := agentPreRun(&agent)
+	root.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if err := agentRun(cmd, args); err != nil {
+			return err
+		}
+		if windowsHome && !global {
+			return errors.New("--windows-home needs -g")
+		}
+		return nil
+	}
+	root.PersistentFlags().BoolVar(&windowsHome, "windows-home", false, "with -g in WSL, install into your Windows home instead of the WSL one")
 	root.SetVersionTemplate("cali {{.Version}}\n")
 	root.PersistentFlags().BoolVarP(&global, "global", "g", false, "use the global scope (your home folder) instead of the project")
+	root.PersistentFlags().BoolVar(&agent, agentFlagName, false, "agent mode: never prompt, exit 2 on usage errors, print totals and next steps (or set CALI_AGENT=1)")
 	root.PersistentFlags().StringVar(&manifestPath, "manifest", "", "use this manifest file; the lock sits next to it (in project scope its folder is the project root)")
 
 	root.AddCommand(&cobra.Command{
@@ -103,8 +124,22 @@ func newRoot(out io.Writer) *cobra.Command {
 	add.Flags().StringSliceVar(&req.Targets, "target", nil, "target to install into: claude or copilot (repeatable)")
 	add.Flags().BoolVar(&req.Adopt, "adopt", false, "take over an existing folder that is not managed by Cali, as is")
 	root.AddCommand(add, newListCmd(out, &global), newShowCmd(out, &global), newStatusCmd(out, &global),
-		newSyncCmd(out, &global), newRemoveCmd(out, &global), newFindCmd(out, &global), newUpdateCmd(out, &global))
+		newSyncCmd(out, &global), newRemoveCmd(out, &global), newFindCmd(out, &global), newUpdateCmd(out, &global), newImportCmd(out, &global), newDoctorCmd(out, &global))
 	return root
+}
+
+// targetFlag adds --target to cmd; targetsOf validates it.
+func targetFlag(cmd *cobra.Command, v *[]string) {
+	cmd.Flags().StringSliceVar(v, "target", nil, "act on this target only: claude or copilot (repeatable)")
+}
+
+func validTargets(ts []string) error {
+	for _, t := range ts {
+		if _, err := targets.Dir(t, targets.Global, "", ""); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func deps(out io.Writer) (install.Deps, error) {
@@ -117,6 +152,13 @@ func deps(out io.Writer) (install.Deps, error) {
 		return install.Deps{}, err
 	}
 	ds := dirs.Resolve(runtime.GOOS, os.Getenv, home, dirsFS)
+	if windowsHome && runtime.GOOS != "windows" { // cali.exe already uses the Windows home
+		wh, err := dirs.WindowsHome(os.Getenv, dirsFS)
+		if err != nil {
+			return install.Deps{}, err
+		}
+		ds.Home = wh
+	}
 	warn := warnOut
 	return install.Deps{
 		Dirs: ds,
